@@ -19,27 +19,27 @@ namespace FluentBehaviorTree
         /// Repeat n times and return
         /// </summary>
         /// <returns></returns>
-        public override Status Tick()
+        protected override Status tick()
         {
-            Status status;
             if (n == -1)
             {             
                 while (true)
                 {
-                    status = child.Tick();
+                    this.Result = child.Tick();
 
-                    if (status == Status.ERROR) return status;
+                    if (this.Result == Status.ERROR) return this.Result;
                 }
             }
             else
             {
                 for (int i = 0; i < n; ++i)
                 {
-                    status = child.Tick();
-                    if (status == Status.ERROR) return status;
+                    this.Result = child.Tick();
+                    if (this.Result == Status.ERROR) return this.Result;
                 }
             }
-            return Status.SUCCESS;
+            this.Result = Status.SUCCESS;
+            return this.Result;
         }
     }
 }

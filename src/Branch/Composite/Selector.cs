@@ -17,12 +17,20 @@ namespace FluentBehaviorTree
         /// Propagate tick to children. Return FAILURE if no child succeeds
         /// </summary>
         /// <returns></returns>
-        public override Status Tick()
+        protected override Status tick()
         {
             foreach (var n in children)
             {
-                var status = n.Tick();
-                if (status != Status.FAILURE) return status;
+                if (n.IsClosed && n.Result == Status.SUCCESS)
+                {
+                    this.Result = Status.SUCCESS;
+                    return this.Result;
+                }
+                else if (!n.IsClosed)
+                {
+                    this.Result = n.Tick();
+                    if (this.Result != Status.FAILURE) return this.Result;
+                }
             }
             return Status.FAILURE;
         }

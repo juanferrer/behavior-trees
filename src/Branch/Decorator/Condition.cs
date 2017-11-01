@@ -19,20 +19,24 @@ namespace FluentBehaviorTree
         /// Return SUCCESS if the condition if met. Otherwise, FAILURE.
         /// </summary>
         /// <returns></returns>
-        public override Status Tick()
+        protected override Status tick()
         {
             try
             {
                 if (condition())
                 {
-                    var status = child.Tick();
-                    return status;
+                    this.Result = child.Tick();
                 }
-                else return Status.FAILURE;
+                else
+                {
+                    this.Result = Status.FAILURE;
+                }
+                return this.Result;
             }
             catch
             {
-                return Status.ERROR;
+                this.Result = Status.ERROR;
+                return this.Result;
             }
         }
     }

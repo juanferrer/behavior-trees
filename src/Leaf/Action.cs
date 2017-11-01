@@ -19,7 +19,7 @@ namespace FluentBehaviorTree
         /// Return result of action
         /// </summary>
         /// <returns></returns>
-        public override Status Tick()
+        protected override Status tick()
         {
             try
             {

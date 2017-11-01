@@ -17,12 +17,15 @@ namespace FluentBehaviorTree
         /// Regardless of result, return SUCCESS
         /// </summary>
         /// <returns></returns>
-        public override Status Tick()
+        protected override Status tick()
         {
-            var status = child.Tick();
+            this.Result = child.Tick();
 
-            if (status != Status.ERROR) return Status.SUCCESS;
-            else return status;
+            if (this.Result != Status.ERROR)
+            {
+                this.Result = Status.SUCCESS;
+            }
+            return this.Result;
         }
     }
 }

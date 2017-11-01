@@ -17,16 +17,16 @@ namespace FluentBehaviorTree
         /// Repeat until FAILURE
         /// </summary>
         /// <returns></returns>
-        public override Status Tick()
+        protected override Status tick()
         {
-            Status status;
             do
             {
-                status = child.Tick();
-                if (status == Status.ERROR) return status;
-            } while (status != Status.FAILURE);
+                this.Result = child.Tick();
+                if (this.Result == Status.ERROR) return this.Result;
+            } while (this.Result != Status.FAILURE);
 
-            return Status.SUCCESS;
+            this.Result = Status.SUCCESS;
+            return this.Result;
         }
     }
 }

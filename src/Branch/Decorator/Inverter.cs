@@ -17,13 +17,14 @@ namespace FluentBehaviorTree
         /// Works as NOT logic operator
         /// </summary>
         /// <returns></returns>
-        public override Status Tick()
+        protected override Status tick()
         {
-            var status = child.Tick();
+            this.Result = child.Tick();
 
-            if (status == Status.SUCCESS) return Status.FAILURE;
-            else if (status == Status.FAILURE) return Status.SUCCESS;
-            else return status;
+            if (this.Result == Status.SUCCESS) this.Result = Status.FAILURE;
+            else if (this.Result == Status.FAILURE) this.Result = Status.SUCCESS;
+
+            return this.Result;
         }
     }
 }

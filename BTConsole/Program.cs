@@ -9,144 +9,149 @@ namespace BTConsole
 {
     class Program
     {
-        static void Main(string[] args)
+        static bool isWayBlocked = false;
+        static bool isDoorLocked = true;
+        static bool haveKey = false;
+        static int STR = 10;
+        static int DC = 12;
+        static bool isDoorBroken = false;
+        static bool isWindowLocked = true;
+        static int ticked = 0;
+
+        static public Status GoToDoor()
         {
-            bool isWayBlocked = false;
-            bool isDoorLocked = true;
-            bool isWindowLocked = false;
-            int ticked = 0;
-
-            /*var repeater = new Repeater(6);
-
-            var root = new Sequence();
-
-            var goToDoor = new BehaviourTrees.Action(() =>
+            if (isWayBlocked)
             {
-                if (isWayBlocked)
-                {
-                    Console.WriteLine("The way is blocked");
-                    return Status.FAILURE;
-                }
-                else if (ticked < 5)
-                {
-                    Console.WriteLine("I'm on my way");
-                    ticked++;
-                    return Status.RUNNING;
-                }
-                else
-                {
-                    Console.WriteLine("I'm at the door");
-                    return Status.SUCCESS;
-                }
-            });
+                Console.WriteLine("The way is blocked");
+                return Status.FAILURE;
+            }
+            else if (ticked < 5)
+            {
+                Console.WriteLine("I'm on my way");
+                ticked++;
+                return Status.RUNNING;
+            }
+            else
+            {
+                Console.WriteLine("I'm at the door");
+                return Status.SUCCESS;
+            }
+        }
 
-            var openDoor = new BehaviourTrees.Action(() =>
+        static public Status OpenDoor()
+        {
+            if (isDoorLocked)
+            {
+                Console.WriteLine("Door is locked");
+                return Status.FAILURE;
+            }
+            else
             {
                 Console.WriteLine("Opening door");
-                return isDoorLocked ? Status.FAILURE : Status.SUCCESS;
-            });
-
-            var succeeder = new Succeeder();
-            var closeDoor = new BehaviourTrees.Action(() =>
-            {
-                Console.WriteLine("Closing door");
                 return Status.SUCCESS;
-            });
+            }
+        }
 
-            repeater.AddChild(root);
-            succeeder.AddChild(openDoor);
+        static public Status UnlockDoor()
+        {
+            if (!haveKey)
+            {
+                Console.WriteLine("Can't unlock the door");
+                return Status.FAILURE;
+            }
+            else
+            {
+                Console.WriteLine("Door unlocked");
+                return Status.SUCCESS;
+            }
+        }
 
-            root.AddChild(goToDoor);
-            root.AddChild(succeeder);
-            root.AddChild(closeDoor);
+        static public Status BreakDoor()
+        {
+            if (DC > STR)
+            {
+                Console.WriteLine("Door is too strong");
+                return Status.FAILURE;
+            }
+            else
+            {
+                Console.WriteLine("Breaking door");
+                isDoorBroken = true;
+                return Status.SUCCESS;
+            }
+        }
 
-            repeater.Tick();*/
+        static public bool IsDoorBroken()
+        {
+            return isDoorBroken;
+        }
+
+        static public Status CloseDoor()
+        {
+            Console.WriteLine("Closing door");
+            return Status.SUCCESS;
+        }
+
+        static public Status GoToWindow()
+        {
+            if (isWayBlocked)
+            {
+                Console.WriteLine("The way is blocked");
+                return Status.FAILURE;
+            }
+            else if (ticked < 9)
+            {
+                Console.WriteLine("I'm on my way");
+                ticked++;
+                return Status.RUNNING;
+            }
+            else
+            {
+                Console.WriteLine("I'm at the window");
+                return Status.SUCCESS;
+            }
+        }
+
+        static public Status OpenWindow()
+        {
+            if (isWindowLocked)
+            {
+                Console.WriteLine("Window is locked");
+                return Status.FAILURE;
+            }
+            else
+            {
+                Console.WriteLine("Opening window");
+                return Status.SUCCESS;
+            }
+        }
+
+        static public Status CloseWindow()
+        {
+            Console.WriteLine("Closing window");
+            return Status.SUCCESS;
+        }
+
+        static void Main(string[] args)
+        {
+
 
             BehaviorTree tree = new BehaviorTreeBuilder("Enter room")
-                .Repeat("Base loop", 9)
+                .Repeat("Base loop")
                     .Selector("Find an entrance")
                         .Sequence("Try door")
-                            .Do("Go to door", () =>
-                            {
-                                if (isWayBlocked)
-                                {
-                                    Console.WriteLine("The way is blocked");
-                                    return Status.FAILURE;
-                                }
-                                else if (ticked < 5)
-                                {
-                                    Console.WriteLine("I'm on my way");
-                                    ticked++;
-                                    return Status.RUNNING;
-                                }
-                                else
-                                {
-                                    Console.WriteLine("I'm at the door");
-                                    return Status.SUCCESS;
-                                }
-                            })
-                            .Do("Open door", () =>
-                            {
-                                if (isDoorLocked)
-                                {
-                                    Console.WriteLine("Door is locked");
-                                    return Status.FAILURE;
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Opening door");
-                                    return Status.SUCCESS;
-                                }
-                            })
-                            /*.Not("Door not broken")
-                                .If("Door broken?", () =>
-                                {
-                                    return false;
-                                })*/
-                            .Do("Close door", () =>
-                            {
-                                Console.WriteLine("Closing door");
-                                return Status.SUCCESS;
-                            })
+                            .Do("Go to door", GoToDoor)
+                            .Selector("Open door selector")
+                                .Do("Open door", OpenDoor)
+                                .Do("Unlock door", UnlockDoor)
+                                .Do("Break door down", BreakDoor)
+                            .End()
+                            .Do("Close door", CloseDoor)
                         .End()
                         .Sequence("Try window")
-                            .Do("Go to window", () =>
-                            {
-                                if (ticked < 8)
-                                {
-                                    Console.WriteLine("I'm on my way");
-                                    ticked++;
-                                    return Status.RUNNING;
-                                }
-                                else
-                                {
-                                    Console.WriteLine("I'm at the window");
-                                    return Status.SUCCESS;
-                                }
-                            })
-                            .Do("Open window", () =>
-                            {
-                                if (isWindowLocked)
-                                {
-                                    Console.WriteLine("Window is locked");
-                                    return Status.FAILURE;
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Opening window");
-                                    return Status.SUCCESS;
-                                }
-                            })
-                            /*.Not("Door not broken")
-                                .If("Door broken?", () =>
-                                {
-                                    return false;
-                                })*/
-                            .Do("Close window", () =>
-                            {
-                                Console.WriteLine("Closing window");
-                                return Status.SUCCESS;
-                            })
+                            .Do("Go to window", GoToWindow)
+                            .Do("Open window", OpenWindow)
+                            .Do("Close window", CloseWindow)
                         .End()
                     .End();
 
