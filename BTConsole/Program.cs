@@ -12,7 +12,7 @@ namespace BTConsole
         static bool isWayBlocked = false;
         static bool isDoorLocked = true;
         static bool haveKey = false;
-        static int STR = 10;
+        static int STR = 13;
         static int DC = 12;
         static bool isDoorBroken = false;
         static bool isWindowLocked = true;
@@ -88,8 +88,16 @@ namespace BTConsole
 
         static public Status CloseDoor()
         {
-            Console.WriteLine("Closing door");
-            return Status.SUCCESS;
+            if (!isDoorBroken)
+            {
+                Console.WriteLine("Closing door");
+                return Status.SUCCESS;
+            }
+            else
+            {
+                Console.WriteLine("Can't close a broken door");
+                return Status.FAILURE;
+            }
         }
 
         static public Status GoToWindow()
@@ -137,7 +145,7 @@ namespace BTConsole
 
 
             BehaviorTree tree = new BehaviorTreeBuilder("Enter room")
-                .Repeat("Base loop")
+                .RepeatUntilFail("Base loop")
                     .Selector("Find an entrance")
                         .Sequence("Try door")
                             .Do("Go to door", GoToDoor)
@@ -146,7 +154,8 @@ namespace BTConsole
                                 .Do("Unlock door", UnlockDoor)
                                 .Do("Break door down", BreakDoor)
                             .End()
-                            .Do("Close door", CloseDoor)
+                            .Ignore("Try to close door")
+                                .Do("Close door", CloseDoor)
                         .End()
                         .Sequence("Try window")
                             .Do("Go to window", GoToWindow)

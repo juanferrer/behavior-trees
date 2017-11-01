@@ -100,6 +100,34 @@ namespace FluentBehaviorTree
             return this;
         }
 
+        public BehaviorTreeBuilder RepeatUntilFail(string name)
+        {
+            var currentNode = new RepeatUntilFail();
+
+            if (parentNodes.Count > 0)
+            {
+                (parentNodes.Peek() as Branch).AddChild(currentNode);
+            }
+
+            parentNodes.Push(currentNode);
+
+            return this;
+        }
+
+        public BehaviorTreeBuilder Ignore(string name)
+        {
+            var currentNode = new Succeeder();
+
+            if (parentNodes.Count > 0)
+            {
+                (parentNodes.Peek() as Branch).AddChild(currentNode);
+            }
+
+            parentNodes.Push(currentNode);
+
+            return this;
+        }
+
         /*********************/
         /***** COMPOSITE *****/
         /*********************/
