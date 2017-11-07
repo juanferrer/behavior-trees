@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FluentBehaviorTree
 {
-    public class Condition : Decorator
+    public class Condition : Leaf
     {
         private Func<bool> condition;
 
@@ -23,20 +23,11 @@ namespace FluentBehaviorTree
         {
             try
             {
-                if (condition())
-                {
-                    this.Result = child.Tick();
-                }
-                else
-                {
-                    this.Result = Status.FAILURE;
-                }
-                return this.Result;
+                return condition() ? Status.SUCCESS : Status.FAILURE;
             }
             catch
             {
-                this.Result = Status.ERROR;
-                return this.Result;
+                return Status.ERROR;
             }
         }
     }

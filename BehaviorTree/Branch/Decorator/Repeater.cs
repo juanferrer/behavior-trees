@@ -10,7 +10,7 @@ namespace FluentBehaviorTree
     {
         private int n;
 
-        public Repeater(int times = -1)
+        public Repeater(int times = 0)
         {
             n = times;
         }
@@ -21,7 +21,7 @@ namespace FluentBehaviorTree
         /// <returns></returns>
         protected override Status tick()
         {
-            if (n == -1)
+            if (n == 0)
             {             
                 while (true)
                 {

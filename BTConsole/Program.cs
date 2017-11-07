@@ -18,14 +18,14 @@ namespace BTConsole
         static bool isWindowLocked = true;
         static int ticked = 0;
 
+        static public bool IsWayBlocked()
+        {
+            return isWayBlocked;
+        }
+
         static public Status GoToDoor()
         {
-            if (isWayBlocked)
-            {
-                Console.WriteLine("The way is blocked");
-                return Status.FAILURE;
-            }
-            else if (ticked < 5)
+            if (ticked < 5)
             {
                 Console.WriteLine("I'm on my way");
                 ticked++;
@@ -148,6 +148,8 @@ namespace BTConsole
                 .RepeatUntilFail("Base loop")
                     .Selector("Find an entrance")
                         .Sequence("Try door")
+                            .Not("Way is not blocked")
+                                .If("Is way blocked?", IsWayBlocked)
                             .Do("Go to door", GoToDoor)
                             .Selector("Open door selector")
                                 .Do("Open door", OpenDoor)
@@ -163,6 +165,44 @@ namespace BTConsole
                             .Do("Close window", CloseWindow)
                         .End()
                     .End();
+
+            /*BehaviorTree tree = new BehaviorTreeBuilder("Enter room")
+            .RepeatUntilFail("Root")
+                .Selector("Selector")
+                    .Sequence("LookNChase")
+                        .If("SawPlayerInLastXSecs", () => { })
+                        .Selector("Selector")
+                            .Sequence("Scan for player")
+                                .If("IsAlertMeterNotFull", () => { })
+                                .Do("LookToLastSeenPlayerPos", () => { })
+                            .End()
+                            .Sequence("ChasePlayerSequence")
+                                .Do("GoToLastSeenPlayerPos", () => { })
+                                .If("ReachedLastSeenPlayerPos", () => { })
+                                .Do("LookAroundLastSeenPlayerPos", () => { })
+                            .End()
+                            .Do("StillChasingPlayer", () => { })
+                        .End()
+                        .Sequence("Search")
+                            .If("GuardSearchActive", () => { })
+                            .Sequence("CheckSearchPointSequence")
+                                .Do("WalkToSearchPoint", () => { })
+                                .Do("WaitTillSearchPoint", () => { })
+                                .Do("SweepAndResetAction", () => { })
+                            .End()
+                            .Sequence("Patrol")
+                                .If("HasReachedWaypoint", () => { })
+                                .If("HasPausedXSecs", () => { })
+                                .If("HasLooked", () => { })
+                                .If("HasPausedXSecsAgain", () => { })
+                                .Do("ChangeWaypoint", () => { })
+                                .Do("LookToNextWayPoint", () => { })
+                                .Do("MoveToNextWaypoint", () => { })
+                            .End()
+                        .End()
+                    .End()
+                .End();*/
+
 
             tree.Tick();
 

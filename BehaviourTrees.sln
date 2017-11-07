@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BehaviourTrees", "BehaviourTrees.csproj", "{78661BB1-28D3-4D2F-B463-974C06060741}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BehaviourTrees", ".\BehaviorTree\BehaviorTrees.csproj", "{78661BB1-28D3-4D2F-B463-974C06060741}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BTConsole", "..\BTConsole\BTConsole.csproj", "{DEF3B3F3-55B9-472F-B270-EFDD6B34D045}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BTConsole", ".\BTConsole\BTConsole.csproj", "{DEF3B3F3-55B9-472F-B270-EFDD6B34D045}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BTMLParser", ".\BTMLParser\BTMLParser.csproj", "{2BF0C6C3-66F5-425E-9FD9-424E0F3325FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{DEF3B3F3-55B9-472F-B270-EFDD6B34D045}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DEF3B3F3-55B9-472F-B270-EFDD6B34D045}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DEF3B3F3-55B9-472F-B270-EFDD6B34D045}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BF0C6C3-66F5-425E-9FD9-424E0F3325FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BF0C6C3-66F5-425E-9FD9-424E0F3325FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BF0C6C3-66F5-425E-9FD9-424E0F3325FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BF0C6C3-66F5-425E-9FD9-424E0F3325FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

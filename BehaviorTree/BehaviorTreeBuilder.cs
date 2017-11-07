@@ -36,17 +36,13 @@ namespace FluentBehaviorTree
                 (parentNodes.Peek() as Branch).AddChild(currentNode);
             }
 
-            while (parentNodes.Peek() is Decorator)
+            while (parentNodes.Count > 1 && parentNodes.Peek() is Decorator)
             {
                 parentNodes.Pop();              // Remove decorators from parentNodes until you reach next Composite
             }
 
             return this;
         }
-
-        /*********************/
-        /***** DECORATOR *****/
-        /*********************/
 
         /// <summary>
         /// Add condition
@@ -63,9 +59,17 @@ namespace FluentBehaviorTree
                 (parentNodes.Peek() as Branch).AddChild(currentNode);
             }
 
-            parentNodes.Push(currentNode);
+            while (parentNodes.Count > 1 && parentNodes.Peek() is Decorator)
+            {
+                parentNodes.Pop();              // Remove decorators from parentNodes until you reach next Composite
+            }
+
             return this;
         }
+
+        /*********************/
+        /***** DECORATOR *****/
+        /*********************/
 
         /// <summary>
         /// Negate child
@@ -86,7 +90,7 @@ namespace FluentBehaviorTree
             return this;
         }
 
-        public BehaviorTreeBuilder Repeat(string name, int n = -1)
+        public BehaviorTreeBuilder Repeat(string name, int n = 0)
         {
             var currentNode = new Repeater(n);
 
