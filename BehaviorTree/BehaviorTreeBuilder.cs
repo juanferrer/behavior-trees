@@ -90,6 +90,12 @@ namespace FluentBehaviorTree
             return this;
         }
 
+        /// <summary>
+        /// Repeatedly tick child n times. If n == 0, tick forever
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="n"></param>
+        /// <returns></returns>
         public BehaviorTreeBuilder Repeat(string name, int n = 0)
         {
             var currentNode = new Repeater(n);
@@ -104,6 +110,11 @@ namespace FluentBehaviorTree
             return this;
         }
 
+        /// <summary>
+        /// Repeatedly tick child until FAILURE is returned
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public BehaviorTreeBuilder RepeatUntilFail(string name)
         {
             var currentNode = new RepeatUntilFail();
@@ -118,6 +129,11 @@ namespace FluentBehaviorTree
             return this;
         }
 
+        /// <summary>
+        /// Tick child and return SUCCESS
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public BehaviorTreeBuilder Ignore(string name)
         {
             var currentNode = new Succeeder();
