@@ -10,6 +10,10 @@
 				# Break door down
 			^ Try to close door
 				# Close door
+		& Check if anyone comes
+			" Wait for people to come
+				? Someone came
+			# Ask them to open door
 		& Try window
 			# Go to window
 			# Open window

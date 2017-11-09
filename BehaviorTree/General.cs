@@ -8,9 +8,9 @@ namespace FluentBehaviorTree
 {
     public enum Status
     {
-        SUCCESS,
-        FAILURE,
-        RUNNING,
-        ERROR
+        RUNNING = 0,
+        SUCCESS = 1,
+        FAILURE = 2,
+        ERROR = 3
     }
 }

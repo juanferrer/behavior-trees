@@ -148,6 +148,20 @@ namespace FluentBehaviorTree
             return this;
         }
 
+        public BehaviorTreeBuilder Wait(string name, ulong ms)
+        {
+            var currentNode = new Timer(ms);
+
+            if (parentNodes.Count > 0)
+            {
+                (parentNodes.Peek() as Branch).AddChild(currentNode);
+            }
+
+            parentNodes.Push(currentNode);
+
+            return this;
+        }
+
         /*********************/
         /***** COMPOSITE *****/
         /*********************/

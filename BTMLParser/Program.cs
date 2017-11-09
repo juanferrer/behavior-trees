@@ -9,6 +9,7 @@ namespace BTMLParser
 {
     class Program
     {
+        static char[] separatorArray = {' '};
         static void Main(string[] args)
         {
             if (args.Length > 0)
@@ -20,7 +21,8 @@ namespace BTMLParser
                 int tabNum = 0;
                 string s = "";
                 string type = "";
-                string output = "BehaviorTree tree = new BehaviorTreeBuilder(\"Enter room\")";
+                string output = "BehaviorTree tree = new BehaviorTreeBuilder(\"\")";
+                string[] parts;
                 foreach (var line in lines)
                 {
                     tabNum = line.Count(ch => ch == '\t');
@@ -30,46 +32,51 @@ namespace BTMLParser
                         levelsOpen--;
                     }
                     s = line.Substring(tabNum);
-                    type = s[0].ToString();
+                    parts = s.Split(separatorArray, 2);
+                    type = parts[0];
                     if (type == "#")
                     {
-                        output += "\n.Do(\"" + s.Substring(2) + "\", () => {})";
+                        output += "\n.Do(\"" + parts[1] + "\", () => {})";
                     }
                     else if (type == "&")
                     {
-                        output += "\n.Sequence(\"" + s.Substring(2) + "\")";
+                        output += "\n.Sequence(\"" + parts[1] + "\")";
                         currentLevel = tabNum;
                         levelsOpen++;
                     }
                     else if (type == "|")
                     {
-                        output += "\n.Selector(\"" + s.Substring(2) + "\")";
+                        output += "\n.Selector(\"" + parts[1] + "\")";
                         currentLevel = tabNum;
                         levelsOpen++;
                     }
                     else if (type == "?")
                     {
-                        output += "\n.If(\"" + s.Substring(2) + "\", () => {})";
+                        output += "\n.If(\"" + parts[1] + "\", () => {})";
                     }
                     else if (type == "!")
                     {
-                        output += "\n.Not(\"" + s.Substring(2) + "\")";
+                        output += "\n.Not(\"" + parts[1] + "\")";
                     }
                     else if (Regex.IsMatch(type, @"\d"))
                     {
                         int result;
                         if (int.TryParse(type, out result))
                         {
-                            output += "\n.Repeat(\"" + s.Substring(2) + (result > 0 ? "\", " + result.ToString() : "") + ")";
+                            output += "\n.Repeat(\"" + parts[1] + (result > 0 ? "\", " + result.ToString() : "") + ")";
                         }
                     }
                     else if (type == "*")
                     {
-                        output += "\n.RepeatUntilFail(\"" + s.Substring(2) + "\")";
+                        output += "\n.RepeatUntilFail(\"" + parts[1] + "\")";
                     }
                     else if (type == "^")
                     {
-                        output += "\n.Ignore(\"" + s.Substring(2) + "\")";
+                        output += "\n.Ignore(\"" + parts[1] + "\")";
+                    }
+                    else if (type == "\"")
+                    {
+                        output += "\n.Wait(\"" + parts[1] + "\", 0)";
                     }
                     else
                     {

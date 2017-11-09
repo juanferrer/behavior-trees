@@ -14,5 +14,15 @@ namespace FluentBehaviorTree
         {
             children.Add(n);
         }
+
+        protected override void Open()
+        {
+            base.Open();
+
+            foreach (var child in children)
+            {
+                child.Result = Status.RUNNING;
+            }
+        }
     }
 }

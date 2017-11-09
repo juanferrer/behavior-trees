@@ -9,8 +9,7 @@ namespace FluentBehaviorTree
     public abstract class Node
     {
         public string Name { get; private set; }
-        public bool IsClosed { get; private set; }
-        public bool IsOpen { get; private set; }
+        public bool IsOpen { get; protected set; }
         public Status Result { get; set; }
 
         /// <summary>
@@ -43,10 +42,11 @@ namespace FluentBehaviorTree
         /// <summary>
         /// Open node only if node has not been opened before
         /// </summary>
-        private void Open()
+        protected virtual void Open()
         {
             IsOpen = true;
-            IsClosed = false;
+
+            this.Result = Status.RUNNING;
         }
 
         /// <summary>
@@ -68,7 +68,6 @@ namespace FluentBehaviorTree
         private void Close()
         {
             IsOpen = false;
-            IsClosed = true;
         }
 
     }

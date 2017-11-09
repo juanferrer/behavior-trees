@@ -23,12 +23,14 @@ namespace FluentBehaviorTree
         {
             try
             {
-                return condition() ? Status.SUCCESS : Status.FAILURE;
+               this.Result = condition() ? Status.SUCCESS : Status.FAILURE;
+
             }
             catch
             {
-                return Status.ERROR;
+                this.Result = Status.ERROR;
             }
+            return this.Result;
         }
     }
 }

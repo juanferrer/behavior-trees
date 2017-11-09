@@ -44,6 +44,7 @@
     <Compile Include="Branch\Branch.cs" />
     <Compile Include="Branch\Decorator\RepeatUntilFail.cs" />
     <Compile Include="Branch\Decorator\Repeater.cs" />
+    <Compile Include="Branch\Decorator\Timer.cs" />
     <Compile Include="Leaf\Action.cs" />
     <Compile Include="Leaf\Condition.cs" />
     <Compile Include="BehaviorTree.cs" />

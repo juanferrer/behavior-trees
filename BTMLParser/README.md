@@ -37,3 +37,6 @@ Run child until it fails.
 
 ### `^` - *Succeeder*
 Run child and suceed.
+
+### `"` - *Timer*
+Wait X and run child

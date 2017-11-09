@@ -19,20 +19,24 @@ namespace FluentBehaviorTree
         /// <returns></returns>
         protected override Status tick()
         {
-            foreach (var n in children)
+            if (this.Result == Status.RUNNING)
             {
-                if (n.IsClosed && n.Result == Status.FAILURE)
+                foreach (var n in children)
                 {
-                    this.Result = Status.FAILURE;
-                    return this.Result;
+                    if (!n.IsOpen && n.Result == Status.FAILURE)
+                    {
+                        this.Result = Status.FAILURE;
+                        return this.Result;
+                    }
+                    else if (n.Result == Status.RUNNING)
+                    {
+                        this.Result = n.Tick();
+                        if (this.Result != Status.SUCCESS) return this.Result;
+                    }
                 }
-                else if (!n.IsClosed)
-                {
-                    this.Result = n.Tick();
-                    if (this.Result != Status.SUCCESS) return this.Result;
-                }
+                this.Result = Status.SUCCESS;
             }
-            return Status.SUCCESS;
+            return this.Result;
         }
     }
 }

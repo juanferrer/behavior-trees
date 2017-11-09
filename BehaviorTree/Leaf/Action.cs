@@ -23,12 +23,13 @@ namespace FluentBehaviorTree
         {
             try
             {
-                return action();
+                this.Result = action();
             }
             catch
             {
-                return Status.ERROR;
+                this.Result = Status.ERROR;
             }
+            return this.Result;
         }
     }
 }
