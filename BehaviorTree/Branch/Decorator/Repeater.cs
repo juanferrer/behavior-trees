@@ -23,7 +23,7 @@ namespace FluentBehaviorTree
         protected override Status tick()
         {
             if (n == 0)
-            {             
+            {
                 while (true)
                 {
                     this.Result = child.Tick();
@@ -35,8 +35,12 @@ namespace FluentBehaviorTree
             {
                 for (int i = 0; i < n; ++i)
                 {
-                    this.Result = child.Tick();
-                    if (this.Result == Status.ERROR) return this.Result;
+                    Console.WriteLine("\t\t Tick number {0}", i);
+                    do
+                    {
+                        this.Result = child.Tick();
+                        if (this.Result == Status.ERROR) return this.Result;
+                    } while (child.IsOpen);
                 }
             }
             this.Result = Status.SUCCESS;
