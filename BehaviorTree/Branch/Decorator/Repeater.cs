@@ -35,7 +35,6 @@ namespace FluentBehaviorTree
             {
                 for (int i = 0; i < n; ++i)
                 {
-                    Console.WriteLine("\t\t Tick number {0}", i);
                     do
                     {
                         this.Result = child.Tick();
