@@ -10,8 +10,9 @@ namespace FluentBehaviorTree
     {
         private Func<Status> action;
 
-        public Action(Func<Status> f)
+        public Action(string name, Func<Status> f)
         {
+            this.Name = name;
             action = f;
         }
 

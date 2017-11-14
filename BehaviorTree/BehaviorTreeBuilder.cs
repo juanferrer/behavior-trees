@@ -29,7 +29,7 @@ namespace FluentBehaviorTree
         /// <returns></returns>
         public BehaviorTreeBuilder Do(string name, Func<Status> f)
         {
-            var currentNode = new Action(f);
+            var currentNode = new Action(name, f);
 
             if (parentNodes.Count > 0)
             {
@@ -52,7 +52,7 @@ namespace FluentBehaviorTree
         /// <returns></returns>
         public BehaviorTreeBuilder If(string name, Func<bool> f)
         {
-            var currentNode = new Condition(f);
+            var currentNode = new Condition(name, f);
 
             if (parentNodes.Count > 0)
             {
@@ -78,7 +78,7 @@ namespace FluentBehaviorTree
         /// <returns></returns>
         public BehaviorTreeBuilder Not(string name)
         {
-            var currentNode = new Inverter();
+            var currentNode = new Inverter(name);
 
             if (parentNodes.Count > 0)
             {
@@ -98,7 +98,7 @@ namespace FluentBehaviorTree
         /// <returns></returns>
         public BehaviorTreeBuilder Repeat(string name, int n = 0)
         {
-            var currentNode = new Repeater(n);
+            var currentNode = new Repeater(name, n);
 
             if (parentNodes.Count > 0)
             {
@@ -117,7 +117,7 @@ namespace FluentBehaviorTree
         /// <returns></returns>
         public BehaviorTreeBuilder RepeatUntilFail(string name)
         {
-            var currentNode = new RepeatUntilFail();
+            var currentNode = new RepeatUntilFail(name);
 
             if (parentNodes.Count > 0)
             {
@@ -136,7 +136,7 @@ namespace FluentBehaviorTree
         /// <returns></returns>
         public BehaviorTreeBuilder Ignore(string name)
         {
-            var currentNode = new Succeeder();
+            var currentNode = new Succeeder(name);
 
             if (parentNodes.Count > 0)
             {
@@ -150,7 +150,7 @@ namespace FluentBehaviorTree
 
         public BehaviorTreeBuilder Wait(string name, ulong ms)
         {
-            var currentNode = new Timer(ms);
+            var currentNode = new Timer(name, ms);
 
             if (parentNodes.Count > 0)
             {
@@ -173,7 +173,7 @@ namespace FluentBehaviorTree
         /// <returns></returns>
         public BehaviorTreeBuilder Sequence(string name)
         {
-            var currentNode = new Sequence();
+            var currentNode = new Sequence(name);
 
             if (parentNodes.Count > 0)
             {
@@ -192,7 +192,7 @@ namespace FluentBehaviorTree
         /// <returns></returns>
         public BehaviorTreeBuilder Selector(string name)
         {
-            var currentNode = new Selector();
+            var currentNode = new Selector(name);
 
             if (parentNodes.Count > 0)
             {

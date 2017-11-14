@@ -8,9 +8,9 @@ namespace FluentBehaviorTree
 {
     public class Succeeder : Decorator
     {
-        public Succeeder()
+        public Succeeder(string name)
         {
-
+            this.Name = name;
         }
 
         /// <summary>

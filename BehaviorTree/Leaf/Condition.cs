@@ -10,8 +10,9 @@ namespace FluentBehaviorTree
     {
         private Func<bool> condition;
 
-        public Condition(Func<bool> f)
+        public Condition(string name, Func<bool> f)
         {
+            this.Name = name;
             condition = f;
         }
 

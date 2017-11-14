@@ -10,8 +10,9 @@ namespace FluentBehaviorTree
     {
         private int n;
 
-        public Repeater(int times = 0)
+        public Repeater(string name, int times = 0)
         {
+            this.Name = name;
             n = times;
         }
 

@@ -8,7 +8,7 @@ namespace FluentBehaviorTree
 {
     public abstract class Node
     {
-        public string Name { get; private set; }
+        public string Name { get; protected set; }
         public bool IsOpen { get; protected set; }
         public Status Result { get; set; }
 

@@ -8,9 +8,9 @@ namespace FluentBehaviorTree
 {
     public class Inverter : Decorator
     {
-        public Inverter()
+        public Inverter(string name)
         {
-
+            this.Name = name;
         }
 
         /// <summary>

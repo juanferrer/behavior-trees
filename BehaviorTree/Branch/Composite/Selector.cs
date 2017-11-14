@@ -8,8 +8,9 @@ namespace FluentBehaviorTree
 {
     public class Selector : Composite
     {
-        public Selector()
+        public Selector(string name)
         {
+            this.Name = name;
             children = new List<Node>();
         }
 

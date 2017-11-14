@@ -8,9 +8,9 @@ namespace FluentBehaviorTree
 {
     public class RepeatUntilFail : Decorator
     {
-        public RepeatUntilFail()
+        public RepeatUntilFail(string name)
         {
-
+            this.Name = name;
         }
 
         /// <summary>

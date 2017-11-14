@@ -37,8 +37,9 @@ namespace FluentBehaviorTree
 
         private Status innerResult = Status.RUNNING;
 
-        public Timer(ulong ms)
+        public Timer(string name, ulong ms)
         {
+            this.Name = name;
             timer = new System.Timers.Timer(ms);
         }
 

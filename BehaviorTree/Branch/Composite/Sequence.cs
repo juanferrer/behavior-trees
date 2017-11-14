@@ -8,8 +8,9 @@ namespace FluentBehaviorTree
 {
     public class Sequence : Composite
     {
-        public Sequence()
+        public Sequence(string name)
         {
+            this.Name = name;
             children = new List<Node>();
         }
 
