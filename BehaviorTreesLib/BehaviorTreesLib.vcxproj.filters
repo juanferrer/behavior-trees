@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Branch">
+      <UniqueIdentifier>{e4e2e00c-cb2f-4012-b9e4-98a0c1a87b0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Branch\Composite">
+      <UniqueIdentifier>{b2a82925-9276-401e-a0d1-e2bcbf6fdfd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Branch\Decorator">
+      <UniqueIdentifier>{a568b194-2bcb-4072-a609-0eb61684229e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Leaf">
+      <UniqueIdentifier>{ee3994a2-f9ca-4758-93fd-c68cf2cea88b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Brandh">
+      <UniqueIdentifier>{37801ab2-258c-400d-8a79-cd1a9ee58761}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Leaf">
+      <UniqueIdentifier>{a4e27156-ff7e-4e13-a9c1-7605da645a00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Brandh\Composite">
+      <UniqueIdentifier>{0106131e-f2d5-4c51-82aa-734358793f56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Brandh\Decorator">
+      <UniqueIdentifier>{87e05253-ea14-442d-a73c-45589f5ff878}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="General.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Branch.h">
+      <Filter>Header Files\Branch</Filter>
+    </ClInclude>
+    <ClInclude Include="Action.h">
+      <Filter>Header Files\Leaf</Filter>
+    </ClInclude>
+    <ClInclude Include="Condition.h">
+      <Filter>Header Files\Leaf</Filter>
+    </ClInclude>
+    <ClInclude Include="Leaf.h">
+      <Filter>Header Files\Leaf</Filter>
+    </ClInclude>
+    <ClInclude Include="Composite.h">
+      <Filter>Header Files\Branch\Composite</Filter>
+    </ClInclude>
+    <ClInclude Include="Selector.h">
+      <Filter>Header Files\Branch\Composite</Filter>
+    </ClInclude>
+    <ClInclude Include="Sequence.h">
+      <Filter>Header Files\Branch\Composite</Filter>
+    </ClInclude>
+    <ClInclude Include="Decorator.h">
+      <Filter>Header Files\Branch\Decorator</Filter>
+    </ClInclude>
+    <ClInclude Include="Inverter.h">
+      <Filter>Header Files\Branch\Decorator</Filter>
+    </ClInclude>
+    <ClInclude Include="Repeater.h">
+      <Filter>Header Files\Branch\Decorator</Filter>
+    </ClInclude>
+    <ClInclude Include="RepeatUntilFail.h">
+      <Filter>Header Files\Branch\Decorator</Filter>
+    </ClInclude>
+    <ClInclude Include="Succeeder.h">
+      <Filter>Header Files\Branch\Decorator</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Header Files\Branch\Decorator</Filter>
+    </ClInclude>
+    <ClInclude Include="BehaviorTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Node.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Action.cpp">
+      <Filter>Source Files\Leaf</Filter>
+    </ClCompile>
+    <ClCompile Include="Condition.cpp">
+      <Filter>Source Files\Leaf</Filter>
+    </ClCompile>
+    <ClCompile Include="BehaviorTree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Composite.cpp">
+      <Filter>Source Files\Brandh\Composite</Filter>
+    </ClCompile>
+    <ClCompile Include="Selector.cpp">
+      <Filter>Source Files\Brandh\Composite</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequence.cpp">
+      <Filter>Source Files\Brandh\Composite</Filter>
+    </ClCompile>
+    <ClCompile Include="Decorator.cpp">
+      <Filter>Source Files\Brandh\Decorator</Filter>
+    </ClCompile>
+    <ClCompile Include="Inverter.cpp">
+      <Filter>Source Files\Brandh\Decorator</Filter>
+    </ClCompile>
+    <ClCompile Include="Repeater.cpp">
+      <Filter>Source Files\Brandh\Decorator</Filter>
+    </ClCompile>
+    <ClCompile Include="RepeatUntilFail.cpp">
+      <Filter>Source Files\Brandh\Decorator</Filter>
+    </ClCompile>
+    <ClCompile Include="Succeeder.cpp">
+      <Filter>Source Files\Brandh\Decorator</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Source Files\Brandh\Decorator</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

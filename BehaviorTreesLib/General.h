@@ -3,13 +3,13 @@
 
 namespace fluentBehaviorTree
 {
-	enum EStatus
+	enum class EStatus
 	{
 		RUNNING = 0,
 		SUCCESS = 1,
 		FAILURE = 2,
 		ERROR = 3
 	};
-} // namespace fluentBehaviorTree
+}
 
 #endif 
