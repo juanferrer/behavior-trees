@@ -16,9 +16,12 @@ namespace fluentBehaviorTree
 		BehaviorTree(std::string name, Node& root);
 
 		std::string getName() { return mName; }
-		void setName(std::string name) { mName = name; }
 
 		// Tick tree to navigate and get result
 		EStatus tick();
+
+
+	protected:
+		void setName(std::string name) { mName = name; }
 	};
 }

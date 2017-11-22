@@ -148,6 +148,12 @@ namespace FluentBehaviorTree
             return this;
         }
 
+        /// <summary>
+        /// Wait ms seconds and execute node
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="ms"></param>
+        /// <returns></returns>
         public BehaviorTreeBuilder Wait(string name, ulong ms)
         {
             var currentNode = new Timer(name, ms);

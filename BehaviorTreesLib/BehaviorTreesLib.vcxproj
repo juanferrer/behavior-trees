@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Action.h" />
     <ClInclude Include="BehaviorTree.h" />
+    <ClInclude Include="BehaviorTreeBuilder.h" />
     <ClInclude Include="Branch.h" />
     <ClInclude Include="Composite.h" />
     <ClInclude Include="Condition.h" />
@@ -39,6 +40,7 @@
   <ItemGroup>
     <ClCompile Include="Action.cpp" />
     <ClCompile Include="BehaviorTree.cpp" />
+    <ClCompile Include="BehaviorTreeBuilder.cpp" />
     <ClCompile Include="Composite.cpp" />
     <ClCompile Include="Condition.cpp" />
     <ClCompile Include="Decorator.cpp" />

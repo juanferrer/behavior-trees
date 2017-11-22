@@ -17,7 +17,7 @@ namespace fluentBehaviorTree
 		this->onTimeout();
 	}
 
-	Timer::Timer(std::string name, int ms)
+	Timer::Timer(std::string name, size_t ms)
 	{
 		this->setName(name);
 		mMS = ms;

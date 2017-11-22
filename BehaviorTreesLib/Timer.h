@@ -16,7 +16,7 @@ namespace fluentBehaviorTree
 		bool timerSet;
 
 	public:
-		Timer(std::string name, int ms);
+		Timer(std::string name, size_t ms);
 
 	protected:
 		void open() override;
