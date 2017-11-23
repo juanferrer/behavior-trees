@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BehaviorTrees", "BehaviorTree\BehaviorTrees.csproj", "{78661BB1-28D3-4D2F-B463-974C06060741}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BehaviorTrees", "C#\BehaviorTree\BehaviorTrees.csproj", "{78661BB1-28D3-4D2F-B463-974C06060741}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BTConsole", "BTConsole\BTConsole.csproj", "{DEF3B3F3-55B9-472F-B270-EFDD6B34D045}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BTConsole", "C#\BTConsole\BTConsole.csproj", "{DEF3B3F3-55B9-472F-B270-EFDD6B34D045}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BTMLParser", "BTMLParser\BTMLParser.csproj", "{2BF0C6C3-66F5-425E-9FD9-424E0F3325FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BTMLParser", "C#\BTMLParser\BTMLParser.csproj", "{2BF0C6C3-66F5-425E-9FD9-424E0F3325FE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BehaviorTreesLib", "BehaviorTreesLib\BehaviorTreesLib.vcxproj", "{F1370DCE-F45F-46A1-88A1-4C0CEC683640}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BehaviorTreesLib", "C++\BehaviorTreesLib\BehaviorTreesLib.vcxproj", "{F1370DCE-F45F-46A1-88A1-4C0CEC683640}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BTConsoleCPP", "BTConsoleCPP\BTConsoleCPP.vcxproj", "{7206B876-0D09-4764-A1F1-82132C9246D5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BTConsoleCPP", "C++\BTConsoleCPP\BTConsoleCPP.vcxproj", "{7206B876-0D09-4764-A1F1-82132C9246D5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
