@@ -50,6 +50,7 @@ namespace fluentBehaviorTree
 			{
 				std::thread timer(&Timer::setTimer, this);
 				timerSet = true;
+				timer.detach();
 			}
 
 			this->setResult(EStatus::RUNNING);

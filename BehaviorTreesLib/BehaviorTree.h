@@ -1,7 +1,11 @@
+#ifndef BT_BEHAVIOR_TREE_H
+#define BT_BEHAVIOR_TREE_H
+
 #include <string>
 
 #include "Node.h"
 #include "General.h"
+#include "BehaviorTreeBuilder.h"
 
 namespace fluentBehaviorTree
 {
@@ -13,7 +17,8 @@ namespace fluentBehaviorTree
 
 	public:
 
-		BehaviorTree(std::string name, Node& root);
+		BehaviorTree(std::string name, Node* root);
+		BehaviorTree(BehaviorTreeBuilder btb);
 
 		std::string getName() { return mName; }
 
@@ -25,3 +30,5 @@ namespace fluentBehaviorTree
 		void setName(std::string name) { mName = name; }
 	};
 }
+
+#endif

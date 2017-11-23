@@ -6,8 +6,6 @@
 #include "Branch.h"
 
 
-
-
 namespace fluentBehaviorTree
 {
 	class BehaviorTreeBuilder
@@ -21,6 +19,10 @@ namespace fluentBehaviorTree
 
 	public:
 		std::string getName() { return mName; }
+		Node* getRoot()
+		{
+			return mParentNodes.top();
+		}
 
 		BehaviorTreeBuilder(std::string name);
 

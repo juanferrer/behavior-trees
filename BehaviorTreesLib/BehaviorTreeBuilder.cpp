@@ -24,14 +24,15 @@ namespace fluentBehaviorTree
 	// Add an action to the tree
 	BehaviorTreeBuilder BehaviorTreeBuilder::Do(std::string name, EStatus(*f)())
 	{
-		Action currentNode(name, f);
+		//Action currentNode(name, f);
+		auto currentNode = new Action(name, f);
 		
 
-		if (mParentNodes.size() > 0)
+		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(currentNode);
+			mParentNodes.top()->addChild(*currentNode);
 		}
-		Decorator* typeCheck;
+		Decorator* typeCheck = dynamic_cast<Decorator*>(mParentNodes.top());
 		while (mParentNodes.size() > 1 && typeCheck)
 		{
 			mParentNodes.pop();              // Remove decorators from parentNodes until you reach next Composite
@@ -44,14 +45,15 @@ namespace fluentBehaviorTree
 	// Add condition
 	BehaviorTreeBuilder BehaviorTreeBuilder::If(std::string name, bool(*f)())
 	{
-		Condition currentNode(name, f);
+		//Condition currentNode(name, f);
+		Condition* currentNode = new Condition(name, f);
 
-		if (mParentNodes.size() > 0)
+		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(currentNode);
+			mParentNodes.top()->addChild(*currentNode);
 		}
 
-		Decorator* typeCheck;
+		Decorator* typeCheck = dynamic_cast<Decorator*>(mParentNodes.top());
 		while (mParentNodes.size() > 1 && typeCheck)
 		{
 			mParentNodes.pop();              // Remove decorators from parentNodes until you reach next Composite
@@ -69,29 +71,31 @@ namespace fluentBehaviorTree
 	// Negate child
 	BehaviorTreeBuilder BehaviorTreeBuilder::Not(std::string name)
 	{
-		Inverter currentNode(name);
+		//Inverter currentNode(name);
+		auto currentNode = new Inverter(name);
 
-		if (mParentNodes.size() > 0)
+		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(currentNode);
+			mParentNodes.top()->addChild(*currentNode);
 		}
 
-		mParentNodes.push(&currentNode);
+		mParentNodes.push(currentNode);
 
 		return *this;
 	}
 
 	// Repeatedly tick child n times. If n == 0, tick forever
-	BehaviorTreeBuilder BehaviorTreeBuilder::Repeat(std::string name, int n = 0)
+	BehaviorTreeBuilder BehaviorTreeBuilder::Repeat(std::string name, int n)
 	{
-		Repeater currentNode(name, n);
+		//Repeater currentNode(name, n);
+		auto currentNode = new Repeater(name, n);
 
-		if (mParentNodes.size() > 0)
+		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(currentNode);
+			mParentNodes.top()->addChild(*currentNode);
 		}
 
-		mParentNodes.push(&currentNode);
+		mParentNodes.push(currentNode);
 
 		return *this;
 	}
@@ -99,14 +103,15 @@ namespace fluentBehaviorTree
 	// Repeatedly tick child until FAILURE is returned
 	BehaviorTreeBuilder BehaviorTreeBuilder::RepeatUntilFail(std::string name)
 	{
-		fluentBehaviorTree::RepeatUntilFail currentNode(name);
+		//fluentBehaviorTree::RepeatUntilFail currentNode(name);
+		auto currentNode = new fluentBehaviorTree::RepeatUntilFail(name);
 
-		if (mParentNodes.size() > 0)
+		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(currentNode);
+			mParentNodes.top()->addChild(*currentNode);
 		}
 
-		mParentNodes.push(&currentNode);
+		mParentNodes.push(currentNode);
 
 		return *this;
 	}
@@ -114,14 +119,15 @@ namespace fluentBehaviorTree
 	// Tick child and return SUCCESS
 	BehaviorTreeBuilder BehaviorTreeBuilder::Ignore(std::string name)
 	{
-		Succeeder currentNode(name);
+		//Succeeder currentNode(name);
+		auto currentNode = new Succeeder(name);
 
-		if (mParentNodes.size() > 0)
+		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(currentNode);
+			mParentNodes.top()->addChild(*currentNode);
 		}
 
-		mParentNodes.push(&currentNode);
+		mParentNodes.push(currentNode);
 
 		return *this;
 	}
@@ -129,14 +135,15 @@ namespace fluentBehaviorTree
 	// Wait ms seconds and execute node
 	BehaviorTreeBuilder BehaviorTreeBuilder::Wait(std::string name, size_t ms)
 	{
-		Timer currentNode(name, ms);
+		//Timer currentNode(name, ms);
+		auto currentNode = new Timer(name, ms);
 
-		if (mParentNodes.size() > 0)
+		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(currentNode);
+			mParentNodes.top()->addChild(*currentNode);
 		}
 
-		mParentNodes.push(&currentNode);
+		mParentNodes.push(currentNode);
 
 		return *this;
 	}
@@ -148,14 +155,15 @@ namespace fluentBehaviorTree
 	// Add a selector
 	BehaviorTreeBuilder BehaviorTreeBuilder::Selector(std::string name)
 	{
-		fluentBehaviorTree::Selector currentNode(name);
+		//fluentBehaviorTree::Selector currentNode(name);
+		auto currentNode = new fluentBehaviorTree::Selector(name);
 
-		if (mParentNodes.size() > 0)
+		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(currentNode);
+			mParentNodes.top()->addChild(*currentNode);
 		}
 
-		mParentNodes.push(&currentNode);
+		mParentNodes.push(currentNode);
 
 		return *this;
 	}
@@ -164,14 +172,15 @@ namespace fluentBehaviorTree
 	// Add a sequence
 	BehaviorTreeBuilder BehaviorTreeBuilder::Sequence(std::string name)
 	{
-		fluentBehaviorTree::Sequence currentNode(name);
+		//fluentBehaviorTree::Sequence currentNode(name);
+		auto currentNode = new fluentBehaviorTree::Sequence(name);
 
-		if (mParentNodes.size() > 0)
+		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(currentNode);
+			mParentNodes.top()->addChild(*currentNode);
 		}
 
-		mParentNodes.push(&currentNode);
+		mParentNodes.push(currentNode);
 
 		return *this;
 	}
