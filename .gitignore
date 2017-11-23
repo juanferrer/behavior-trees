@@ -303,6 +303,3 @@ __pycache__/
 
 # OpenCover UI analysis results
 OpenCover/
-
-# BTML files
-*.btml
