@@ -135,8 +135,8 @@ int main(int argc, char* argv[])
 			}
 			output += ";";
 
-			std::remove("output.txt");
-			ofstream ofile("output.txt");
+			std::remove("./Debug/output.txt");
+			ofstream ofile("./Debug/output.txt");
 			ofile.clear();
 			ofile << output;
 			ofile.close();
