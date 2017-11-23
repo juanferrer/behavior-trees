@@ -14,6 +14,12 @@ namespace fluentBehaviorTree
 		mRoot = btb.getRoot();
 	}
 
+	BehaviorTree::~BehaviorTree()
+	{
+		delete mRoot;
+	}
+
+	// Tick tree to navigate and get result
 	EStatus BehaviorTree::tick()
 	{
 		return mRoot->tick();	

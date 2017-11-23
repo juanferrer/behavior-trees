@@ -6,6 +6,17 @@ namespace fluentBehaviorTree
 	{
 		this->setName(name);
 	}
+	// Deallocate memory for children
+	Sequence::~Sequence()
+	{
+		for each (auto n in mChildren)
+		{
+			if (n != nullptr)
+			{
+				delete n;
+			}
+		}
+	}
 
 	// Propagate tick to children. Return SUCCESS if no child fails
 	EStatus Sequence::tickNode()

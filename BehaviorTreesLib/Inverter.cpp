@@ -7,6 +7,14 @@ namespace fluentBehaviorTree
 		this->setName(name);
 	}
 
+	Inverter::~Inverter()
+	{
+		if (mChild != nullptr)
+		{
+			delete mChild;
+		}
+	}
+
 	// Works as NOT logic operator
 	EStatus Inverter::tickNode()
 	{

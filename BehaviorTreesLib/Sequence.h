@@ -10,6 +10,8 @@ namespace fluentBehaviorTree
 	public:
 		Sequence(std::string name);
 
+		~Sequence() override;
+
 	protected:
 		EStatus tickNode() override;
 	};

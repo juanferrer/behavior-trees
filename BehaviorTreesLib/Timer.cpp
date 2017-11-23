@@ -25,6 +25,14 @@ namespace fluentBehaviorTree
 		timerSet = false;
 	}
 
+	Timer::~Timer()
+	{
+		if (mChild != nullptr)
+		{
+			delete mChild;
+		}
+	}
+
 	// Reset its inner state
 	void Timer::open()
 	{

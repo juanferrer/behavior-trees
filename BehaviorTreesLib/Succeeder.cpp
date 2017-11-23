@@ -7,6 +7,14 @@ namespace fluentBehaviorTree
 		this->setName(name);
 	}
 
+	Succeeder::~Succeeder()
+	{
+		if (mChild != nullptr)
+		{
+			delete mChild;
+		}
+	}
+
 	// Regardless of result, return SUCCESS
 	EStatus Succeeder::tickNode()
 	{

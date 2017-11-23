@@ -2,6 +2,10 @@
 #include "../BehaviorTreesLib/BehaviorTree.h"
 #include "../BehaviorTreesLib/BehaviorTreeBuilder.h"
 
+#include <stdlib.h>
+#include <crtdbg.h>
+#define _CRTDBG_MAP_ALLOC
+
 using namespace std;
 using namespace fluentBehaviorTree;
 
@@ -157,9 +161,9 @@ static EStatus CloseWindow()
 	return EStatus::SUCCESS;
 }
 
-int main()
+void function()
 {
-		BehaviorTree tree = BehaviorTreeBuilder("Enter room")
+		/*BehaviorTree tree = BehaviorTreeBuilder("Enter room")
 			.RepeatUntilFail("Base loop")
 				.Selector("Find an entrance")
 					.Sequence("Try door")
@@ -184,16 +188,22 @@ int main()
 					.Do("Open window", OpenWindow)
 					.Do("Close window", CloseWindow)
 				.End()
-			.End();
+			.End();*/
 
-	/*BehaviorTree tree = BehaviorTreeBuilder("Enter room")
+	BehaviorTree tree = BehaviorTreeBuilder("Enter room")
 		.Selector("Open door")
 			.Do("Open door", OpenDoor)
 			.Do("Unlock door", UnlockDoor)
 			.Do("Break door down", BreakDoor)
-		.End();*/
+			.Do("Break door down 2", BreakDoor)
+		.End();
 
 	tree.tick();
+}
 
+int main()
+{
+	function();
+	_CrtDumpMemoryLeaks();
 	return 0;
 }

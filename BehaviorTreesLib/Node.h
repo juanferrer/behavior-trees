@@ -31,6 +31,8 @@ namespace fluentBehaviorTree
 		EStatus getResult() { return mResult; }
 		void setResult(EStatus result) { mResult = result; }
 
+		virtual ~Node() {};
+
 	protected:
 		void setName(std::string name) { mName = name; }
 		bool setOpen(bool isOpen) { mIsOpen = isOpen; }

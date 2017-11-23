@@ -9,6 +9,7 @@ namespace fluentBehaviorTree
 	{
 	public:
 		Inverter(std::string name);
+		~Inverter() override;
 	protected:
 		EStatus tickNode() override;
 	};

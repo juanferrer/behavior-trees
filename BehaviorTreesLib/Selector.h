@@ -10,6 +10,8 @@ namespace fluentBehaviorTree
 	public:
 		Selector(std::string name);
 
+		~Selector() override;
+
 	protected:
 		EStatus tickNode() override;
 	};

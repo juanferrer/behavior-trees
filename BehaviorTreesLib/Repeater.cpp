@@ -8,6 +8,14 @@ namespace fluentBehaviorTree
 		mN = times;
 	}
 
+	Repeater::~Repeater()
+	{
+		if (mChild != nullptr)
+		{
+			delete mChild;
+		}
+	}
+
 	// Repeat n times and return
 	EStatus Repeater::tickNode()
 	{

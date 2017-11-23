@@ -7,6 +7,18 @@ namespace fluentBehaviorTree
 		setName(name);
 	}
 
+	// Deallocate memory of children
+	Selector::~Selector()
+	{
+		for each (auto n in mChildren)
+		{
+			if (n != nullptr)
+			{
+				delete n;
+			}
+		}
+	}
+
 	// Propagate tick to children.Return FAILURE if no child succeeds
 	EStatus Selector::tickNode()
 	{

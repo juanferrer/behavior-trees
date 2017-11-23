@@ -9,6 +9,7 @@ namespace fluentBehaviorTree
 	{
 	public:
 		Succeeder(std::string name);
+		~Succeeder() override;
 
 	protected:
 		EStatus tickNode() override;

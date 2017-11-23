@@ -19,10 +19,10 @@ namespace fluentBehaviorTree
 
 		BehaviorTree(std::string name, Node* root);
 		BehaviorTree(BehaviorTreeBuilder btb);
+		~BehaviorTree();
 
 		std::string getName() { return mName; }
-
-		// Tick tree to navigate and get result
+	
 		EStatus tick();
 
 

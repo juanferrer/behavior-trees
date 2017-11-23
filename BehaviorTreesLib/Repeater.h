@@ -12,6 +12,7 @@ namespace fluentBehaviorTree
 
 	public:
 		Repeater(std::string name, int times);
+		~Repeater() override;
 
 	protected:
 		EStatus tickNode() override;

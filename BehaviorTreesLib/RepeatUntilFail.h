@@ -9,6 +9,7 @@ namespace fluentBehaviorTree
 	{
 	public:
 		RepeatUntilFail(std::string name);
+		~RepeatUntilFail() override;
 
 	protected:
 		EStatus tickNode() override;

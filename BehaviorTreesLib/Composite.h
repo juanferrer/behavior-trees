@@ -13,6 +13,8 @@ namespace fluentBehaviorTree
 
 		void addChild(Node& n) override;
 
+		virtual ~Composite() override {}
+
 	protected:
 		void open() override;
 	};

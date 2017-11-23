@@ -7,6 +7,14 @@ namespace fluentBehaviorTree
 		this->setName(name);
 	}
 
+	RepeatUntilFail::~RepeatUntilFail()
+	{
+		if (mChild != nullptr)
+		{
+			delete mChild;
+		}
+	}
+
 	// Repeat until FAILURE
 	EStatus RepeatUntilFail::tickNode()
 	{
