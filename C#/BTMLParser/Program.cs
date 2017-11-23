@@ -9,6 +9,10 @@ namespace BTMLParser
 {
     class Program
     {
+        static string GetLambda(string type)
+        {
+            return "() => { return " + (type == "action" ? "Status.ERROR" : "false") + ";}";
+        }
         static char[] separatorArray = { ' ' };
         static void Main(string[] args)
         {
@@ -38,7 +42,7 @@ namespace BTMLParser
                         type = parts[0];
                         if (type == "#")
                         {
-                            output += "\n.Do(\"" + parts[1] + "\", () => {})";
+                            output += "\n.Do(\"" + parts[1] + "\", " + GetLambda("action") + ")";
                         }
                         else if (type == "&")
                         {
@@ -54,7 +58,7 @@ namespace BTMLParser
                         }
                         else if (type == "?")
                         {
-                            output += "\n.If(\"" + parts[1] + "\", () => {})";
+                            output += "\n.If(\"" + parts[1] + "\", " + GetLambda("condition") + ")";
                         }
                         else if (type == "!")
                         {
