@@ -53,7 +53,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BehaviorTree\BehaviorTrees.csproj">
       <Project>{78661bb1-28d3-4d2f-b463-974c06060741}</Project>
-      <Name>BehaviourTrees</Name>
+      <Name>BehaviorTrees</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
