@@ -8,6 +8,10 @@ The project consists of the following parts:
 - A DirectX app for tree modification and visualisation
 - A couple of demos (and probably a live demo) to showcase the project
 
+### References
+
+[Behavior Tree for Modelling Artifial Intelligence: A Tutorial](https://link.springer.com/article/10.1007%2Fs40869-017-0040-9)
+
 ### Articles
 
 - [Renato Pereira](http://blog.renatopp.com/2014/07/25/an-introduction-to-behavior-trees-part-1/)
