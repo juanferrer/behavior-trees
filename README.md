@@ -10,8 +10,9 @@ The project consists of the following parts:
 
 ### References
 
-[Behavior Tree for Modelling Artifial Intelligence: A Tutorial](https://link.springer.com/article/10.1007%2Fs40869-017-0040-9)
-
+- [Behavior Tree for Modelling Artifial Intelligence: A Tutorial](http://dx.doi.org/10.1007/s40869-017-0040-9)
+- [Synthesis of Correct-by-Construction Behavior Trees](http://dx.doi.org/10.1109/IROS.2017.8206502)
+- [How Behavior Trees Modularize Hybrid Control Systems and Generalize Sequential Behavior Compositions, the Subsumption Architecture, and Decision Trees](http://dx.doi.org/10.1109/TRO.2016.2633567)
 ### Articles
 
 - [Renato Pereira](http://blog.renatopp.com/2014/07/25/an-introduction-to-behavior-trees-part-1/)
