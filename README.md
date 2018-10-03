@@ -10,9 +10,13 @@ The project consists of the following parts:
 
 ### References
 
+- [Defining the abstract syntax of visual languages with advanced graph grammars - a case study based on behavior trees](http://dx.doi.org/10.1016/j.jvlc.2007.11.003)
+- [Evolving Behaviour Trees for the Commercial Game DEFCON](http://dx.doi.org/10.1007/978-3-642-12239-2_11)
 - [Behavior Tree for Modelling Artifial Intelligence: A Tutorial](http://dx.doi.org/10.1007/s40869-017-0040-9)
-- [Synthesis of Correct-by-Construction Behavior Trees](http://dx.doi.org/10.1109/IROS.2017.8206502)
-- [How Behavior Trees Modularize Hybrid Control Systems and Generalize Sequential Behavior Compositions, the Subsumption Architecture, and Decision Trees](http://dx.doi.org/10.1109/TRO.2016.2633567)
+- [Towards a Unified Behavior Trees Framework for Robot Control](http://dx.doi.org/10.1109/ICRA.2014.6907656)
+- [Are Behavior Trees a Thing of the Past?](https://www.gamasutra.com/blogs/JakobRasmussen/20160427/271188/Are_Behavior_Trees_a_Thing_of_the_Past.php)
+- [Behavior Trees for AI: How they work](https://www.gamasutra.com/blogs/ChrisSimpson/20140717/221339/Behavior_trees_for_AI_How_they_work.php)
+
 ### Articles
 
 - [Renato Pereira](http://blog.renatopp.com/2014/07/25/an-introduction-to-behavior-trees-part-1/)
