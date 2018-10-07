@@ -163,6 +163,10 @@ static EStatus CloseWindow()
 
 void function()
 {
+	BehaviorTree openDoor = BehaviorTreeBuilder("Open door")
+			.Do("Try to open door", []() { return EStatus::FAILURE; })
+		.End();
+
 	BehaviorTree tree = BehaviorTreeBuilder("Enter room")
 		.RepeatUntilFail("Base loop")
 			.Selector("Find an entrance")

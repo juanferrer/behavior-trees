@@ -32,6 +32,7 @@ namespace fluentBehaviorTree
 		{
 			mParentNodes.top()->addChild(*currentNode);
 		}
+		else throw std::exception("No parent node on Do");
 		Decorator* typeCheck = dynamic_cast<Decorator*>(mParentNodes.top());
 		while (mParentNodes.size() > 1 && typeCheck)
 		{
@@ -39,6 +40,11 @@ namespace fluentBehaviorTree
 			typeCheck = dynamic_cast<Decorator*>(mParentNodes.top());
 		}
 
+		return *this;
+	}
+
+	BehaviorTreeBuilder BehaviorTreeBuilder::Do(std::string name, BehaviorTree *tree)
+	{
 		return *this;
 	}
 
