@@ -13,8 +13,11 @@ namespace FluentBehaviorTree
 
         public BehaviorTreeBuilder(string newName)
         {
+            var currentNode = new Root();
             name = newName;
+
             parentNodes = new Stack<Node>();
+            parentNodes.Push(currentNode);
         }
 
         /*********************/
@@ -40,6 +43,21 @@ namespace FluentBehaviorTree
             {
                 parentNodes.Pop();              // Remove decorators from parentNodes until you reach next Composite
             }
+
+            return this;
+        }
+
+        public BehaviorTreeBuilder Do(string name, Node tree)
+        {
+            // TODO: Needs deep copy
+            var currentNode = tree;
+
+            if (parentNodes.Count > 0)
+            {
+                (parentNodes.Peek() as Branch).AddChild(currentNode);
+            }
+
+            parentNodes.Push(currentNode);
 
             return this;
         }

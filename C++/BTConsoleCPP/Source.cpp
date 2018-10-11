@@ -10,7 +10,7 @@ using namespace std;
 using namespace fluentBehaviorTree;
 
 static bool isWayBlocked = false;
-static bool isDoorLocked = true;
+static bool isDoorLocked = false;
 static bool haveKey = false;
 static int STR = 13;
 static int DC = 20;
@@ -164,12 +164,12 @@ static EStatus CloseWindow()
 void function()
 {
 	BehaviorTree openDoor = BehaviorTreeBuilder("Open door")
-			.Do("Try to open door", []()
-			{ 	
-				cout << "Try to open door" << endl;
-				return EStatus::SUCCESS;
-			})
-		.End();
+			.Repeat("Open and close the door 5 times", 5)
+				.Sequence("Open and close door")
+					.Do("Open door", OpenDoor)
+					.Do("Close door", CloseDoor)
+					.End()
+				.End();
 
 	BehaviorTree tree = BehaviorTreeBuilder("Enter room")
 		.RepeatUntilFail("Base loop")
@@ -202,8 +202,8 @@ void function()
 				.End()
 			.End();
 
-	tree.tick();
-	//openDoor.tick();
+	//tree.tick();
+	openDoor.tick();
 
 	std::cin.ignore(); // Wait for a keypress
 }

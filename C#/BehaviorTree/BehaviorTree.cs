@@ -11,7 +11,9 @@ namespace FluentBehaviorTree
         private string name;
 
         public string GetName() { return name; }
+        public Node GetRoot() { return root; }
         protected void SetName(string newName) { name = newName; }
+
 
         private Node root;
 

@@ -164,6 +164,9 @@ namespace BTConsole
         static void Main(string[] args)
         {
 
+            BehaviorTree openDoor = new BehaviorTreeBuilder("Open door tree")
+                    .Do("Open door", () => { Console.WriteLine("Open door"); return Status.SUCCESS; })
+                    .End();
 
             BehaviorTree tree = new BehaviorTreeBuilder("Enter room")
                 .RepeatUntilFail("Base loop")
@@ -173,7 +176,7 @@ namespace BTConsole
                                 .If("Is way blocked?", IsWayBlocked)
                             .Do("Go to door", GoToDoor)
                             .Selector("Open door selector")
-                                .Do("Open door", OpenDoor)
+                                .Do("Open door", openDoor.GetRoot())
                                 .Do("Unlock door", UnlockDoor)
                                 .Do("Break door down", BreakDoor)
                             .End()
@@ -193,6 +196,8 @@ namespace BTConsole
                     .End();
 
             tree.Tick();
+
+            Console.ReadKey();
         }
     }
 }

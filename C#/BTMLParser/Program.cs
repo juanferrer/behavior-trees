@@ -94,7 +94,7 @@ namespace BTMLParser
                         output += "\n.End()";
                         levelsOpen--;
                     }
-                    output += ";";
+                    output += "\n.End();";
 
                     System.IO.File.AppendAllText("output.txt", output);
                 }
