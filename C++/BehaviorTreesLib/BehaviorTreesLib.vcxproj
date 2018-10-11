@@ -32,6 +32,7 @@
     <ClInclude Include="Node.h" />
     <ClInclude Include="Repeater.h" />
     <ClInclude Include="RepeatUntilFail.h" />
+    <ClInclude Include="Root.h" />
     <ClInclude Include="Selector.h" />
     <ClInclude Include="Sequence.h" />
     <ClInclude Include="Succeeder.h" />
@@ -48,6 +49,7 @@
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Repeater.cpp" />
     <ClCompile Include="RepeatUntilFail.cpp" />
+    <ClCompile Include="Root.cpp" />
     <ClCompile Include="Selector.cpp" />
     <ClCompile Include="Sequence.cpp" />
     <ClCompile Include="Succeeder.cpp" />

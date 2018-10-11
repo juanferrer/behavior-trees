@@ -164,7 +164,11 @@ static EStatus CloseWindow()
 void function()
 {
 	BehaviorTree openDoor = BehaviorTreeBuilder("Open door")
-			.Do("Try to open door", []() { return EStatus::FAILURE; })
+			.Do("Try to open door", []()
+	{ 	
+		cout << "Try to open door" << endl;
+		return EStatus::SUCCESS;
+	})
 		.End();
 
 	BehaviorTree tree = BehaviorTreeBuilder("Enter room")
@@ -194,7 +198,10 @@ void function()
 			.End()
 		.End();
 
-	tree.tick();
+	//tree.tick();
+	openDoor.tick();
+
+	std::cin.ignore(); // Wait for a keypress
 }
 
 int main()

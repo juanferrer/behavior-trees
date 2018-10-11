@@ -1,5 +1,6 @@
 #include "BehaviorTreeBuilder.h"
 
+#include "Root.h"
 #include "Action.h"
 #include "Condition.h"
 #include "Inverter.h"
@@ -14,7 +15,10 @@ namespace fluentBehaviorTree
 {
 	BehaviorTreeBuilder::BehaviorTreeBuilder(std::string name)
 	{
+		auto currentNode = new Root();
 		this->setName(name);
+
+		mParentNodes.push(currentNode);
 	}
 
 	/*********************/
