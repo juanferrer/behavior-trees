@@ -165,15 +165,16 @@ void function()
 {
 	BehaviorTree openDoor = BehaviorTreeBuilder("Open door")
 			.Do("Try to open door", []()
-	{ 	
-		cout << "Try to open door" << endl;
-		return EStatus::SUCCESS;
-	})
+			{ 	
+				cout << "Try to open door" << endl;
+				return EStatus::SUCCESS;
+			})
 		.End();
 
 	BehaviorTree tree = BehaviorTreeBuilder("Enter room")
 		.RepeatUntilFail("Base loop")
 			.Selector("Find an entrance")
+
 				.Sequence("Try door")
 					.Not("Way is not blocked")
 						.If("Is way blocked?", IsWayBlocked)
@@ -182,24 +183,27 @@ void function()
 						.Do("Open door", OpenDoor)
 						.Do("Unlock door", UnlockDoor)
 						.Do("Break door down", BreakDoor)
-				.End()
-			.Ignore("Try to close door")
-				.Do("Close door", CloseDoor)
-			.End()
-			.Sequence("Check if anyone comes")
-				.Wait("Wait for people to come", 5000)
-					.If("Someone came", SomeoneCame)
-				.Do("Ask them to open door", AskToOpenDoor)
-			.End()
-			.Sequence("Try window")
-				.Do("Go to window", GoToWindow)
-				.Do("Open window", OpenWindow)
-				.Do("Close window", CloseWindow)
-			.End()
-		.End();
+						.End()
+					.Ignore("Try to close door")
+						.Do("Close door", CloseDoor)
+					.End()
 
-	//tree.tick();
-	openDoor.tick();
+				.Sequence("Check if anyone comes")
+					.Wait("Wait for people to come", 5000)
+						.If("Someone came", SomeoneCame)
+					.Do("Ask them to open door", AskToOpenDoor)
+					.End()
+
+				.Sequence("Try window")
+					.Do("Go to window", GoToWindow)
+					.Do("Open window", OpenWindow)
+					.Do("Close window", CloseWindow)
+					.End()
+				.End()
+			.End();
+
+	tree.tick();
+	//openDoor.tick();
 
 	std::cin.ignore(); // Wait for a keypress
 }

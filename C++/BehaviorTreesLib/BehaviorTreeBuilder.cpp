@@ -47,8 +47,17 @@ namespace fluentBehaviorTree
 		return *this;
 	}
 
-	BehaviorTreeBuilder BehaviorTreeBuilder::Do(std::string name, BehaviorTree *tree)
+	BehaviorTreeBuilder BehaviorTreeBuilder::Do(std::string name, Node *tree)
 	{
+		Node* currentNode = tree;
+
+		if (!mParentNodes.empty())
+		{
+			mParentNodes.top()->addChild(*currentNode);
+		}
+
+		mParentNodes.push(dynamic_cast<Branch*>(currentNode));
+
 		return *this;
 	}
 

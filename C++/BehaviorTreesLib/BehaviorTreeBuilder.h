@@ -8,7 +8,7 @@
 
 namespace fluentBehaviorTree
 {
-	class BehaviorTree;
+	class Root;
 
 	class BehaviorTreeBuilder
 	{
@@ -27,6 +27,7 @@ namespace fluentBehaviorTree
 		}
 
 		BehaviorTreeBuilder(std::string name);
+		~BehaviorTreeBuilder() {}
 
 		/*********************/
 		/******* LEAF ********/
@@ -34,7 +35,7 @@ namespace fluentBehaviorTree
 
 		BehaviorTreeBuilder Do(std::string name, EStatus(*f)());
 
-		BehaviorTreeBuilder Do(std::string name, BehaviorTree *tree);
+		BehaviorTreeBuilder Do(std::string name, Node *tree);
 
 		BehaviorTreeBuilder If(std::string name, bool(*f)());
 

@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
 				output += "\n.End()";
 				levelsOpen--;
 			}
-			output += ";";
+			output += "\n.End();";
 
 			std::remove(".\\output.txt");
 			ofstream ofile(".\\output.txt");

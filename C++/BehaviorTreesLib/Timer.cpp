@@ -30,6 +30,7 @@ namespace fluentBehaviorTree
 		if (mChild != nullptr)
 		{
 			delete mChild;
+			mChild = nullptr;
 		}
 	}
 

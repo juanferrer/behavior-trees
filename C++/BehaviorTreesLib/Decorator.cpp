@@ -6,4 +6,13 @@ namespace fluentBehaviorTree
 	{
 		mChild = &n;
 	}
+
+	Decorator::~Decorator()
+	{
+		if (mChild != nullptr)
+		{
+			delete mChild;
+			mChild = nullptr;
+		}
+	}
 }
