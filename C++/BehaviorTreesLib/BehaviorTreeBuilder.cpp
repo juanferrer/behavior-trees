@@ -31,10 +31,9 @@ namespace fluentBehaviorTree
 		//Action currentNode(name, f);
 		auto currentNode = new Action(name, f);
 		
-
 		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(*currentNode);
+			mParentNodes.top()->addChild(currentNode);
 		}
 		else throw std::exception("No parent node on Do");
 		Decorator* typeCheck = dynamic_cast<Decorator*>(mParentNodes.top());
@@ -47,16 +46,17 @@ namespace fluentBehaviorTree
 		return *this;
 	}
 
+	// Add a subtree to the tree
 	BehaviorTreeBuilder BehaviorTreeBuilder::Do(std::string name, Node *tree)
 	{
-		Node* currentNode = tree;
+		Node* currentNode = tree->copy();
 
 		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(*currentNode);
+			mParentNodes.top()->addChild(currentNode);
 		}
 
-		mParentNodes.push(dynamic_cast<Branch*>(currentNode));
+		//mParentNodes.push(dynamic_cast<Branch*>(currentNode));
 
 		return *this;
 	}
@@ -69,7 +69,7 @@ namespace fluentBehaviorTree
 
 		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(*currentNode);
+			mParentNodes.top()->addChild(currentNode);
 		}
 
 		Decorator* typeCheck = dynamic_cast<Decorator*>(mParentNodes.top());
@@ -95,7 +95,7 @@ namespace fluentBehaviorTree
 
 		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(*currentNode);
+			mParentNodes.top()->addChild(currentNode);
 		}
 
 		mParentNodes.push(currentNode);
@@ -111,7 +111,7 @@ namespace fluentBehaviorTree
 
 		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(*currentNode);
+			mParentNodes.top()->addChild(currentNode);
 		}
 
 		mParentNodes.push(currentNode);
@@ -127,7 +127,7 @@ namespace fluentBehaviorTree
 
 		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(*currentNode);
+			mParentNodes.top()->addChild(currentNode);
 		}
 
 		mParentNodes.push(currentNode);
@@ -143,7 +143,7 @@ namespace fluentBehaviorTree
 
 		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(*currentNode);
+			mParentNodes.top()->addChild(currentNode);
 		}
 
 		mParentNodes.push(currentNode);
@@ -159,7 +159,7 @@ namespace fluentBehaviorTree
 
 		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(*currentNode);
+			mParentNodes.top()->addChild(currentNode);
 		}
 
 		mParentNodes.push(currentNode);
@@ -179,7 +179,7 @@ namespace fluentBehaviorTree
 
 		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(*currentNode);
+			mParentNodes.top()->addChild(currentNode);
 		}
 
 		mParentNodes.push(currentNode);
@@ -196,7 +196,7 @@ namespace fluentBehaviorTree
 
 		if (!mParentNodes.empty())
 		{
-			mParentNodes.top()->addChild(*currentNode);
+			mParentNodes.top()->addChild(currentNode);
 		}
 
 		mParentNodes.push(currentNode);

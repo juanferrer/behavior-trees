@@ -9,7 +9,8 @@ namespace fluentBehaviorTree
 	{
 	public:
 		Node* mChild;
-		void addChild(Node& n);
+		void addChild(Node* n);
+		Node* copy() override;
 
 		Root();
 		~Root() override;

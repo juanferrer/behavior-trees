@@ -2,9 +2,9 @@
 
 namespace fluentBehaviorTree
 {
-	void Root::addChild(Node & n)
+	void Root::addChild(Node* n)
 	{
-		mChild = &n;
+		mChild = n;
 	}
 	Root::Root()
 	{
@@ -26,5 +26,13 @@ namespace fluentBehaviorTree
 		this->setResult(mChild->tick());
 
 		return this->getResult();
+	}
+
+	// Perform deep copy of tree and return a pointer to the new tree
+	Node * Root::copy()
+	{
+		Root* newNode = new Root();
+		newNode->addChild(((this->mChild)->copy()));
+		return newNode;
 	}
 }

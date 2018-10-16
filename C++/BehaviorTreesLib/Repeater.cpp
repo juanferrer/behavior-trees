@@ -2,6 +2,12 @@
 
 namespace fluentBehaviorTree
 {
+	Node * Repeater::copy()
+	{
+		Repeater* newNode = new Repeater(this->getName(), this->mN);
+		newNode->addChild(((this->mChild)->copy()));
+		return newNode;
+	}
 	Repeater::Repeater(std::string name, int times = 0)
 	{
 		this->setName(name);

@@ -2,6 +2,16 @@
 
 namespace fluentBehaviorTree
 {
+	Node * Sequence::copy()
+	{
+		Sequence* newNode = new Sequence(this->getName());
+		for (int i = 0, size = mChildren.size(); i < size; ++i)
+		{
+			newNode->addChild((mChildren[i]->copy()));
+		}
+		return newNode;
+	}
+
 	Sequence::Sequence(std::string name)
 	{
 		this->setName(name);

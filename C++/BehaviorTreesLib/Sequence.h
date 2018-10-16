@@ -8,6 +8,7 @@ namespace fluentBehaviorTree
 	class Sequence : public Composite
 	{
 	public:
+		Node* copy() override;
 		Sequence(std::string name);
 
 		~Sequence() override;

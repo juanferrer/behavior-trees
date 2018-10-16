@@ -30,6 +30,7 @@ namespace fluentBehaviorTree
 		bool isOpen() { return mIsOpen; }
 		EStatus getResult() { return mResult; }
 		void setResult(EStatus result) { mResult = result; }
+		virtual Node* copy() = 0;
 
 		virtual ~Node() {};
 

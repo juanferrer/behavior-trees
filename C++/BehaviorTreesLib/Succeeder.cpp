@@ -2,6 +2,12 @@
 
 namespace fluentBehaviorTree
 {
+	Node * Succeeder::copy()
+	{
+		Succeeder* newNode = new Succeeder(this->getName());
+		newNode->addChild(((this->mChild)->copy()));
+		return newNode;
+	}
 	Succeeder::Succeeder(std::string name)
 	{
 		this->setName(name);

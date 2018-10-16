@@ -10,13 +10,13 @@ using namespace std;
 using namespace fluentBehaviorTree;
 
 static bool isWayBlocked = false;
-static bool isDoorLocked = false;
+static bool isDoorLocked = true;
 static bool haveKey = false;
 static int STR = 13;
 static int DC = 20;
 static bool isDoorBroken = false;
 static bool someoneCame = false;
-static bool isWindowLocked = false;
+static bool isWindowLocked = true;
 static int ticked = 0;
 
 static bool IsWayBlocked()
@@ -164,13 +164,22 @@ static EStatus CloseWindow()
 void function()
 {
 	BehaviorTree openDoor = BehaviorTreeBuilder("Open door")
-			.Repeat("Open and close the door 5 times", 5)
-				.Sequence("Open and close door")
-					.Do("Open door", OpenDoor)
-					.Do("Close door", CloseDoor)
-					.End()
-				.End();
+		.Sequence("Open and close door")
+			.Do("Open door", OpenDoor)
+			.Do("Close door", CloseDoor)
+			.End()
+		.End();
 
+	BehaviorTree testTree = BehaviorTreeBuilder("Test nested tree")
+		.Selector("Nested tree sequence")
+			.Do("Nested tree", openDoor.getRoot())
+			.Do("Filler", []()
+			{
+				std::cout << "IGNORE THIS" << std::endl; return EStatus::FAILURE;
+			})
+			.End()
+		.End();
+	
 	BehaviorTree tree = BehaviorTreeBuilder("Enter room")
 		.RepeatUntilFail("Base loop")
 			.Selector("Find an entrance")
@@ -180,12 +189,12 @@ void function()
 						.If("Is way blocked?", IsWayBlocked)
 					.Do("Go to door", GoToDoor)
 					.Selector("Open door selector")
-						.Do("Open door", OpenDoor)
+						.Do("Open door", openDoor.getRoot())
 						.Do("Unlock door", UnlockDoor)
 						.Do("Break door down", BreakDoor)
 						.End()
-					.Ignore("Try to close door")
-						.Do("Close door", CloseDoor)
+					/*.Ignore("Try to close door")
+						.Do("Close door", CloseDoor)*/
 					.End()
 
 				.Sequence("Check if anyone comes")
@@ -202,8 +211,9 @@ void function()
 				.End()
 			.End();
 
-	//tree.tick();
-	openDoor.tick();
+	tree.tick();
+	//openDoor.tick();
+	//testTree.tick();
 
 	std::cin.ignore(); // Wait for a keypress
 }

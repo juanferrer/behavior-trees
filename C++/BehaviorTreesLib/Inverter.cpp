@@ -2,6 +2,13 @@
 
 namespace fluentBehaviorTree
 {
+	Node* Inverter::copy()
+	{
+		Inverter* newNode = new Inverter(this->getName());
+		newNode->addChild(((this->mChild)->copy()));
+		return newNode;
+	}
+
 	Inverter::Inverter(std::string name)
 	{
 		this->setName(name);

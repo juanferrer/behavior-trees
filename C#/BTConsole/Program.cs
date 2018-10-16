@@ -16,7 +16,7 @@ namespace BTConsole
         static int DC = 20;
         static bool isDoorBroken = false;
         static bool someoneCame = false;
-        static bool isWindowLocked = false;
+        static bool isWindowLocked = true;
         static int ticked = 0;
 
         static public bool IsWayBlocked()
@@ -176,7 +176,7 @@ namespace BTConsole
                                 .If("Is way blocked?", IsWayBlocked)
                             .Do("Go to door", GoToDoor)
                             .Selector("Open door selector")
-                                .Do("Open door", openDoor.GetRoot())
+                                .Do("Open door", OpenDoor)
                                 .Do("Unlock door", UnlockDoor)
                                 .Do("Break door down", BreakDoor)
                             .End()
