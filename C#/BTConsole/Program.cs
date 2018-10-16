@@ -176,7 +176,7 @@ namespace BTConsole
                                 .If("Is way blocked?", IsWayBlocked)
                             .Do("Go to door", GoToDoor)
                             .Selector("Open door selector")
-                                .Do("Open door", OpenDoor)
+                                .Do("Open door", openDoor.GetRoot())
                                 .Do("Unlock door", UnlockDoor)
                                 .Do("Break door down", BreakDoor)
                             .End()

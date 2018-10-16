@@ -16,6 +16,12 @@ namespace FluentBehaviorTree
             condition = f;
         }
 
+        public override Node Copy()
+        {
+            Condition newNode = new Condition(this.Name, this.condition);
+            return newNode;
+        }
+
         /// <summary>
         /// Return SUCCESS if the condition if met. Otherwise, FAILURE.
         /// </summary>

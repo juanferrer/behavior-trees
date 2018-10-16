@@ -13,6 +13,13 @@ namespace FluentBehaviorTree
             this.Name = name;
         }
 
+        public override Node Copy()
+        {
+            Succeeder* newNode = new Succeeder(this->getName());
+            newNode->addChild(((this->mChild)->copy()));
+            return newNode;
+        }
+
         /// <summary>
         /// Regardless of result, return SUCCESS
         /// </summary>

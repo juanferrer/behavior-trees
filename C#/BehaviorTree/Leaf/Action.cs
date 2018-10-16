@@ -16,6 +16,12 @@ namespace FluentBehaviorTree
             action = f;
         }
 
+        public override Node Copy()
+        {
+            Action newNode = new Action(this.Name, this.action);
+            return newNode;
+        }
+
         /// <summary>
         /// Return result of action
         /// </summary>

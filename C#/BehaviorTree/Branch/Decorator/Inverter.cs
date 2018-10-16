@@ -13,6 +13,13 @@ namespace FluentBehaviorTree
             this.Name = name;
         }
 
+        public override Node Copy()
+        {
+            Inverter newNode = new Inverter(this.Name);
+            newNode.AddChild(this.child.Copy());
+            return newNode;
+        }
+
         /// <summary>
         /// Works as NOT logic operator
         /// </summary>

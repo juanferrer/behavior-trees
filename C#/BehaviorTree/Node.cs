@@ -12,6 +12,8 @@ namespace FluentBehaviorTree
         public bool IsOpen { get; protected set; }
         public Status Result { get; set; }
 
+        public abstract Node Copy();
+
         /// <summary>
         /// 
         /// </summary>
