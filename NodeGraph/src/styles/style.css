@@ -1,0 +1,19 @@
+body {
+    display: flex;
+    height: calc(100vh - 16px - 1px);
+}
+
+#text {
+    width: 50%;
+    height: 100%;
+}
+
+#text-editor {
+    width: calc(100% - 8px);;
+    height: calc(100% - 5px);
+}
+
+#cy {
+    width: 50%;
+    height: 100%;
+}
