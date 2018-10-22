@@ -123,7 +123,7 @@ $("#text-editor").change(e => {
 	parse();
 });
 
-$("text-editor").keydown(e => {
+/*$("text-editor").keydown(e => {
 	// Tab pressed
 	if (e.keyCode === 9) { // tab was pressed
 		// get caret position/selection
@@ -144,20 +144,23 @@ $("text-editor").keydown(e => {
 		// prevent the focus lose
 		e.preventDefault();
 	}
-});
+});*/
 
 // #endregion
 
 // #region Parser functions
 function countTabs(s) {
 	var num = 0;
-	while (s[0] === "\t") {
+	while (s[0] === "\t" || (s.substr(0, 4) === "    ")) {
 		s = s.substr(1);
 		num++;
 	}
 	return num;
 }
 
+/**
+ * Format the text and create a map according to it
+ */
 function parse() {
 	cy.elements().remove();
 	addNode("ROOT", "", "_", "Base");
@@ -174,6 +177,11 @@ function parse() {
 
 	lines.forEach(line => {
 		if (line) {
+
+			// Make sure we replace spaces and tabs
+			// Might add as an option
+			line = line.replace(/ {4}/g, "\t");
+
 			tabNum = countTabs(line);
 			while (tabNum < parents.length - 1) {
 				// We finished in this level, so go back to the previous parent
