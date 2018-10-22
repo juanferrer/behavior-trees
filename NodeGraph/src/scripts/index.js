@@ -108,7 +108,7 @@ function addNode(nodeId, parentId, nodeType, nodeName) {
 		});
 	}
 
-	log(`Node ${node.data.id} added as a child of ${edge.data.parentId}`);
+	log(`Node ${node.data.id} added as a child of ${(edge ? (edge.data.parentId || "NULL") : "NULL")}`);
 
 	var layout = cy.layout({ name: "breadthfirst", directed: true, roots: "#ROOT" });
 	layout.run();
@@ -131,16 +131,24 @@ $("#text-editor").change(() => {
  */
 $("#output").click(() => {
 	// TODO
-	var child = require("child_process").execFile;
-	var executablePath = "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe";
+	const { app } = require("electron");
+	const { fs } = require("fs");
 
-	child(executablePath, function (err, data) {
-		if (err) {
-			error(err);
-			return;
-		}
+	var tempfile = app.getPath("temp") + "\\" + (new Date()).getTime() + ".btml";
 
-		log(data.toString());
+	fs.writeFile(tempfile, $("#text-editor")[0].value, "utf-8", () => {
+		var child = require("child_process").execFile;
+		var executablePath = ".\\BTMLPARSERCPP.exe";
+		var parameters = [tempfile];
+
+		child(executablePath, parameters, function (err, data) {
+			if (err) {
+				error(err);
+				return;
+			}
+
+			log(data.toString());
+		});
 	});
 });
 

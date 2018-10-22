@@ -53,7 +53,12 @@ int main(int argc, char* argv[])
 {
 	if (argc > 0)
 	{
+		char* outputFile = ".\\output.txt";
 		char* filename = argv[1];
+		if (argv[2] != NULL)
+		{
+			outputFile = argv[2];
+		}
 		ifstream ifile(filename);
 		if (ifile)
 		{
@@ -135,8 +140,8 @@ int main(int argc, char* argv[])
 			}
 			output += "\n.End();";
 
-			std::remove(".\\output.txt");
-			ofstream ofile(".\\output.txt");
+			std::remove(outputFile);
+			ofstream ofile(outputFile);
 			ofile.clear();
 			if (ofile.is_open())
 			{
