@@ -1,4 +1,4 @@
-/* globals require */
+/* globals require, process*/
 const { app, Menu, BrowserWindow } = require("electron");
 
 // Keep a global reference of the window object, if you don"t, the window will

@@ -1,6 +1,7 @@
-/* globals $, cytoscape,  */
+/* globals $, cytoscape, require  */
 
 // #region Cytoscape
+//function main() {
 var cy = cytoscape({
 	container: document.getElementById("cy"), // container to render in
 
@@ -107,6 +108,8 @@ function addNode(nodeId, parentId, nodeType, nodeName) {
 		});
 	}
 
+	log(`Node ${node.data.id} added as a child of ${edge.data.parentId}`);
+
 	var layout = cy.layout({ name: "breadthfirst", directed: true, roots: "#ROOT" });
 	layout.run();
 }
@@ -119,8 +122,26 @@ $(window).resize(() => {
 	$("#text-editor")[0].style.height = "calc(100% - 5px)";
 });
 
-$("#text-editor").change(e => {
+$("#text-editor").change(() => {
 	parse();
+});
+
+/**
+ * Run BTML parser
+ */
+$("#output").click(() => {
+	// TODO
+	var child = require("child_process").execFile;
+	var executablePath = "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe";
+
+	child(executablePath, function (err, data) {
+		if (err) {
+			error(err);
+			return;
+		}
+
+		log(data.toString());
+	});
 });
 
 /*$("text-editor").keydown(e => {
@@ -213,8 +234,15 @@ function parse() {
 
 // #region Utility functions
 
+function error(message) {
+	console.error(message); // eslint-disable-line
+}
+
 function log(message) {
 	console.log(message); // eslint-disable-line
 }
 
 // #endregion
+/*}
+
+main();*/
