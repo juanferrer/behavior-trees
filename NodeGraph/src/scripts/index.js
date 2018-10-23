@@ -108,7 +108,7 @@ function addNode(nodeId, parentId, nodeType, nodeName) {
 		});
 	}
 
-	log(`Node ${node.data.id} added as a child of ${(edge ? (edge.data.parentId || "NULL") : "NULL")}`);
+	utility.log(`Node ${node.data.id} added as a child of ${(edge ? (edge.data.parentId || "NULL") : "NULL")}`);
 
 	var layout = cy.layout({ name: "breadthfirst", directed: true, roots: "#ROOT" });
 	layout.run();
@@ -116,7 +116,106 @@ function addNode(nodeId, parentId, nodeType, nodeName) {
 
 // #endregion
 
+// #region globals
+const { app, ipcRenderer } = require("electron");
+const { dialog } = require("electron").remote;
+const fs = require("fs");
+
+var pathToFileBeingEdited;
+
+function newFile() {
+	$("#text-editor")[0].value = "";
+	pathToFileBeingEdited = undefined;
+}
+
+/**
+ * Open a file from a specified location
+ */
+function open() {
+
+	dialog.showOpenDialog(ipcRenderer,{
+		filters: [
+			{name: "BTML files", extensions: ["btml"]},
+			{name: "All Files", extensions: ["*"]}
+		]
+	},filename => {
+		if (filename === undefined) {
+			utility.log("No file selected");
+			return;
+		}
+
+		fs.readFile(filename, "utf-8", (err, data) => {
+			if (err) {
+				utility.error("An error ocurred reading the file: " + err.message);
+				return;
+			}
+			pathToFileBeingEdited = filename;
+			// Do stuff with open file
+			$("#text-editor")[0].value = data;
+		});
+
+	});
+}
+
+/**
+ * Save file to the path it was loaded from
+ */
+function save() {
+
+	if (!pathToFileBeingEdited) {
+		saveAs();
+
+	} else {
+		var content = $("#text-editor")[0].value;
+
+		fs.writeFile(pathToFileBeingEdited, content, (err) => {
+			if (err) {
+				utility.error("An error ocurred creating the file " + err.message);
+			}
+
+			utility.log("The file has been succesfully saved");
+		});
+	}
+}
+
+/**
+ * Save file to a new path
+ */
+function saveAs() {
+	var content = $("#text-editor")[0].value;
+
+	dialog.showSaveDialog({
+		filters: [
+			{name: "BTML files", extensions: ["btml"]},
+			{name: "All Files", extensions: ["*"]}
+		]
+	},(filename) => {
+		if (filename === undefined) {
+			utility.log("No file selected");
+			return;
+		}
+
+		fs.writeFile(filename, content, (err) => {
+			if (err) {
+				utility.error("An error ocurred creating the file " + err.message);
+			}
+			pathToFileBeingEdited = filename;
+			utility.log("The file has been succesfully saved");
+		});
+	});
+}
+
+/**
+ * Modify graph zoom
+ */
+function zoom() {
+	// TODO
+}
+
+// #endregion
+
 // #region Event handlers
+
 $(window).resize(() => {
 	$("#text-editor")[0].style.width = "calc(100% - 8px)";
 	$("#text-editor")[0].style.height = "calc(100% - 5px)";
@@ -131,8 +230,6 @@ $("#text-editor").change(() => {
  */
 $("#output").click(() => {
 	// TODO
-	const { app } = require("electron");
-	const { fs } = require("fs");
 
 	var tempfile = app.getPath("temp") + "\\" + (new Date()).getTime() + ".btml";
 
@@ -143,37 +240,34 @@ $("#output").click(() => {
 
 		child(executablePath, parameters, function (err, data) {
 			if (err) {
-				error(err);
+				utility.error(err);
 				return;
 			}
 
-			log(data.toString());
+			utility.log(data.toString());
 		});
 	});
 });
 
-/*$("text-editor").keydown(e => {
-	// Tab pressed
-	if (e.keyCode === 9) { // tab was pressed
-		// get caret position/selection
-		var start = this.selectionStart;
-		var end = this.selectionEnd;
+ipcRenderer.on("new", (e, args) => {
+	newFile();
+});
 
-		var $this = $(this);
-		var value = $this.val();
+ipcRenderer.on("open", (e, args) => {
+	open();
+});
 
-		// set textarea value to: text before caret + tab + text after caret
-		$this.val(value.substring(0, start)
-			+ "\t"
-			+ value.substring(end));
+ipcRenderer.on("save", (e, args) => {
+	save();
+});
 
-		// put caret at right position again (add one for the tab)
-		this.selectionStart = this.selectionEnd = start + 1;
+ipcRenderer.on("saveAs", (e, args) => {
+	saveAs();
+});
 
-		// prevent the focus lose
-		e.preventDefault();
-	}
-});*/
+ipcRenderer.on("zoom", (e, args) => {
+	zoom(args[0]);
+});
 
 // #endregion
 
@@ -241,14 +335,16 @@ function parse() {
 // #endregion
 
 // #region Utility functions
+var utility = {
 
-function error(message) {
-	console.error(message); // eslint-disable-line
-}
+	error: function (message) {
+		console.error(message); // eslint-disable-line
+	},
 
-function log(message) {
-	console.log(message); // eslint-disable-line
-}
+	log: function (message) {
+		console.log(message); // eslint-disable-line
+	}
+};
 
 // #endregion
 /*}
