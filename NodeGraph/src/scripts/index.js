@@ -21,7 +21,9 @@ var cy = cytoscape({
 				"background-color": "#666",
 				label: "data(label)",
 				"text-wrap": "wrap",
-				"text-max-width": "25px"
+				"text-max-width": "25px",
+				"width": "100px",
+				"height": "100px"
 			},
 		},
 		{
@@ -36,71 +38,101 @@ var cy = cytoscape({
 		{
 			selector: ".root",
 			style: {
-				"background-color": "#4dd926"
+				"background-color": "#4dd926",
+				//"color": "#000000"
 			},
 		},
 		{
 			selector: ".leaf",
 			style: {
-				"background-color": "#d93e26"
+				"background-color": "#d93e26",
+				//"color": "#ffffff"
 			},
 		},
 		{
 			selector: ".composite",
 			style: {
-				"background-color": "#d6d926"
+				"background-color": "#d6d926",
+				//"color": "#000000"
 			},
 		},
 		{
 			selector: ".decorator",
 			style: {
-				"background-color": "#d98026"
+				"background-color": "#d98026",
+				//"color": "#ffffff"
 			},
 		},
 		{
 			selector: ".action",
 			style: {
-				
+				"background-image": "./img/action.svg",
+				"background-width": "70%",
+				"background-height": "70%"
 			},
 		},
 		{
 			selector: ".condition",
 			style: {
+				"background-image": "./img/condition.svg",
+				"background-width": "70%",
+				"background-height": "70%"
 			},
 		},
 		{
 			selector: ".sequence",
 			style: {
+				"background-image": "./img/sequence.svg",
+				"background-width": "70%",
+				"background-height": "70%"
 			},
 		},
 		{
 			selector: ".selector",
 			style: {
+				"background-image": "./img/selector.svg",
+				"background-width": "70%",
+				"background-height": "70%"
 			},
 		},
 		{
 			selector: ".negator",
 			style: {
+				"background-image": "./img/negator.svg",
+				"background-width": "70%",
+				"background-height": "70%"
 			},
 		},
 		{
 			selector: ".repeater",
 			style: {
+				"background-image": "./img/repeater.svg",
+				"background-width": "70%",
+				"background-height": "70%"
 			},
 		},
 		{
 			selector: ".repeatUntilFail",
 			style: {
+				"background-image": "./img/repeatUntilFail.svg",
+				"background-width": "70%",
+				"background-height": "70%"
 			},
 		},
 		{
 			selector: ".succeeder",
 			style: {
+				"background-image": "./img/succeeder.svg",
+				"background-width": "70%",
+				"background-height": "70%"
 			},
 		},
 		{
 			selector: ".timer",
 			style: {
+				"background-image": "./img/timer.svg",
+				"background-width": "70%",
+				"background-height": "70%"
 			},
 		},
 	],
