@@ -1,27 +1,27 @@
-* Root
+* Loop
 	| Selector
-		& LookNChase
-			? SawPlayerInLastXSecs
+		& Look and chase
+			? Saw player in last X secs
 			| Selector
 				& Scan for player
-					? IsAlertMeterNotFull
-					# LookToLastSeenPlayerPos
-				& ChasePlayerSequence
-					# GoToLastSeenPlayerPos
-					? ReachedLastSeenPlayerPos
-					# LookAroundLastSeenPlayerPos
-				# StillChasingPlayer
+					? Is alert meter not full
+					! Look to last seen player pos
+				& Chase player sequence
+					! Go to last seen player pos
+					? Reached last seen player pos
+					! Look around last seen player pos
+				! Still chasing player
 		& Search
-			? GuardSearchActive
-			& CheckSearchPointSequence
-				# WalkToSearchPoint
-				# WaitTillSearchPoint
-				# SweepAndResetAction
+			? Guard search active
+			& Check search point sequence
+				! Walk to search point
+				! Wait till search point
+				! Sweep and reset action
 		& Patrol
-			? HasReachedWaypoint
-			? HasPausedXSecs
-			? HasLooked
-			? HasPausedXSecsAgain
-			# ChangeWaypoint
-			# LookToNextWayPoint
-			# MoveToNextWaypoint
+			? Has reached waypoint
+			? Has paused X secs
+			? Has looked
+			? Has paused X secs again
+			! Change waypoint
+			! Look to next waypoint
+			! Move to next waypoint

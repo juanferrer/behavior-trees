@@ -40,7 +40,7 @@ namespace BTMLParser
                         s = line.Substring(tabNum);
                         parts = s.Split(separatorArray, 2);
                         type = parts[0];
-                        if (type == "#")
+                        if (type == "!")
                         {
                             output += "\n.Do(\"" + parts[1] + "\", " + GetLambda("action") + ")";
                         }
@@ -60,7 +60,7 @@ namespace BTMLParser
                         {
                             output += "\n.If(\"" + parts[1] + "\", " + GetLambda("condition") + ")";
                         }
-                        else if (type == "!")
+                        else if (type == "¬")
                         {
                             output += "\n.Not(\"" + parts[1] + "\")";
                         }

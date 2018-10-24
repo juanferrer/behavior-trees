@@ -178,7 +178,7 @@ function addNode(nodeId, parentId, nodeType, nodeName) {
 		case "_":
 			classes = "root";
 			break;
-		case "#":
+		case "!":
 			classes = "leaf action";
 			break;
 		case "?":
@@ -190,7 +190,7 @@ function addNode(nodeId, parentId, nodeType, nodeName) {
 		case "|":
 			classes = "composite selector";
 			break;
-		case "!":
+		case "¬":
 			classes = "decorator negator";
 			break;
 		case "n":
@@ -449,7 +449,7 @@ function parse() {
 			addNode(nodeId, parent.id, nodeType, nodeName);
 
 			// Make sure we push this parent into the list for next child
-			if (["&", "|", "?", "!", "n", "*", "^", "\""].includes(nodeType)) {
+			if (["&", "|", "?", "¬", "n", "*", "^", "\""].includes(nodeType)) {
 				parents.push({ id: nodeId, childNo: 0, type: nodeType });
 			}
 		}

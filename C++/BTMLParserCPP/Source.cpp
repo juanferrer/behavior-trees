@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 				parts = separateStringBy(iss.str(), separator);
 				type = parts[0];
 
-				if (type == "#")
+				if (type == "!")
 				{
 					output += "\n.Do(\"" + parts[1] + "\", " + getLambda("action") + ")";
 				}
@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
 				{
 					output += "\n.If(\"" + parts[1] + "\"," + getLambda("condition") + ")";
 				}
-				else if (type == "!")
+				else if (type == "¬")
 				{
 					output += "\n.Not(\"" + parts[1] + "\")";
 				}
