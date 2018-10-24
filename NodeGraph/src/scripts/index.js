@@ -117,29 +117,28 @@ function addNode(nodeId, parentId, nodeType, nodeName) {
 // #endregion
 
 // #region globals
-const { app, ipcRenderer } = require("electron");
-const { dialog } = require("electron").remote;
+const { ipcRenderer } = require("electron");
+const { dialog, app } = require("electron").remote;
 const fs = require("fs");
 
 var pathToFileBeingEdited;
 
+/** Start editing a new file */
 function newFile() {
 	$("#text-editor")[0].value = "";
 	pathToFileBeingEdited = undefined;
 }
 
-/**
- * Open a file from a specified location
- */
+/** Open a file from a specified location */
 function open() {
-
-	dialog.showOpenDialog(ipcRenderer,{
+	dialog.showOpenDialog({
 		filters: [
-			{name: "BTML files", extensions: ["btml"]},
-			{name: "All Files", extensions: ["*"]}
+			{ name: "BTML files", extensions: ["btml"] },
+			{ name: "All Files", extensions: ["*"] }
 		]
-	},filename => {
-		if (filename === undefined) {
+	}, filenames => {
+		var filename = filenames[0];
+		if (!filename) {
 			utility.log("No file selected");
 			return;
 		}
@@ -152,14 +151,13 @@ function open() {
 			pathToFileBeingEdited = filename;
 			// Do stuff with open file
 			$("#text-editor")[0].value = data;
+			$("#text-editor").change();
 		});
 
 	});
 }
 
-/**
- * Save file to the path it was loaded from
- */
+/** Save file to the path it was loaded from */
 function save() {
 
 	if (!pathToFileBeingEdited) {
@@ -178,18 +176,16 @@ function save() {
 	}
 }
 
-/**
- * Save file to a new path
- */
+/** Save file to a new path */
 function saveAs() {
 	var content = $("#text-editor")[0].value;
 
 	dialog.showSaveDialog({
 		filters: [
-			{name: "BTML files", extensions: ["btml"]},
-			{name: "All Files", extensions: ["*"]}
+			{ name: "BTML files", extensions: ["btml"] },
+			{ name: "All Files", extensions: ["*"] }
 		]
-	},(filename) => {
+	}, (filename) => {
 		if (filename === undefined) {
 			utility.log("No file selected");
 			return;
@@ -205,11 +201,21 @@ function saveAs() {
 	});
 }
 
-/**
- * Modify graph zoom
- */
-function zoom() {
+/** Modify graph zoom */
+function zoom(type) {
 	// TODO
+	switch (type) {
+		case "increase":
+			// TODO
+			cy.zoom(cy.zoom() + 1);
+			break;
+
+		case "decrease":
+			// TODO
+			cy.zoom(cy.zoom() - 1);
+			break;
+	}
+	cy.center();
 }
 
 // #endregion
@@ -230,7 +236,6 @@ $("#text-editor").change(() => {
  */
 $("#output").click(() => {
 	// TODO
-
 	var tempfile = app.getPath("temp") + "\\" + (new Date()).getTime() + ".btml";
 
 	fs.writeFile(tempfile, $("#text-editor")[0].value, "utf-8", () => {
@@ -244,29 +249,31 @@ $("#output").click(() => {
 				return;
 			}
 
+			// TODO: Need to fix BTMLParser to return the text so that it can be saved here
+
 			utility.log(data.toString());
 		});
 	});
 });
 
-ipcRenderer.on("new", (e, args) => {
+ipcRenderer.on("new", () => {
 	newFile();
 });
 
-ipcRenderer.on("open", (e, args) => {
+ipcRenderer.on("open", () => {
 	open();
 });
 
-ipcRenderer.on("save", (e, args) => {
+ipcRenderer.on("save", () => {
 	save();
 });
 
-ipcRenderer.on("saveAs", (e, args) => {
+ipcRenderer.on("saveAs", () => {
 	saveAs();
 });
 
-ipcRenderer.on("zoom", (e, args) => {
-	zoom(args[0]);
+ipcRenderer.on("zoom", (e, type) => {
+	zoom(type);
 });
 
 // #endregion
