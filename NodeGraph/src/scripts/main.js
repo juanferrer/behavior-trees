@@ -7,25 +7,39 @@ const template = [
 		label: "File",
 		submenu: [
 			{
-				label: "New", accelerator: "CommandOrControl+N", click: function () {
+				label: "New", accelerator: "CommandOrControl+N",
+				click: function () {
 					win.webContents.send("new");
 				}
 			},
 			{
-				label: "Open...", accelerator: "CommandOrControl+O", click: function () {
+				label: "Open...", accelerator: "CommandOrControl+O",
+				click: function () {
 					win.webContents.send("open");
 				}
 			},
 			{
-				label: "Save", accelerator: "CommandOrControl+S", click: function () {
+				label: "Save", accelerator: "CommandOrControl+S",
+				click: function () {
 					win.webContents.send("save");
 				}
 			},
 			{
-				label: "Save As...", click: function saveAs() {
+				label: "Save As...",
+				click: function saveAs() {
 					win.webContents.send("saveAs");
 				}
 			},
+			{ type: "separator" },
+			{
+				label: "Preferences",
+				enabled: false,
+				click: function () {
+
+				},
+
+			},
+			{ type: "separator" },
 			{ role: "quit" }
 		]
 	},
@@ -45,12 +59,14 @@ const template = [
 		submenu: [
 			{ role: "toggledevtools" },
 			{
-				label: "Zoom in", click: function () {
+				label: "Zoom in",
+				click: function () {
 					win.webContents.send("zoom", "increase");
 				}
 			},
 			{
-				label: "Zoom out", click: function () {
+				label: "Zoom out",
+				click: function () {
 					win.webContents.send("zoom", "decrease");
 				}
 			}

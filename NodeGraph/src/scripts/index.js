@@ -34,19 +34,75 @@ var cy = cytoscape({
 			}
 		},
 		{
-			selector: ".action",
+			selector: ".root",
 			style: {
-				"background-color": "#ff50f0",
-				"border-color": "#00ff00"
+				"background-color": "#4dd926"
 			},
 		},
 		{
-			selector: ".root",
+			selector: ".leaf",
 			style: {
-				"background-color": "#ff50f0",
-				"border-color": "#00ff00"
+				"background-color": "#d93e26"
 			},
-		}
+		},
+		{
+			selector: ".composite",
+			style: {
+				"background-color": "#d6d926"
+			},
+		},
+		{
+			selector: ".decorator",
+			style: {
+				"background-color": "#d98026"
+			},
+		},
+		{
+			selector: ".action",
+			style: {
+				
+			},
+		},
+		{
+			selector: ".condition",
+			style: {
+			},
+		},
+		{
+			selector: ".sequence",
+			style: {
+			},
+		},
+		{
+			selector: ".selector",
+			style: {
+			},
+		},
+		{
+			selector: ".negator",
+			style: {
+			},
+		},
+		{
+			selector: ".repeater",
+			style: {
+			},
+		},
+		{
+			selector: ".repeatUntilFail",
+			style: {
+			},
+		},
+		{
+			selector: ".succeeder",
+			style: {
+			},
+		},
+		{
+			selector: ".timer",
+			style: {
+			},
+		},
 	],
 
 	// initial viewport state:
@@ -87,7 +143,35 @@ function addNode(nodeId, parentId, nodeType, nodeName) {
 	var classes = "";
 
 	switch (nodeType) {
-		case "":
+		case "_":
+			classes = "root";
+			break;
+		case "#":
+			classes = "leaf action";
+			break;
+		case "?":
+			classes = "leaf condition";
+			break;
+		case "&":
+			classes = "composite sequence";
+			break;
+		case "|":
+			classes = "composite selector";
+			break;
+		case "!":
+			classes = "decorator negator";
+			break;
+		case "n":
+			classes = "decorator repeater";
+			break;
+		case "*":
+			classes = "decorator repeatUntilFail";
+			break;
+		case "^":
+			classes = "decorator succeeder";
+			break;
+		case "\"":
+			classes = "decorator timer";
 			break;
 	}
 
@@ -108,7 +192,7 @@ function addNode(nodeId, parentId, nodeType, nodeName) {
 		});
 	}
 
-	utility.log(`Node ${node.data.id} added as a child of ${(edge ? (edge.data.parentId || "NULL") : "NULL")}`);
+	utility.log(`Node ${node.data().id} added as a child of ${(edge ? (edge.data().source || "NULL") : "NULL")}`);
 
 	var layout = cy.layout({ name: "breadthfirst", directed: true, roots: "#ROOT" });
 	layout.run();
@@ -231,9 +315,7 @@ $("#text-editor").change(() => {
 	parse();
 });
 
-/**
- * Run BTML parser
- */
+/** Run BTML parser */
 $("#output").click(() => {
 	// TODO
 	var tempfile = app.getPath("temp") + "\\" + (new Date()).getTime() + ".btml";
@@ -326,13 +408,16 @@ function parse() {
 
 			// Get string until first space, that should be the node symbol
 			nodeType = line.substring(0, line.indexOf(" ")).trim();
+
+			if ($.isNumeric(nodeType)) nodeType = "n";
+
 			nodeName = line.substring(line.indexOf(" "));
 
 			// Add a node to the node graph
 			addNode(nodeId, parent.id, nodeType, nodeName);
 
 			// Make sure we push this parent into the list for next child
-			if (["&", "|", "?", "!", "*", "^", "\""].includes(nodeType)) {
+			if (["&", "|", "?", "!", "n", "*", "^", "\""].includes(nodeType)) {
 				parents.push({ id: nodeId, childNo: 0, type: nodeType });
 			}
 		}
