@@ -1,4 +1,6 @@
 /* globals $, cytoscape, require  */
+let dagre = require("cytoscape-dagre");
+cytoscape.use(dagre); // register extension
 
 // #region Cytoscape
 //function main() {
