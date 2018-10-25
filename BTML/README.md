@@ -14,6 +14,9 @@ Do an action and return the result.
 ### `?` - *Condition*
 Return success if condition is met. Cannot return RUNNING.
 
+### `#` - *Subtree*
+It allows a leaf to lead into another tree. Whatever comes after the `#` needs to be the name of the file (e.g. `subtree.btml`) that defines the subtree.
+
 ## Composites
 
 Have multiple children and run all children on tick.

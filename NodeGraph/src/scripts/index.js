@@ -20,13 +20,15 @@ var cy = cytoscape({
 		{
 			selector: "node",
 			style: {
-				"background-color": "#666",
+				"background-color": "#888",
 				label: "data(label)",
 				"text-wrap": "wrap",
 				"text-max-width": "80px",
 				"width": "100px",
 				"height": "100px",
-				"min-zoomed-font-size": "5px"
+				"min-zoomed-font-size": "8px",
+				"background-width": "70%",
+				"background-height": "70%"
 			},
 		},
 		{
@@ -42,100 +44,84 @@ var cy = cytoscape({
 			selector: ".root",
 			style: {
 				"background-color": "#4dd926",
-				//"color": "#000000"
 			},
 		},
 		{
 			selector: ".leaf",
 			style: {
 				"background-color": "#d93e26",
-				//"color": "#ffffff"
 			},
 		},
 		{
 			selector: ".composite",
 			style: {
-				"background-color": "#d6d926",
-				//"color": "#000000"
+				//"background-color": "#d6d926",
 			},
+		},
+		{
+			selector: ".tree",
+			style: {
+				"background-color": "#4dd926"
+			}
 		},
 		{
 			selector: ".decorator",
 			style: {
-				"background-color": "#d98026",
-				//"color": "#ffffff"
+				//"background-color": "#d98026",
 			},
 		},
 		{
 			selector: ".action",
 			style: {
-				"background-image": "./img/action.svg",
-				"background-width": "70%",
-				"background-height": "70%"
+				"background-image": "./img/action.svg"
 			},
 		},
 		{
 			selector: ".condition",
 			style: {
-				"background-image": "./img/condition.svg",
-				"background-width": "70%",
-				"background-height": "70%"
+				"background-image": "./img/condition.svg"
 			},
 		},
 		{
 			selector: ".sequence",
 			style: {
-				"background-image": "./img/sequence.svg",
-				"background-width": "70%",
-				"background-height": "70%"
+				"background-image": "./img/sequence.svg"
 			},
 		},
 		{
 			selector: ".selector",
 			style: {
-				"background-image": "./img/selector.svg",
-				"background-width": "70%",
-				"background-height": "70%"
+				"background-image": "./img/selector.svg"
 			},
 		},
 		{
 			selector: ".negator",
 			style: {
-				"background-image": "./img/negator.svg",
-				"background-width": "70%",
-				"background-height": "70%"
+				"background-image": "./img/negator.svg"
 			},
 		},
 		{
 			selector: ".repeater",
 			style: {
-				"background-image": "./img/repeater.svg",
-				"background-width": "70%",
-				"background-height": "70%"
+				"background-image": "./img/repeater.svg"
 			},
 		},
 		{
 			selector: ".repeatUntilFail",
 			style: {
-				"background-image": "./img/repeatUntilFail.svg",
-				"background-width": "70%",
-				"background-height": "70%"
+				"background-image": "./img/repeatUntilFail.svg"
 			},
 		},
 		{
 			selector: ".succeeder",
 			style: {
-				"background-image": "./img/succeeder.svg",
-				"background-width": "70%",
-				"background-height": "70%"
+				"background-image": "./img/succeeder.svg"
 			},
 		},
 		{
 			selector: ".timer",
 			style: {
-				"background-image": "./img/timer.svg",
-				"background-width": "70%",
-				"background-height": "70%"
+				"background-image": "./img/timer.svg"
 			},
 		},
 	],
@@ -180,6 +166,9 @@ function addNode(nodeId, parentId, nodeType, nodeName) {
 	switch (nodeType) {
 		case "_":
 			classes = "root";
+			break;
+		case "#":
+			classes = "tree";
 			break;
 		case "!":
 			classes = "leaf action";
@@ -257,11 +246,11 @@ function open() {
 			{ name: "All Files", extensions: ["*"] }
 		]
 	}, filenames => {
-		var filename = filenames[0];
-		if (!filename) {
+		if (!filenames) {
 			utility.log("No file selected");
 			return;
 		}
+		var filename = filenames[0];
 
 		fs.readFile(filename, "utf-8", (err, data) => {
 			if (err) {
@@ -406,20 +395,14 @@ function countTabs(s) {
 	return num;
 }
 
-/**
- * Format the text and create a map according to it
- */
-function parse() {
-	cy.elements().remove();
-	addNode("ROOT", "", "_", "Base");
-
+function addNodesToParent(content, parentId, parentType) {
 	var tabNum = 0;
 	var nodeType;
 	var nodeName;
-	var parents = [{ id: "ROOT", childNo: 0, type: "_" }];
+	var parents = [{ id: parentId, childNo: 0, type: parentType }];
 	var parent;
 
-	var lines = $("#text-editor")[0].value.split("\n");
+	var lines = content.split("\n");
 
 	var nodeId;
 
@@ -447,17 +430,32 @@ function parse() {
 
 			if ($.isNumeric(nodeType)) nodeType = "n";
 
-			nodeName = line.substring(line.indexOf(" "));
+			nodeName = line.substring(line.indexOf(" ") + 1);
 
 			// Add a node to the node graph
 			addNode(nodeId, parent.id, nodeType, nodeName);
 
 			// Make sure we push this parent into the list for next child
-			if (["&", "|", "?", "¬", "n", "*", "^", "\""].includes(nodeType)) {
+			if (["&", "|", "?", "¬", "n", "*", "^", "\"", "#"].includes(nodeType)) {
 				parents.push({ id: nodeId, childNo: 0, type: nodeType });
+			}
+
+			if (nodeType === "#" && pathToFileBeingEdited) {
+				var substreeFilename = pathToFileBeingEdited.substr(0, pathToFileBeingEdited.lastIndexOf("\\") + 1) + nodeName;
+				var content = fs.readFileSync(substreeFilename, "utf-8");
+				addNodesToParent(content, nodeId, nodeType);
 			}
 		}
 	});
+}
+
+/**
+ * Format the text and create a map according to it
+ */
+function parse() {
+	cy.elements().remove();
+	addNode("ROOT", "", "_", "Root");
+	addNodesToParent($("#text-editor")[0].value, "ROOT", "_");
 }
 
 // #endregion
