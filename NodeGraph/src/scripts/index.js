@@ -23,9 +23,10 @@ var cy = cytoscape({
 				"background-color": "#666",
 				label: "data(label)",
 				"text-wrap": "wrap",
-				"text-max-width": "25px",
+				"text-max-width": "80px",
 				"width": "100px",
-				"height": "100px"
+				"height": "100px",
+				"min-zoomed-font-size": "5px"
 			},
 		},
 		{
@@ -144,7 +145,7 @@ var cy = cytoscape({
 	pan: { x: 0, y: 0 },
 
 	// interaction options:
-	minZoom: 0.5,
+	minZoom: 0.2,
 	maxZoom: 5,
 	zoomingEnabled: true,
 	userZoomingEnabled: true,
@@ -228,7 +229,8 @@ function addNode(nodeId, parentId, nodeType, nodeName) {
 
 	utility.log(`Node ${node.data().id} added as a child of ${(edge ? (edge.data().source || "NULL") : "NULL")}`);
 
-	var layout = cy.layout({ name: "breadthfirst", directed: true, roots: "#ROOT" });
+	// var layout = cy.layout({ name: "breadthfirst", directed: true, roots: "#ROOT" });
+	var layout = cy.layout({ name: "dagre", directed: true });
 	layout.run();
 }
 
