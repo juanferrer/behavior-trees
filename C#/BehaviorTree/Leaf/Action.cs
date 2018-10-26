@@ -16,7 +16,7 @@ namespace FluentBehaviorTree
             action = f;
         }
 
-        public override Node Copy()
+        public override object Clone()
         {
             Action newNode = new Action(this.Name, this.action);
             return newNode;

@@ -16,7 +16,7 @@ namespace FluentBehaviorTree
             condition = f;
         }
 
-        public override Node Copy()
+        public override object Clone()
         {
             Condition newNode = new Condition(this.Name, this.condition);
             return newNode;

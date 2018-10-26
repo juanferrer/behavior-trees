@@ -21,6 +21,13 @@ namespace FluentBehaviorTree
             child = n;
         }
 
+        public override object Clone()
+        {
+            Root newNode = new Root();
+            newNode.AddChild((this.child).Clone() as Node);
+            return newNode;
+        }
+
         protected override Status tick()
         {
             this.Result = child.Tick();

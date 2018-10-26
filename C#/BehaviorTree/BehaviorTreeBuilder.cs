@@ -47,17 +47,17 @@ namespace FluentBehaviorTree
             return this;
         }
 
-        public BehaviorTreeBuilder Do(string name, Node tree)
+        public BehaviorTreeBuilder Do(string name, BehaviorTree tree)
         {
             // TODO: Needs deep copy
-            var currentNode = tree;
+            var currentNode = (tree.Clone() as BehaviorTree).GetRoot();
 
             if (parentNodes.Count > 0)
             {
                 (parentNodes.Peek() as Branch).AddChild(currentNode);
             }
 
-            parentNodes.Push(currentNode);
+            //parentNodes.Push(currentNode);
 
             return this;
         }

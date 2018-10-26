@@ -16,10 +16,10 @@ namespace FluentBehaviorTree
             n = times;
         }
 
-        public override Node Copy()
+        public override object Clone()
         {
             Repeater newNode = new Repeater(this.Name, this.n);
-            newNode.AddChild(this.child.Copy());
+            newNode.AddChild(this.child.Clone() as Node);
             return newNode;
         }
 

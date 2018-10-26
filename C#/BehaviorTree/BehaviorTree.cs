@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FluentBehaviorTree
 {
-    public class BehaviorTree
+    public class BehaviorTree : ICloneable
     {
         private string name;
 
@@ -31,6 +31,11 @@ namespace FluentBehaviorTree
         {
             var status = root.Tick();
             return status;
+        }
+
+        public object Clone()
+        {
+            return new BehaviorTree(this.name, root.Clone() as Node);
         }
     }
 }

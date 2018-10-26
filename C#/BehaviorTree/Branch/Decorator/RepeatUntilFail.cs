@@ -13,10 +13,10 @@ namespace FluentBehaviorTree
             this.Name = name;
         }
 
-        public override Node Copy()
+        public override object Clone()
         {
             RepeatUntilFail newNode = new RepeatUntilFail(this.Name);
-            newNode.AddChild(this.child.Copy());
+            newNode.AddChild(this.child.Clone() as Node);
             return newNode;
         }
 

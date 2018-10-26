@@ -71,5 +71,12 @@ namespace FluentBehaviorTree
             }
             return this.Result;
         }
+
+        public override object Clone()
+        {
+            Timer newNode = new Timer(this.Name, (ulong)this.timer.Interval);
+            newNode.AddChild((this.child).Clone() as Node);
+            return newNode;
+        }
     }
 }
