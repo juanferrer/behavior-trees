@@ -5,6 +5,9 @@
 
 using namespace std;
 
+
+
+// Split string by character
 vector<string> separateStringBy(const string& s, const char& d)
 {
 	vector<string> parts;
@@ -14,6 +17,7 @@ vector<string> separateStringBy(const string& s, const char& d)
 	return parts;
 }
 
+// Trim the string
 string trimString(const string& s)
 {
 	string str = s;
@@ -27,11 +31,13 @@ string trimString(const string& s)
 	return str.substr(begin, range);
 }
 
+// Check if string is a number
 bool isNumber(const std::string& s)
 {
 	return !s.empty() && s.find_first_not_of("0123456789") == std::string::npos;
 }
 
+// Count amount of tabs in specified string
 int countTabs(string s)
 {
 	int num = 0;
@@ -43,25 +49,41 @@ int countTabs(string s)
 	return num;
 }
 
-string getLambda(string type)
+// Produce a lambda of the specified type in the specified language
+string getLambda(string type, bool needsCPP)
 {
-	string returnValue = type == "action" ? "EStatus::ERROR" : "false";
-	return "[]() { return " + returnValue + "; }";
+	string enumReturn = needsCPP ? "EStatus::ERROR" : "Status.ERROR";
+	string returnValue = type == "action" ? enumReturn : "false";
+	string lambdaStart = needsCPP ? "[]()" : "() =>";
+
+	return lambdaStart + " { return " + returnValue + "; }";
 }
 
+// 
 int main(int argc, char* argv[])
 {
-	if (argc > 0)
+	if (argc == 0)
+	{
+		cout << "Usage:\n" <<
+			"btmlparsercpp <C# | C++> <input path> [<output path>]" << endl;
+	}
+	else if (argc > 0)
 	{
 		char* outputFile = ".\\output.txt";
-		char* filename = argv[1];
-		if (argv[2] != NULL)
+		char* language = argv[1];
+		char* filename = argv[2];
+		if (argv[3] != NULL)
 		{
-			outputFile = argv[2];
+			outputFile = argv[3];
 		}
 		ifstream ifile(filename);
 		if (ifile)
 		{
+			bool convertingToCPP = (language == "C++" || language == "c++");
+			if (!convertingToCPP && language != "c#" && language != "c#")
+			{
+				cout << "No language specified: " << language << endl; return 0;
+			}
 			const char separator = ' ';
 			string line = "";
 
@@ -71,7 +93,7 @@ int main(int argc, char* argv[])
 			string type = "";
 			vector<string> parts;
 
-			string output = "BehaviorTree tree = BehaviorTreeBuilder(\"\")";
+			string output = "BehaviorTree tree = " + string(convertingToCPP ? "" : "new") + " BehaviorTreeBuilder(\"\")";
 
 			while (getline(ifile, line))
 			{
@@ -88,7 +110,7 @@ int main(int argc, char* argv[])
 
 				if (type == "!")
 				{
-					output += "\n.Do(\"" + parts[1] + "\", " + getLambda("action") + ")";
+					output += "\n.Do(\"" + parts[1] + "\", " + getLambda("action", convertingToCPP) + ")";
 				}
 				else if (type == "&")
 				{
@@ -104,7 +126,7 @@ int main(int argc, char* argv[])
 				}
 				else if (type == "?")
 				{
-					output += "\n.If(\"" + parts[1] + "\"," + getLambda("condition") + ")";
+					output += "\n.If(\"" + parts[1] + "\"," + getLambda("condition", convertingToCPP) + ")";
 				}
 				else if (type == "¬")
 				{
@@ -126,6 +148,11 @@ int main(int argc, char* argv[])
 				else if (type == "\"")
 				{
 					output += "\n.Wait(\"" + parts[1] + "\", 0)";
+				}
+				else if (type == "#") // Subtree
+				{
+					// TODO: Needs to open file and do this step until tree is completed
+					output += "\n.Do(\"" + parts[1] + "\")";
 				}
 				else
 				{

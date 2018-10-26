@@ -206,8 +206,8 @@ namespace BTConsole
                         .End()
                     .End();
 
-            //tree.Tick();
-            testTree.Tick();
+            tree.Tick();
+            //testTree.Tick();
 
             Console.ReadKey();
         }
