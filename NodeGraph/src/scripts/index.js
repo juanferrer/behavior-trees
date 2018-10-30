@@ -343,26 +343,38 @@ $("#text-editor").change(() => {
 /** Run BTML parser */
 $("#output").click(() => {
 	var language = "C#";
-	var tempfile = app.getPath("temp") + "\\" + (new Date()).getTime() + ".btml";
 
-	fs.writeFile(tempfile, $("#text-editor")[0].value, "utf-8", () => {
+	var filepath;
+
+	// If we are not using a file we opened, create a temp file to read from there
+	if (!pathToFileBeingEdited) {
+		filepath = app.getPath("temp") + "\\" + (new Date()).getTime() + ".btml";		
+		fs.writeFile(filepath, $("#text-editor")[0].value, "utf-8", () => {
+			outputToFile(language, filepath);
+		});
+	} else { 
+		filepath = pathToFileBeingEdited;
+		outputToFile(language, filepath);
+	}
+
+	function outputToFile(l, p) {
+		// Run a local copy of the parser
 		var executablePath = ".\\BTMLPARSERCPP.exe";
-		var parameters = [language, tempfile];
-		var child = require("child_process").execFile(executablePath, parameters, function (err, stdout, stderr) {
+		var parameters = [l, p];
+		var child = require("child_process").execFile(executablePath, parameters, (err, stdout, stderr) => {
 			if (err) {
 				utility.error(err);
 				return;
 			}
 
-			// TODO: Need to fix BTMLParser to return the text so that it can be saved here
-
+			// When the output comes back, if no errors, save that as the dialog
 			utility.log(stdout);
 			dialog.showSaveDialog({
 				filters: [
 					{ name: "Text files", extensions: ["txt"] },
 					{ name: "All Files", extensions: ["*"] }
 				]
-			}, (filename) => {
+			}, filename => {
 				if (filename === undefined) {
 					utility.log("No file selected");
 					return;
@@ -377,7 +389,7 @@ $("#output").click(() => {
 				});
 			});
 		});
-	});
+	}
 });
 
 ipcRenderer.on("new", () => {
@@ -480,11 +492,11 @@ function parse() {
 // #region Utility functions
 var utility = {
 
-	error: function (message) {
+	error: (message) => {
 		console.error(message); // eslint-disable-line
 	},
 
-	log: function (message) {
+	log: (message) => {
 		console.log(message); // eslint-disable-line
 	}
 };
