@@ -1,5 +1,8 @@
 {
     "name": "node-graph",
     "version": "0.1.0",
-    "main": "./scripts/main.js"
+    "main": "./scripts/main.js",
+    "dependencies": {
+        "cytoscape-dagre": "^2.2.2"
+    }
 }

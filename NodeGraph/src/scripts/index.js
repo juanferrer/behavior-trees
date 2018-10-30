@@ -342,15 +342,13 @@ $("#text-editor").change(() => {
 
 /** Run BTML parser */
 $("#output").click(() => {
-	// TODO
+	var language = "C#";
 	var tempfile = app.getPath("temp") + "\\" + (new Date()).getTime() + ".btml";
 
 	fs.writeFile(tempfile, $("#text-editor")[0].value, "utf-8", () => {
-		var child = require("child_process").execFile;
 		var executablePath = ".\\BTMLPARSERCPP.exe";
-		var parameters = [tempfile];
-
-		child(executablePath, parameters, function (err, data) {
+		var parameters = [language, tempfile];
+		var child = require("child_process").execFile(executablePath, parameters, function (err, stdout, stderr) {
 			if (err) {
 				utility.error(err);
 				return;
@@ -358,7 +356,26 @@ $("#output").click(() => {
 
 			// TODO: Need to fix BTMLParser to return the text so that it can be saved here
 
-			utility.log(data.toString());
+			utility.log(stdout);
+			dialog.showSaveDialog({
+				filters: [
+					{ name: "Text files", extensions: ["txt"] },
+					{ name: "All Files", extensions: ["*"] }
+				]
+			}, (filename) => {
+				if (filename === undefined) {
+					utility.log("No file selected");
+					return;
+				}
+		
+				fs.writeFile(filename, stdout, (err) => {
+					if (err) {
+						utility.error("An error ocurred creating the file " + err.message);
+					}
+					pathToFileBeingEdited = filename;
+					utility.log("The file has been succesfully saved");
+				});
+			});
 		});
 	});
 });
