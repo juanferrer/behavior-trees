@@ -33,9 +33,8 @@ const template = [
 			{ type: "separator" },
 			{
 				label: "Preferences",
-				enabled: false,
 				click: function () {
-
+					win.webContents.send("preferences");
 				},
 
 			},

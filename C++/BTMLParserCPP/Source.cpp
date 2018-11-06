@@ -68,7 +68,8 @@ string parse(string filename, string language, bool isBase = false)
 		bool convertingToCPP = (language == "C++" || language == "c++");
 		if (!convertingToCPP && language != "C#" && language != "c#")
 		{
-			cout << "No language specified: " << language << endl; return 0;
+			cout << "No language specified: " << language << endl;
+			return 0;
 		}
 		const char separator = ' ';
 		string line = "";

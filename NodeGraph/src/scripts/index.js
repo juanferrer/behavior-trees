@@ -2,17 +2,16 @@
 //function main() {
 // #region Cytoscape
 let dagre = require("cytoscape-dagre");
-cytoscape.use(dagre); // register extension
-var cy = cytoscape({
-    container: document.getElementById("cy"), // container to render in
+cytoscape.use(dagre);
+let cy = cytoscape({
+    container: document.getElementById("cy"), // Container to render in
 
     elements: [
-        // list of graph elements to start with
         {}
     ],
 
     style: [
-        // the stylesheet for the graph
+        // Stylesheet for the graph
         {
             selector: "node",
             style: {
@@ -122,11 +121,10 @@ var cy = cytoscape({
         }
     ],
 
-    // initial viewport state:
+    // Options
     zoom: 1,
     pan: { x: 0, y: 0 },
 
-    // interaction options:
     minZoom: 0.2,
     maxZoom: 5,
     zoomingEnabled: true,
@@ -141,7 +139,6 @@ var cy = cytoscape({
     autoungrabify: true,
     autounselectify: false,
 
-    // rendering options:
     headless: false,
     styleEnabled: true,
     hideEdgesOnViewport: false,
@@ -153,10 +150,18 @@ var cy = cytoscape({
     pixelRatio: "auto"
 });
 
+// Disable node grabbing
 cy.autoungrabify();
 
+/**
+ * Add a node of the specified type to the specified parent (or headless if undefined)
+ * @param {string} nodeId 
+ * @param {string} parentId 
+ * @param {string} nodeType 
+ * @param {string} nodeName 
+ */
 function addNode(nodeId, parentId, nodeType, nodeName) {
-    var classes = "";
+    let classes = "";
 
     switch (nodeType) {
         case "_":
@@ -194,14 +199,14 @@ function addNode(nodeId, parentId, nodeType, nodeName) {
             break;
     }
 
-    var node = cy.add({
+    let node = cy.add({
         group: "nodes",
         data: { id: nodeId, label: nodeName },
         classes: classes
     });
-
+    let edge;
     if (parentId) {
-        var edge = cy.add({
+        edge = cy.add({
             group: "edges",
             data: {
                 id: parentId + "to" + nodeId,
@@ -217,19 +222,18 @@ function addNode(nodeId, parentId, nodeType, nodeName) {
         }`
     );
 
-    // var layout = cy.layout({ name: "breadthfirst", directed: true, roots: "#ROOT" });
-    var layout = cy.layout({ name: "dagre", directed: true });
-    layout.run();
+    // Update layout
+    cy.layout({ name: "dagre", directed: true }).run();
 }
 
 // #endregion
 
 // #region globals
 const { ipcRenderer } = require("electron");
-const { dialog, app } = require("electron").remote;
+const { dialog, app, BrowserWindow} = require("electron").remote;
 const fs = require("fs");
 
-var pathToFileBeingEdited;
+let pathToFileBeingEdited;
 
 /** Start editing a new file */
 function newFile() {
@@ -253,7 +257,7 @@ function open() {
                 utility.log("No file selected");
                 return;
             }
-            var filename = filenames[0];
+            let filename = filenames[0];
 
             fs.readFile(filename, "utf-8", (err, data) => {
                 if (err) {
@@ -276,7 +280,7 @@ function save() {
     if (!pathToFileBeingEdited) {
         saveAs();
     } else {
-        var content = $("#text-editor")[0].value;
+        let content = $("#text-editor")[0].value;
 
         fs.writeFile(pathToFileBeingEdited, content, err => {
             if (err) {
@@ -292,7 +296,7 @@ function save() {
 
 /** Save file to a new path */
 function saveAs() {
-    var content = $("#text-editor")[0].value;
+    let content = $("#text-editor")[0].value;
 
     dialog.showSaveDialog(
         require("electron").remote.getCurrentWindow(),
@@ -324,6 +328,18 @@ function saveAs() {
 /** Open the preferences window */
 function openPreferences() {
     // TODO: Load and populate user preferences from file
+    let preferencesWindow = new BrowserWindow({ width: 300, height: 400,
+    resizable: false });
+
+    preferencesWindow.loadFile("preferences.html");
+
+    preferencesWindow.on("closed", () => {
+        // Update renderer if needed
+    });
+
+    /*preferencesWindow.once("ready-to-show", () => {
+        preferencesWindow.show();
+    });*/
 }
 
 /** Modify graph zoom */
@@ -347,37 +363,33 @@ function zoom(type) {
 
 // #region Event handlers
 
+/** Update when resizing */
 $(window).resize(() => {
     $("#text-editor")[0].style.width = "calc(100% - 8px)";
     $("#text-editor")[0].style.height = "calc(100% - 5px)";
 });
 
+/** Update render when text editor changes */
 $("#text-editor").change(() => {
     parse();
 });
 
 /** Run BTML parser */
 $("#output").click(() => {
-    var language = "C#";
+    let language = JSON.parse(localStorage.getItem("preferences")).languageOutput || "C++";
 
-    var filepath;
+    let filepath;
 
-    // If we are not using a file we opened, create a temp file to read from there
-    if (!pathToFileBeingEdited) {
-        filepath = app.getPath("temp") + "\\" + new Date().getTime() + ".btml";
-        fs.writeFile(filepath, $("#text-editor")[0].value, "utf-8", () => {
-            outputToFile(language, filepath);
-        });
-    } else {
-        filepath = pathToFileBeingEdited;
+    filepath = app.getPath("temp") + "\\" + new Date().getTime() + ".btml";
+    fs.writeFile(filepath, $("#text-editor")[0].value, "utf-8", () => {
         outputToFile(language, filepath);
-    }
+    });
 
     function outputToFile(l, p) {
         // Run a local copy of the parser
-        var executablePath = ".\\BTMLPARSERCPP.exe";
-        var parameters = [l, p];
-        var child = require("child_process").execFile(
+        let executablePath = ".\\BTMLPARSERCPP.exe";
+        let parameters = [l, p];
+        let child = require("child_process").execFile(
             executablePath,
             parameters,
             (err, stdout, stderr) => {
@@ -418,6 +430,7 @@ $("#output").click(() => {
     }
 });
 
+// Handle events triggered in main window
 ipcRenderer.on("new", () => {
     newFile();
 });
@@ -445,8 +458,12 @@ ipcRenderer.on("zoom", (e, type) => {
 // #endregion
 
 // #region Parser functions
+/**
+ * Count the amount of tabs (or group of 4 spaces) in a given string
+ * @param {string} s 
+ */
 function countTabs(s) {
-    var num = 0;
+    let num = 0;
     while (s[0] === "\t" || s.substr(0, 4) === "    ") {
         s = s.substr(1);
         num++;
@@ -454,16 +471,24 @@ function countTabs(s) {
     return num;
 }
 
+/**
+ * Find nodes in content and add them to parent. If a subtree node
+ * is found, it will try to load that file and append the nodes to
+ * the tree
+ * @param {string} content 
+ * @param {string} parentId 
+ * @param {string} parentType 
+ */
 function addNodesToParent(content, parentId, parentType) {
-    var tabNum = 0;
-    var nodeType;
-    var nodeName;
-    var parents = [{ id: parentId, childNo: 0, type: parentType }];
-    var parent;
+    let tabNum = 0;
+    let nodeType;
+    let nodeName;
+    let parents = [{ id: parentId, childNo: 0, type: parentType }];
+    let parent;
 
-    var lines = content.split("\n");
+    let lines = content.split("\n");
 
-    var nodeId;
+    let nodeId;
 
     lines.forEach(line => {
         if (line) {
@@ -502,21 +527,19 @@ function addNodesToParent(content, parentId, parentType) {
             }
 
             if (nodeType === "#" && pathToFileBeingEdited) {
-                var substreeFilename =
+                let substreeFilename =
                     pathToFileBeingEdited.substr(
                         0,
                         pathToFileBeingEdited.lastIndexOf("\\") + 1
                     ) + nodeName;
-                var content = fs.readFileSync(substreeFilename, "utf-8");
+                let content = fs.readFileSync(substreeFilename, "utf-8");
                 addNodesToParent(content, nodeId, nodeType);
             }
         }
     });
 }
 
-/**
- * Format the text and create a map according to it
- */
+/** Format the text and create a map according to it */
 function parse() {
     cy.elements().remove();
     addNode("ROOT", "", "_", "Root");
@@ -526,7 +549,7 @@ function parse() {
 // #endregion
 
 // #region Utility functions
-var utility = {
+let utility = {
     error: message => {
         console.error(message); // eslint-disable-line
     },

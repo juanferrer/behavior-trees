@@ -8,12 +8,16 @@
 </head>
 
 <body>
-	<div id="editor-area" class="main-area">
-		<div id="text"><textarea id="text-editor"></textarea></div>
-		<div id="cy"></div>
+	<div id="language-selector-container" class="main-area">
+		<select id="language-selector">
+			<option value="C#">C#</option>
+			<option value="C++">C++</option>
+		</select>
 	</div>
+
 	<div class="button-area">
-		<button id="output">Output</button>
+		<button id="cancelButton">Cancel</button>
+		<button id="saveButton">Save</button>
 	</div>
 </body>
 
@@ -23,8 +27,7 @@
 
 <!-- normal script imports etc  -->
 <script src="3rd-party/jquery-3.3.1.min.js"></script>
-<script src="3rd-party/cytoscape.js"></script>
-<script src="scripts/index.js"></script>
+<script src="scripts/preferences.js"></script>
 
 <!-- Insert this line after script imports -->
 <script>if (window.module) module = window.module;</script>
