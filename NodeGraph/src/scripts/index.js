@@ -241,6 +241,7 @@ function newFile() {
 /** Open a file from a specified location */
 function open() {
     dialog.showOpenDialog(
+        require("electron").remote.getCurrentWindow(),
         {
             filters: [
                 { name: "BTML files", extensions: ["btml"] },
@@ -294,6 +295,7 @@ function saveAs() {
     var content = $("#text-editor")[0].value;
 
     dialog.showSaveDialog(
+        require("electron").remote.getCurrentWindow(),
         {
             filters: [
                 { name: "BTML files", extensions: ["btml"] },
@@ -317,6 +319,11 @@ function saveAs() {
             });
         }
     );
+}
+
+/** Open the preferences window */
+function openPreferences() {
+    // TODO: Load and populate user preferences from file
 }
 
 /** Modify graph zoom */
@@ -425,6 +432,10 @@ ipcRenderer.on("save", () => {
 
 ipcRenderer.on("saveAs", () => {
     saveAs();
+});
+
+ipcRenderer.on("preferences", () => {
+    openPreferences();
 });
 
 ipcRenderer.on("zoom", (e, type) => {
