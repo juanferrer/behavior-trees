@@ -1,14 +1,16 @@
 /* globals $, cytoscape, require  */
 //function main() {
 // #region Cytoscape
-let dagre = require("cytoscape-dagre");
-cytoscape.use(dagre);
 let cy = cytoscape({
     container: document.getElementById("cy"), // Container to render in
 
     elements: [
         {}
     ],
+
+    layout: {
+        name: "dagre"
+    },
 
     style: [
         // Stylesheet for the graph
