@@ -235,6 +235,7 @@ const { ipcRenderer } = require("electron");
 const { dialog, app, BrowserWindow} = require("electron").remote;
 const fs = require("fs");
 
+const parentNodeTypes = ["&", "|", "¬", "n", "*", "^", '"', "#"];
 let pathToFileBeingEdited;
 
 /** Start editing a new file */
@@ -496,12 +497,15 @@ function addNodesToParent(content, parentId, parentType) {
         if (line) {
             // Make sure we replace spaces and tabs
             // Might add as an option
-            line = line.replace(/ {4}/g, "\t");
+            line = line.replace(/    /g, "\t");
 
             tabNum = countTabs(line);
             while (tabNum < parents.length - 1) {
                 // We finished in this level, so go back to the previous parent
-                parents.pop();
+                let lastParent = parents.pop();
+                if (parentNodeTypes.includes(lastParent.type)) {
+                    utility.error(`Parent ${lastParent.id} with type ${lastParent.type} has no child. Tree might end up malformed`);
+                }
             }
 
             parent = parents[parents.length - 1];
@@ -522,9 +526,7 @@ function addNodesToParent(content, parentId, parentType) {
             addNode(nodeId, parent.id, nodeType, nodeName);
 
             // Make sure we push this parent into the list for next child
-            if (
-                ["&", "|", "?", "¬", "n", "*", "^", '"', "#"].includes(nodeType)
-            ) {
+            if (parentNodeTypes.includes(nodeType)) {
                 parents.push({ id: nodeId, childNo: 0, type: nodeType });
             }
 
