@@ -220,7 +220,7 @@ function addNode(nodeId, parentId, nodeType, nodeName) {
             });
         }
 
-        utility.log(
+        debug.log(
             `Node ${node.data().id} added as a child of ${
             edge ? edge.data().source || "NULL" : "NULL"
             }`
@@ -240,6 +240,7 @@ const fs = require("fs");
 
 const parentNodeTypes = ["&", "|", "¬", "n", "*", "^", '"', "#"];
 let pathToFileBeingEdited;
+let lineCount = 0;
 
 /** Start editing a new file */
 function newFile() {
@@ -260,14 +261,14 @@ function open() {
         },
         filenames => {
             if (!filenames) {
-                utility.log("No file selected");
+                debug.log("No file selected");
                 return;
             }
             let filename = filenames[0];
 
             fs.readFile(filename, "utf-8", (err, data) => {
                 if (err) {
-                    utility.error(
+                    debug.error(
                         "An error ocurred reading the file: " + err.message
                     );
                     return;
@@ -290,12 +291,12 @@ function save() {
 
         fs.writeFile(pathToFileBeingEdited, content, err => {
             if (err) {
-                utility.error(
+                debug.error(
                     "An error ocurred creating the file " + err.message
                 );
             }
 
-            utility.log("The file has been succesfully saved");
+            debug.log("The file has been succesfully saved");
         });
     }
 }
@@ -314,18 +315,18 @@ function saveAs() {
         },
         filename => {
             if (filename === undefined) {
-                utility.log("No file selected");
+                debug.log("No file selected");
                 return;
             }
 
             fs.writeFile(filename, content, err => {
                 if (err) {
-                    utility.error(
+                    debug.error(
                         "An error ocurred creating the file " + err.message
                     );
                 }
                 pathToFileBeingEdited = filename;
-                utility.log("The file has been succesfully saved");
+                debug.log("The file has been succesfully saved");
             });
         }
     );
@@ -382,7 +383,11 @@ $("#text-editor").change(() => {
 
 /** Update render when text editor receives user input */
 $("#text-editor").on("input", () => {
-    parse(true);
+    var newLineCount = $("#text-editor")[0].value.split("\n").length
+    if (lineCount !== newLineCount) {
+        lineCount = newLineCount;
+        parse(true);
+    }
 });
 
 /** Run BTML parser */
@@ -405,12 +410,12 @@ $("#output").click(() => {
             parameters,
             (err, stdout, stderr) => {
                 if (err) {
-                    utility.error(err);
+                    debug.error(err);
                     return;
                 }
 
                 // When the output comes back, if no errors, save that as the dialog
-                utility.log(stdout);
+                debug.log(stdout);
                 dialog.showSaveDialog(
                     {
                         filters: [
@@ -420,19 +425,19 @@ $("#output").click(() => {
                     },
                     filename => {
                         if (filename === undefined) {
-                            utility.log("No file selected");
+                            debug.log("No file selected");
                             return;
                         }
 
                         fs.writeFile(filename, stdout, err => {
                             if (err) {
-                                utility.error(
+                                debug.error(
                                     "An error ocurred creating the file " +
                                         err.message
                                 );
                             }
                             pathToFileBeingEdited = filename;
-                            utility.log("The file has been succesfully saved");
+                            debug.log("The file has been succesfully saved");
                         });
                     }
                 );
@@ -511,8 +516,9 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
             while (tabNum < parents.length - 1) {
                 // We finished in this level, so go back to the previous parent
                 let lastParent = parents.pop();
-                if (parentNodeTypes.includes(lastParent.type) && !isRealTimeParsing) {
-                    utility.error(`Parent ${lastParent.id} with type ${lastParent.type} has no child. Tree might end up malformed`);
+                // Check if the last node type (since we haven't updated it yet) was expecting a child
+                if (parentNodeTypes.includes(nodeType) && !isRealTimeParsing) {
+                    debug.error(`Parent ${lastParent.id} with type ${lastParent.type} has no child. Tree might end up malformed`);
                     return;
                 }
             }
@@ -564,10 +570,12 @@ function parse(isRealTimeParsing = false) {
 
 // #endregion
 
-// #region Utility functions
-let utility = {
+// #region Debug functions
+let debug = {
+    isDebugging: true,
     error: message => {
-        console.error(message); // eslint-disable-line
+        if (isDebugging)
+            console.error(message); // eslint-disable-line
     },
 
     log: message => {
