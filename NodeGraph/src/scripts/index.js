@@ -163,69 +163,72 @@ cy.autoungrabify();
  * @param {string} nodeName 
  */
 function addNode(nodeId, parentId, nodeType, nodeName) {
-    let classes = "";
+    if (nodeType)
+    {
+        let classes = "";
 
-    switch (nodeType) {
-        case "_":
-            classes = "root";
-            break;
-        case "#":
-            classes = "tree";
-            break;
-        case "!":
-            classes = "leaf action";
-            break;
-        case "?":
-            classes = "leaf condition";
-            break;
-        case "&":
-            classes = "composite sequence";
-            break;
-        case "|":
-            classes = "composite selector";
-            break;
-        case "¬":
-            classes = "decorator negator";
-            break;
-        case "n":
-            classes = "decorator repeater";
-            break;
-        case "*":
-            classes = "decorator repeatUntilFail";
-            break;
-        case "^":
-            classes = "decorator succeeder";
-            break;
-        case '"':
-            classes = "decorator timer";
-            break;
-    }
+        switch (nodeType) {
+            case "_":
+                classes = "root";
+                break;
+            case "#":
+                classes = "tree";
+                break;
+            case "!":
+                classes = "leaf action";
+                break;
+            case "?":
+                classes = "leaf condition";
+                break;
+            case "&":
+                classes = "composite sequence";
+                break;
+            case "|":
+                classes = "composite selector";
+                break;
+            case "¬":
+                classes = "decorator negator";
+                break;
+            case "n":
+                classes = "decorator repeater";
+                break;
+            case "*":
+                classes = "decorator repeatUntilFail";
+                break;
+            case "^":
+                classes = "decorator succeeder";
+                break;
+            case '"':
+                classes = "decorator timer";
+                break;
+        }
 
-    let node = cy.add({
-        group: "nodes",
-        data: { id: nodeId, label: nodeName },
-        classes: classes
-    });
-    let edge;
-    if (parentId) {
-        edge = cy.add({
-            group: "edges",
-            data: {
-                id: parentId + "to" + nodeId,
-                source: parentId,
-                target: nodeId
-            }
+        let node = cy.add({
+            group: "nodes",
+            data: { id: nodeId, label: nodeName },
+            classes: classes
         });
-    }
+        let edge;
+        if (parentId) {
+            edge = cy.add({
+                group: "edges",
+                data: {
+                    id: parentId + "to" + nodeId,
+                    source: parentId,
+                    target: nodeId
+                }
+            });
+        }
 
-    utility.log(
-        `Node ${node.data().id} added as a child of ${
+        utility.log(
+            `Node ${node.data().id} added as a child of ${
             edge ? edge.data().source || "NULL" : "NULL"
-        }`
-    );
+            }`
+        );
 
-    // Update layout
-    cy.layout({ name: "dagre", directed: true }).run();
+        // Update layout
+        cy.layout({ name: "dagre", directed: true }).run();
+    }
 }
 
 // #endregion
@@ -372,9 +375,14 @@ $(window).resize(() => {
     $("#text-editor")[0].style.height = "calc(100% - 5px)";
 });
 
-/** Update render when text editor changes */
+/** Update render when text editor loses focus */
 $("#text-editor").change(() => {
     parse();
+});
+
+/** Update render when text editor receives user input */
+$("#text-editor").on("input", () => {
+    parse(true);
 });
 
 /** Run BTML parser */
@@ -482,7 +490,7 @@ function countTabs(s) {
  * @param {string} parentId 
  * @param {string} parentType 
  */
-function addNodesToParent(content, parentId, parentType) {
+function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
     let tabNum = 0;
     let nodeType;
     let nodeName;
@@ -494,7 +502,7 @@ function addNodesToParent(content, parentId, parentType) {
     let nodeId;
 
     lines.forEach(line => {
-        if (line) {
+        if (line.trim()) {
             // Make sure we replace spaces and tabs
             // Might add as an option
             line = line.replace(/    /g, "\t");
@@ -503,8 +511,9 @@ function addNodesToParent(content, parentId, parentType) {
             while (tabNum < parents.length - 1) {
                 // We finished in this level, so go back to the previous parent
                 let lastParent = parents.pop();
-                if (parentNodeTypes.includes(lastParent.type)) {
+                if (parentNodeTypes.includes(lastParent.type) && !isRealTimeParsing) {
                     utility.error(`Parent ${lastParent.id} with type ${lastParent.type} has no child. Tree might end up malformed`);
+                    return;
                 }
             }
 
@@ -537,17 +546,20 @@ function addNodesToParent(content, parentId, parentType) {
                         pathToFileBeingEdited.lastIndexOf("\\") + 1
                     ) + nodeName;
                 let content = fs.readFileSync(substreeFilename, "utf-8");
-                addNodesToParent(content, nodeId, nodeType);
+                addNodesToParent(content, nodeId, nodeType, isRealTimeParsing);
             }
         }
     });
 }
 
-/** Format the text and create a map according to it */
-function parse() {
+/**
+ * Format the text and create a map according to it
+ * @param {boolean} isRealTimeParsing 
+ */
+function parse(isRealTimeParsing = false) {
     cy.elements().remove();
     addNode("ROOT", "", "_", "Root");
-    addNodesToParent($("#text-editor")[0].value, "ROOT", "_");
+    addNodesToParent($("#text-editor")[0].value, "ROOT", "_", isRealTimeParsing);
 }
 
 // #endregion
