@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 
 namespace FluentBehaviorTree
 {
-    public class BehaviorTree
+    public class BehaviorTree : ICloneable
     {
         private string name;
 
         public string GetName() { return name; }
+        public Node GetRoot() { return root; }
         protected void SetName(string newName) { name = newName; }
+
 
         private Node root;
 
@@ -29,6 +31,11 @@ namespace FluentBehaviorTree
         {
             var status = root.Tick();
             return status;
+        }
+
+        public object Clone()
+        {
+            return new BehaviorTree(this.name, root.Clone() as Node);
         }
     }
 }

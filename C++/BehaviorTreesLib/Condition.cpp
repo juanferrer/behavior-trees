@@ -3,6 +3,11 @@
 
 namespace fluentBehaviorTree
 {
+	Node * Condition::copy()
+	{
+		Condition* newNode = new Condition(this->getName(), this->mCondition);
+		return newNode;
+	}
 	Condition::Condition(std::string name, bool(*f)())
 	{
 		this->setName(name);

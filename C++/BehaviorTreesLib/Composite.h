@@ -11,7 +11,7 @@ namespace fluentBehaviorTree
 	public:
 		std::vector<Node*> mChildren;
 
-		void addChild(Node& n) override;
+		void addChild(Node* n) override;
 
 		virtual ~Composite() override {}
 

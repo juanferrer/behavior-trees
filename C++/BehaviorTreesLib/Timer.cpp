@@ -17,6 +17,13 @@ namespace fluentBehaviorTree
 		this->onTimeout();
 	}
 
+	Node * Timer::copy()
+	{
+		Timer* newNode = new Timer(this->getName(), this->mMS);
+		newNode->addChild(((this->mChild)->copy()));
+		return newNode;
+	}
+
 	Timer::Timer(std::string name, size_t ms)
 	{
 		this->setName(name);
@@ -30,6 +37,7 @@ namespace fluentBehaviorTree
 		if (mChild != nullptr)
 		{
 			delete mChild;
+			mChild = nullptr;
 		}
 	}
 

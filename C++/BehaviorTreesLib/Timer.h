@@ -16,6 +16,7 @@ namespace fluentBehaviorTree
 		bool timerSet;
 
 	public:
+		Node* copy() override;
 		Timer(std::string name, size_t ms);
 		~Timer() override;
 

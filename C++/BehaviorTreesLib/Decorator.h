@@ -9,9 +9,9 @@ namespace fluentBehaviorTree
 	{
 	public:
 		Node* mChild;
-		void addChild(Node& n) override;
+		void addChild(Node* n) override;
 
-		virtual ~Decorator() override {}
+		virtual ~Decorator() override;
 	};
 }
 

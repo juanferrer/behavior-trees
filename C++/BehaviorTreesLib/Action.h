@@ -8,6 +8,7 @@ namespace fluentBehaviorTree
 	class Action : public Leaf
 	{
 	private:
+		Node* copy() override;
 		EStatus(*mAction)();
 
 	public:

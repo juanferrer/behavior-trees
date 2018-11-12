@@ -1,4 +1,5 @@
 #include "BehaviorTree.h"
+#include "Root.h"
 
 namespace fluentBehaviorTree
 {
@@ -16,7 +17,11 @@ namespace fluentBehaviorTree
 
 	BehaviorTree::~BehaviorTree()
 	{
-		delete mRoot;
+		if (mRoot != nullptr)
+		{
+			delete mRoot;
+			mRoot = nullptr;
+		}
 	}
 
 	// Tick tree to navigate and get result

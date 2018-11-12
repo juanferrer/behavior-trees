@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace FluentBehaviorTree
 {
@@ -13,4 +10,8 @@ namespace FluentBehaviorTree
         FAILURE = 2,
         ERROR = 3
     }
+
+
+    // https://stackoverflow.com/questions/129389/how-do-you-do-a-deep-copy-of-an-object-in-net-c-specifically/11308879#11308879
+
 }

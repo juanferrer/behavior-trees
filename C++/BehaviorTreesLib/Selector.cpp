@@ -2,6 +2,15 @@
 
 namespace fluentBehaviorTree
 {
+	Node * Selector::copy()
+	{
+		Selector* newNode = new Selector(this->getName());
+		for (int i = 0, size = mChildren.size(); i < size; ++i)
+		{
+			newNode->addChild((mChildren[i]->copy()));
+		}
+		return newNode;
+	}
 	Selector::Selector(std::string name)
 	{
 		setName(name);

@@ -8,6 +8,7 @@ namespace fluentBehaviorTree
 	class RepeatUntilFail : public Decorator
 	{
 	public:
+		Node* copy() override;
 		RepeatUntilFail(std::string name);
 		~RepeatUntilFail() override;
 

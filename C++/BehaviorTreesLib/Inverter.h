@@ -8,6 +8,8 @@ namespace fluentBehaviorTree
 	class Inverter : public Decorator
 	{
 	public:
+		Node* copy() override;
+
 		Inverter(std::string name);
 		~Inverter() override;
 	protected:

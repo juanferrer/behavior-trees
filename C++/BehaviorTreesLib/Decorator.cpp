@@ -2,8 +2,17 @@
 
 namespace fluentBehaviorTree
 {
-	void Decorator::addChild(Node & n)
+	void Decorator::addChild(Node* n)
 	{
-		mChild = &n;
+		mChild = n;
+	}
+
+	Decorator::~Decorator()
+	{
+		if (mChild != nullptr)
+		{
+			delete mChild;
+			mChild = nullptr;
+		}
 	}
 }

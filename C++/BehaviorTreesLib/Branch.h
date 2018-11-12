@@ -8,7 +8,7 @@ namespace fluentBehaviorTree
 	class Branch : public Node
 	{
 	public:
-		virtual void addChild(Node& n) = 0;
+		virtual void addChild(Node* n) = 0;
 
 		virtual ~Branch() override {}
 	};

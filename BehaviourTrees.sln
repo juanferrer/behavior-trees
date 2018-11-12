@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2018
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BehaviorTrees", "C#\BehaviorTree\BehaviorTrees.csproj", "{78661BB1-28D3-4D2F-B463-974C06060741}"
 EndProject
@@ -25,6 +25,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BTML", "BTML", "{CA6CF64C-8
 		BTML\README.md = BTML\README.md
 		BTML\test-tree.btml = BTML\test-tree.btml
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NodeGraph", "NodeGraph", "{96D22F18-7BB9-4C66-BFED-D0BDE9FFEB0D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -113,5 +115,8 @@ Global
 		{F1370DCE-F45F-46A1-88A1-4C0CEC683640} = {AB5BCAAC-ABA7-41B6-A4B7-FDB05E8B9885}
 		{7206B876-0D09-4764-A1F1-82132C9246D5} = {AB5BCAAC-ABA7-41B6-A4B7-FDB05E8B9885}
 		{FE24A866-9C09-4C45-858B-4189E112B3D7} = {AB5BCAAC-ABA7-41B6-A4B7-FDB05E8B9885}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6F961435-5BD1-4970-B956-0354F718C37D}
 	EndGlobalSection
 EndGlobal

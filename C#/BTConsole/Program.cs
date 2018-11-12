@@ -16,7 +16,7 @@ namespace BTConsole
         static int DC = 20;
         static bool isDoorBroken = false;
         static bool someoneCame = false;
-        static bool isWindowLocked = false;
+        static bool isWindowLocked = true;
         static int ticked = 0;
 
         static public bool IsWayBlocked()
@@ -164,6 +164,19 @@ namespace BTConsole
         static void Main(string[] args)
         {
 
+            BehaviorTree openDoor = new BehaviorTreeBuilder("Open door")
+                .Sequence("Open and close door")
+                    .Do("Open door", OpenDoor)
+                    .Do("Close door", CloseDoor)
+                    .End()
+                .End();
+
+            BehaviorTree testTree = new BehaviorTreeBuilder("Test nested tree")
+                .Selector("Nested tree sequence")
+                    .Do("Nested tree", openDoor)
+                    .Do("Filler", () => { Console.WriteLine("IGNORE THIS"); return Status.FAILURE; })
+			        .End()
+                .End();
 
             BehaviorTree tree = new BehaviorTreeBuilder("Enter room")
                 .RepeatUntilFail("Base loop")
@@ -173,26 +186,30 @@ namespace BTConsole
                                 .If("Is way blocked?", IsWayBlocked)
                             .Do("Go to door", GoToDoor)
                             .Selector("Open door selector")
-                                .Do("Open door", OpenDoor)
+                                .Do("Open door", openDoor)
                                 .Do("Unlock door", UnlockDoor)
                                 .Do("Break door down", BreakDoor)
-                            .End()
+                                .End()
                             .Ignore("Try to close door")
                                 .Do("Close door", CloseDoor)
-                        .End()
+                            .End()
                         .Sequence("Check if anyone comes")
                             .Wait("Wait for people to come", 5000)
                                 .If("Someone came", SomeoneCame)
                             .Do("Ask them to open door", AskToOpenDoor)
-                        .End()
+                            .End()
                         .Sequence("Try window")
                             .Do("Go to window", GoToWindow)
                             .Do("Open window", OpenWindow)
                             .Do("Close window", CloseWindow)
+                            .End()
                         .End()
                     .End();
 
             tree.Tick();
+            //testTree.Tick();
+
+            Console.ReadKey();
         }
     }
 }

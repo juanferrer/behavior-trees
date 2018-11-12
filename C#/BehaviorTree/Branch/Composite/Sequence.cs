@@ -14,6 +14,16 @@ namespace FluentBehaviorTree
             children = new List<Node>();
         }
 
+        public override object Clone()
+        {
+            Sequence newNode = new Sequence(this.Name);
+            for (int i = 0, size = children.Count; i < size; ++i)
+            {
+                newNode.AddChild(children[i].Clone() as Node);
+            }
+            return newNode;
+        }
+
         /// <summary>
         /// Propagate tick to children. Return SUCCESS if no child fails
         /// </summary>

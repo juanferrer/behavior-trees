@@ -16,7 +16,7 @@ static int STR = 13;
 static int DC = 20;
 static bool isDoorBroken = false;
 static bool someoneCame = false;
-static bool isWindowLocked = false;
+static bool isWindowLocked = true;
 static int ticked = 0;
 
 static bool IsWayBlocked()
@@ -163,34 +163,60 @@ static EStatus CloseWindow()
 
 void function()
 {
+	BehaviorTree openDoor = BehaviorTreeBuilder("Open door")
+		.Sequence("Open and close door")
+			.Do("Open door", OpenDoor)
+			.Do("Close door", CloseDoor)
+			.End()
+		.End();
+
+	BehaviorTree testTree = BehaviorTreeBuilder("Test nested tree")
+		.Selector("Nested tree sequence")
+			.Do("Nested tree", openDoor.getRoot())
+			.Do("Filler", []()
+			{
+				std::cout << "IGNORE THIS" << std::endl; return EStatus::FAILURE;
+			})
+			.End()
+		.End();
+	
 	BehaviorTree tree = BehaviorTreeBuilder("Enter room")
 		.RepeatUntilFail("Base loop")
 			.Selector("Find an entrance")
+
 				.Sequence("Try door")
 					.Not("Way is not blocked")
 						.If("Is way blocked?", IsWayBlocked)
 					.Do("Go to door", GoToDoor)
 					.Selector("Open door selector")
-						.Do("Open door", OpenDoor)
+						.Do("Open door", openDoor.getRoot())
 						.Do("Unlock door", UnlockDoor)
 						.Do("Break door down", BreakDoor)
+						.End()
+					/*.Ignore("Try to close door")
+						.Do("Close door", CloseDoor)*/
+					.End()
+
+				.Sequence("Check if anyone comes")
+					.Wait("Wait for people to come", 5000)
+						.If("Someone came", SomeoneCame)
+					.Do("Ask them to open door", AskToOpenDoor)
+					.End()
+
+				.Sequence("Try window")
+					.Do("Go to window", GoToWindow)
+					.Do("Open window", OpenWindow)
+					.Do("Close window", CloseWindow)
+					.End()
 				.End()
-			.Ignore("Try to close door")
-				.Do("Close door", CloseDoor)
-			.End()
-			.Sequence("Check if anyone comes")
-				.Wait("Wait for people to come", 5000)
-					.If("Someone came", SomeoneCame)
-				.Do("Ask them to open door", AskToOpenDoor)
-			.End()
-			.Sequence("Try window")
-				.Do("Go to window", GoToWindow)
-				.Do("Open window", OpenWindow)
-				.Do("Close window", CloseWindow)
-			.End()
-		.End();
+			.End();
+
 
 	tree.tick();
+	//openDoor.tick();
+	//testTree.tick();
+
+	std::cin.ignore(); // Wait for a keypress
 }
 
 int main()

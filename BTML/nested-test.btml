@@ -1,0 +1,12 @@
+* Loop
+    | Selector
+        ! Action 1
+        ! Action 2
+        ! Action 3
+    & Sequence
+        ? Condition
+        2 Loop twice
+            ! Action 4
+        ! Action 5
+    ^ Succeeder
+    # test-tree.btml

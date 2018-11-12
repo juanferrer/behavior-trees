@@ -8,6 +8,7 @@ namespace fluentBehaviorTree
 	class Condition : public Leaf
 	{
 	private:
+		Node* copy() override;
 		// Function to check
 		bool(*mCondition)();
 

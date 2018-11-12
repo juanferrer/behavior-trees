@@ -25,16 +25,16 @@
     <Filter Include="Header Files\Leaf">
       <UniqueIdentifier>{ee3994a2-f9ca-4758-93fd-c68cf2cea88b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Brandh">
-      <UniqueIdentifier>{37801ab2-258c-400d-8a79-cd1a9ee58761}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Leaf">
       <UniqueIdentifier>{a4e27156-ff7e-4e13-a9c1-7605da645a00}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Brandh\Composite">
+    <Filter Include="Source Files\Branch">
+      <UniqueIdentifier>{37801ab2-258c-400d-8a79-cd1a9ee58761}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Branch\Composite">
       <UniqueIdentifier>{0106131e-f2d5-4c51-82aa-734358793f56}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Brandh\Decorator">
+    <Filter Include="Source Files\Branch\Decorator">
       <UniqueIdentifier>{87e05253-ea14-442d-a73c-45589f5ff878}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -90,6 +90,9 @@
     <ClInclude Include="BehaviorTreeBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Root.h">
+      <Filter>Header Files\Branch</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Node.cpp">
@@ -105,34 +108,37 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Composite.cpp">
-      <Filter>Source Files\Brandh\Composite</Filter>
+      <Filter>Source Files\Branch\Composite</Filter>
     </ClCompile>
     <ClCompile Include="Selector.cpp">
-      <Filter>Source Files\Brandh\Composite</Filter>
+      <Filter>Source Files\Branch\Composite</Filter>
     </ClCompile>
     <ClCompile Include="Sequence.cpp">
-      <Filter>Source Files\Brandh\Composite</Filter>
+      <Filter>Source Files\Branch\Composite</Filter>
     </ClCompile>
     <ClCompile Include="Decorator.cpp">
-      <Filter>Source Files\Brandh\Decorator</Filter>
+      <Filter>Source Files\Branch\Decorator</Filter>
     </ClCompile>
     <ClCompile Include="Inverter.cpp">
-      <Filter>Source Files\Brandh\Decorator</Filter>
+      <Filter>Source Files\Branch\Decorator</Filter>
     </ClCompile>
     <ClCompile Include="Repeater.cpp">
-      <Filter>Source Files\Brandh\Decorator</Filter>
+      <Filter>Source Files\Branch\Decorator</Filter>
     </ClCompile>
     <ClCompile Include="RepeatUntilFail.cpp">
-      <Filter>Source Files\Brandh\Decorator</Filter>
+      <Filter>Source Files\Branch\Decorator</Filter>
     </ClCompile>
     <ClCompile Include="Succeeder.cpp">
-      <Filter>Source Files\Brandh\Decorator</Filter>
+      <Filter>Source Files\Branch\Decorator</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
-      <Filter>Source Files\Brandh\Decorator</Filter>
+      <Filter>Source Files\Branch\Decorator</Filter>
     </ClCompile>
     <ClCompile Include="BehaviorTreeBuilder.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Root.cpp">
+      <Filter>Source Files\Branch</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

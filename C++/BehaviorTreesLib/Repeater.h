@@ -11,6 +11,8 @@ namespace fluentBehaviorTree
 		int mN;
 
 	public:
+		Node* copy() override;
+
 		Repeater(std::string name, int times);
 		~Repeater() override;
 

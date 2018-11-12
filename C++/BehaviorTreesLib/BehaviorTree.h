@@ -22,6 +22,7 @@ namespace fluentBehaviorTree
 		~BehaviorTree();
 
 		std::string getName() { return mName; }
+		Node* getRoot() { return mRoot; }
 	
 		EStatus tick();
 

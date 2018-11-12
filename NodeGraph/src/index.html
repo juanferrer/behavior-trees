@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Node graph editor</title>
+	<link rel="stylesheet" type="text/css" href="styles/style.css">
+</head>
+
+<body>
+	<div id="editor-area" class="main-area">
+		<div id="text"><textarea id="text-editor"></textarea></div>
+		<div id="cy"></div>
+	</div>
+	<div class="button-area">
+		<button id="output">Output</button>
+	</div>
+</body>
+
+
+<!-- Insert this line above script imports  -->
+<script>if (typeof module === 'object') { window.module = module; module = undefined; }</script>
+
+<!-- normal script imports etc  -->
+<script src="3rd-party/jquery-3.3.1.min.js"></script>
+<script src="3rd-party/cytoscape.min.js"></script>
+<script src="3rd-party/dagre.js"></script>
+<script src="3rd-party/cytoscape-dagre.js"></script>
+<script src="scripts/index.js"></script>
+
+<!-- Insert this line after script imports -->
+<script>if (window.module) module = window.module;</script>
+
+</html>

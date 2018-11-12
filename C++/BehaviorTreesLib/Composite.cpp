@@ -2,9 +2,9 @@
 
 namespace fluentBehaviorTree
 {
-	void Composite::addChild(Node & n)
+	void Composite::addChild(Node* n)
 	{
-		mChildren.push_back(&n);
+		mChildren.push_back(n);
 	}
 
 	void Composite::open()

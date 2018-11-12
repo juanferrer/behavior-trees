@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FluentBehaviorTree
 {
-    public abstract class Node
+    public abstract class Node : ICloneable
     {
         public string Name { get; protected set; }
         public bool IsOpen { get; protected set; }
@@ -70,5 +70,6 @@ namespace FluentBehaviorTree
             IsOpen = false;
         }
 
+        public abstract object Clone();
     }
 }

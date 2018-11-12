@@ -8,6 +8,7 @@ namespace fluentBehaviorTree
 	class Selector : public Composite
 	{
 	public:
+		Node* copy() override;
 		Selector(std::string name);
 
 		~Selector() override;
