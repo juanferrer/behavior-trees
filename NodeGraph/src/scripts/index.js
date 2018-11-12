@@ -1,6 +1,7 @@
 /* globals $, cytoscape, require  */
 //function main() {
 // #region Cytoscape
+let wipCy = [];
 let cy = cytoscape({
     container: document.getElementById("cy"), // Container to render in
 
@@ -203,31 +204,28 @@ function addNode(nodeId, parentId, nodeType, nodeName) {
                 break;
         }
 
-        let node = cy.add({
+        let node = wipCy[nodeId] = {
             group: "nodes",
             data: { id: nodeId, label: nodeName },
             classes: classes
-        });
+        };
+
         let edge;
         if (parentId) {
-            edge = cy.add({
+            let edgeId = parentId + "to" + nodeId;
+            edge = wipCy[edgeId] = {
                 group: "edges",
                 data: {
-                    id: parentId + "to" + nodeId,
+                    id: edgeId,
                     source: parentId,
                     target: nodeId
                 }
-            });
+            };
         }
 
         debug.log(
-            `Node ${node.data().id} added as a child of ${
-            edge ? edge.data().source || "NULL" : "NULL"
-            }`
+            `Node ${nodeId} added as a child of ${ parentId || "NULL" }`
         );
-
-        // Update layout
-        cy.layout({ name: "dagre", directed: true }).run();
     }
 }
 
@@ -383,11 +381,7 @@ $("#text-editor").change(() => {
 
 /** Update render when text editor receives user input */
 $("#text-editor").on("input", () => {
-    var newLineCount = $("#text-editor")[0].value.split("\n").length
-    if (lineCount !== newLineCount) {
-        lineCount = newLineCount;
         parse(true);
-    }
 });
 
 /** Run BTML parser */
@@ -506,6 +500,11 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
 
     let nodeId;
 
+    // Clear memory
+    wipCy = {};
+
+    addNode("ROOT", "", "_", "Root");
+
     lines.forEach(line => {
         if (line.trim()) {
             // Make sure we replace spaces and tabs
@@ -556,6 +555,12 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
             }
         }
     });
+
+    // Add all noded and edges as a batch
+    cy.add(Object.values(wipCy));
+
+    // Update layout
+    cy.layout({ name: "dagre", directed: true }).run();
 }
 
 /**
@@ -564,7 +569,7 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
  */
 function parse(isRealTimeParsing = false) {
     cy.elements().remove();
-    addNode("ROOT", "", "_", "Root");
+    
     addNodesToParent($("#text-editor")[0].value, "ROOT", "_", isRealTimeParsing);
 }
 
@@ -574,7 +579,7 @@ function parse(isRealTimeParsing = false) {
 let debug = {
     isDebugging: true,
     error: message => {
-        if (isDebugging)
+        if (this.isDebugging)
             console.error(message); // eslint-disable-line
     },
 
