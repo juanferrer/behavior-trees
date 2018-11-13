@@ -553,6 +553,8 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
                 if (fs.existsSync(subtreeFilename)) {
                     let content = fs.readFileSync(subtreeFilename, "utf-8");
                     addNodesToParent(content, nodeId, nodeType, isRealTimeParsing);
+                } else {
+                    
                 }
             }
         }
