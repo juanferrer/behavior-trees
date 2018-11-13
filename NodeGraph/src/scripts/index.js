@@ -545,13 +545,15 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
             }
 
             if (nodeType === "#" && pathToFileBeingEdited) {
-                let substreeFilename =
+                let subtreeFilename =
                     pathToFileBeingEdited.substr(
                         0,
                         pathToFileBeingEdited.lastIndexOf("\\") + 1
                     ) + nodeName;
-                let content = fs.readFileSync(substreeFilename, "utf-8");
-                addNodesToParent(content, nodeId, nodeType, isRealTimeParsing);
+                if (fs.existsSync(subtreeFilename)) {
+                    let content = fs.readFileSync(subtreeFilename, "utf-8");
+                    addNodesToParent(content, nodeId, nodeType, isRealTimeParsing);
+                }
             }
         }
     });
