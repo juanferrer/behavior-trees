@@ -571,7 +571,7 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
  */
 function parse(isRealTimeParsing = false) {
     cy.elements().remove();
-    addNode("ROOT", "NULL", "_", "ROOT");
+    addNode("ROOT", undefined, "_", "ROOT");
     addNodesToParent($("#text-editor")[0].value, "ROOT", "_", isRealTimeParsing);
 }
 
