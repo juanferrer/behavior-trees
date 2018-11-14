@@ -1,5 +1,5 @@
 
-/* globals $ */
+/* globals $, debug */
 /**
  * This is the text editor and contains syntax highlighting and other goodies
  */
@@ -17,24 +17,46 @@ window.editor = {
 	},
 
 	/**
-	 *
+	 * Construct editor and return the newly created object
 	 * @param {string} elementSelector Selector for element to substitute
 	 */
 	editor: function (elementSelector) {
-		let element = $(elementSelector)[0];
-		if (element.nodeName === "DIV") {
+		this.element = $(elementSelector)[0];
+		if (this.element.nodeName === "DIV") {
 			// Remove all children from element
-			while (element.firstChild) { element.removeChild(element.firstChild); }
+			while (this.element.firstChild) { element.removeChild(this.element.firstChild); }
 			// Create a single div element from the editor-line class
 			let newLine = document.createElement("DIV");
 			newLine.classList.add(this.classes.lineClass);
-			element.appendChild(newLine);
+			this.element.appendChild(newLine);
 		} else {
-			error(`Unexpected tag for editor element. Expected "DIV", found ${element.nodeName}`);
+			debug.error(`Unexpected tag for editor element. Expected "DIV", found ${this.element.nodeName}`);
+			return;
 		}
+		return this;
+	}
+
+	/**
+	 * Get the text inside the line
+	 * @param {HTMLElement} element
+	 */
+	getLine: function (element) {
+		let str = "";
+		//
+		Array.from(element.children()).reduce(() => {
+			// str +=
+		});
 	}
 };
 
-$(`.${window.editor.classes.lineClass}`).click(() => {
+/**  */
+$(`.${window.editor.classes.lineClass}`).click((e) => {
+	let target = e.target;
+	// Get coordinates of mouse click and element relative to sreen
+	let mouseX = e.clientX,
+		elementX = window.scrollX + target.getBoundingClientRect().left;
 
+	let charNum = (mouseX - elementX) / 10;
+
+	getLine(target);
 });
