@@ -203,16 +203,15 @@ function addNode(nodeId, parentId, nodeType, nodeName) {
 				break;
 		}
 
-		let node = wipCy[nodeId] = {
+		wipCy[nodeId] = {
 			group: "nodes",
 			data: { id: nodeId, label: nodeName },
 			classes: classes
 		};
 
-		let edge;
 		if (parentId) {
 			let edgeId = parentId + "to" + nodeId;
-			edge = wipCy[edgeId] = {
+			wipCy[edgeId] = {
 				group: "edges",
 				data: {
 					id: edgeId,
@@ -237,7 +236,6 @@ const fs = require("fs");
 
 const parentNodeTypes = ["&", "|", "¬", "n", "*", "^", '"', "#"];
 let pathToFileBeingEdited;
-let lineCount = 0;
 
 /** Start editing a new file */
 function newFile() {
@@ -343,7 +341,7 @@ function openPreferences() {
 		// Update renderer if needed
 	});
 
-    /*preferencesWindow.once("ready-to-show", () => {
+	/*preferencesWindow.once("ready-to-show", () => {
         preferencesWindow.show();
     });*/
 }
@@ -400,10 +398,10 @@ $("#output").click(() => {
 		// Run a local copy of the parser
 		let executablePath = ".\\BTMLPARSERCPP.exe";
 		let parameters = [l, p];
-		let child = require("child_process").execFile(
+		require("child_process").execFile(
 			executablePath,
 			parameters,
-			(err, stdout, stderr) => {
+			(err, stdout) => {
 				if (err) {
 					debug.error(err);
 					return;
@@ -505,7 +503,7 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
 		if (line.trim()) {
 			// Make sure we replace spaces and tabs
 			// Might add as an option
-			line = line.replace(/    /g, "\t");
+			line = line.replace(/ {4}/g, "\t");
 
 			tabNum = countTabs(line);
 			while (tabNum < parents.length - 1) {
@@ -550,7 +548,7 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
 					let content = fs.readFileSync(subtreeFilename, "utf-8");
 					addNodesToParent(content, nodeId, nodeType, isRealTimeParsing);
 				} else {
-
+					//
 				}
 			}
 		}
