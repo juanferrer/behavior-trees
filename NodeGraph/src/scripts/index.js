@@ -128,7 +128,7 @@ let cy = cytoscape({
 	zoom: 1,
 	pan: { x: 0, y: 0 },
 
-	minZoom: 0.2,
+	minZoom: 0.1,
 	maxZoom: 5,
 	zoomingEnabled: true,
 	userZoomingEnabled: true,
@@ -501,11 +501,6 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
 
 	let nodeId;
 
-	// Clear memory
-	wipCy = {};
-
-	addNode("ROOT", "", "_", "Root");
-
 	lines.forEach(line => {
 		if (line.trim()) {
 			// Make sure we replace spaces and tabs
@@ -554,6 +549,8 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
 				if (fs.existsSync(subtreeFilename)) {
 					let content = fs.readFileSync(subtreeFilename, "utf-8");
 					addNodesToParent(content, nodeId, nodeType, isRealTimeParsing);
+				} else {
+
 				}
 			}
 		}
@@ -561,6 +558,9 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
 
 	// Add all noded and edges as a batch
 	cy.add(Object.values(wipCy));
+
+	// Clear memory
+	wipCy = {};
 
 	// Update layout
 	cy.layout({ name: "dagre", directed: true }).run();
@@ -572,7 +572,7 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
  */
 function parse(isRealTimeParsing = false) {
 	cy.elements().remove();
-
+	addNode("ROOT", undefined, "_", "ROOT");
 	addNodesToParent($("#text-editor")[0].value, "ROOT", "_", isRealTimeParsing);
 }
 
