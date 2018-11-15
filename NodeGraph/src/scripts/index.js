@@ -374,14 +374,14 @@ $(window).resize(() => {
 });
 
 /** Update render when text editor loses focus */
-$("#text-editor").change(() => {
+/*$("#text-editor").change(() => {
 	parse();
-});
+});*/
 
 /** Update render when text editor receives user input */
-$("#text-editor").on("input", () => {
+/*$("#text-editor").on("input", () => {
 	parse(true);
-});
+});*/
 
 /** Run BTML parser */
 $("#output").click(() => {
@@ -591,6 +591,7 @@ let debug = {
 
 // #endregion
 
+window.editor = new editor($("#text-editor"));
 newFile();
 //}
 

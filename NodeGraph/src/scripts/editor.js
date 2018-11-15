@@ -11,20 +11,39 @@
 //		  input, update the underlying div to show the new character added. If character
 // 		  is enter close this div and create a new one under it
 
-window.editor = {
-	classes: {
-		lineClass: "editor-line",
-	},
-
+class editor {
 	/**
 	 * Construct editor and return the newly created object
 	 * @param {string} elementSelector Selector for element to substitute
 	 */
-	editor: function (elementSelector) {
+	constructor (elementSelector) {
+		
+		this.classes = {
+			lineClass: "editor-line"
+		};
+
+		this.charWidth = 0
+		
+		this.cursor = {
+			linePos: 0,
+			colPos: 0
+		}
+
+
 		this.element = $(elementSelector)[0];
 		if (this.element.nodeName === "DIV") {
 			// Remove all children from element
 			while (this.element.firstChild) { element.removeChild(this.element.firstChild); }
+
+			// Now store the width of the character
+			// TODO: Performant enough to be done on click?
+			let testElement = document.createElement("SPAN");
+			const testStr = "Test";
+			testElement.innerHTML = testStr;
+			this.element.appendChild(testElement);
+			this.charWidth = $(testElement).width() / testStr.length;
+			this.element.removeChild(testElement);
+
 			// Create a single div element from the editor-line class
 			let newLine = document.createElement("DIV");
 			newLine.classList.add(this.classes.lineClass);
@@ -33,30 +52,35 @@ window.editor = {
 			debug.error(`Unexpected tag for editor element. Expected "DIV", found ${this.element.nodeName}`);
 			return;
 		}
+
 		return this;
 	}
 
 	/**
 	 * Get the text inside the line
-	 * @param {HTMLElement} element
+	 * @param {HTMLElement} e
 	 */
-	getLine: function (element) {
+	getLine(e) {
 		let str = "";
 		//
-		Array.from(element.children()).reduce(() => {
+		Array.from(e.children()).reduce(() => {
 			// str +=
 		});
 	}
+
+	let
 };
 
 /**  */
-$(`.${window.editor.classes.lineClass}`).click((e) => {
+$(`.${editor.classes.lineClass}`).click((e) => {
 	let target = e.target;
 	// Get coordinates of mouse click and element relative to sreen
 	let mouseX = e.clientX,
 		elementX = window.scrollX + target.getBoundingClientRect().left;
 
-	let charNum = (mouseX - elementX) / 10;
+	let charNum = (mouseX - elementX) / window.editor.charWidth;
+	let line = getLine(target);
+	if (charNum > line.length) charNum = line.length - 1;
 
-	getLine(target);
+	debug.log(charNum);
 });
