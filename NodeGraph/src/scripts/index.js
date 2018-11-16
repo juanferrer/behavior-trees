@@ -1,4 +1,4 @@
-/* globals $, cytoscape, require, editor */
+/* globals $, cytoscape, require, Editor */
 //function main() {
 // #region Cytoscape
 let wipCy = [];
@@ -591,7 +591,7 @@ let debug = {
 
 // #endregion
 
-window.editor = new editor($("#text-editor"));
+window.editor = new Editor($("#text-editor"));
 newFile();
 //}
 

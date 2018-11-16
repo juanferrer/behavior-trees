@@ -4,8 +4,16 @@ body {
 	flex-direction: column;
 }
 
-#editor-area {
+#editor-area {}
 
+.editor-line {
+	height: 20px;
+	font-family: monospace;
+	font-size: 15px;
+}
+
+.editor-input {
+	display: none;
 }
 
 .main-area {
