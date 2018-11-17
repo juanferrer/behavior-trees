@@ -235,6 +235,7 @@ const { dialog, app, BrowserWindow } = require("electron").remote;
 const fs = require("fs");
 
 const parentNodeTypes = ["&", "|", "¬", "n", "*", "^", '"', "#"];
+const nodeTypes = ["!", "?", "&", "|", "¬", "n", "*", '"', "#"];
 let pathToFileBeingEdited;
 
 /** Start editing a new file */
