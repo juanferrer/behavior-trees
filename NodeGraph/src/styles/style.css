@@ -25,6 +25,12 @@ body {
 	color: var(--black);
 }
 
+.editor-invisible-line {
+	color: transparent;
+	position: relative;
+	top: -20px;
+}
+
 .editor-input {
 	opacity: 0;
 	position: absolute;
@@ -33,21 +39,19 @@ body {
 }
 
 .editor-cursor {
-	/* TODO */
-	height: 15px;
-    width: 2px;
-	background-color: var(--black);
+	position: relative;
+	left: -3px;
 	animation: 1s blink step-end infinite;
 }
 
 @keyframes blink {
 	from, to {
-	  color: transparent;
+		color: transparent;
 	}
 	50% {
 		color: var(--black);
 	}
-  }
+}
 
 .editor-node {
 	color: var(--pink);

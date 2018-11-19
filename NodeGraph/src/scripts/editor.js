@@ -177,7 +177,6 @@ class Editor {
 	addInputToElement(element) {
 		let lineInput = document.createElement("INPUT");
 		lineInput.setAttribute("type", "text");
-		lineInput.setAttribute("id", "editor-cursor");
 		lineInput.classList.add(Editor.data.inputClass);
 		lineInput.addEventListener("keydown", e => {
 			Editor.eventHandlers.inputHandler(e, this);
@@ -197,12 +196,19 @@ class Editor {
 	 */
 	redraw(element) {
 		let text = element.getAttribute(Editor.data.dataTextAttribute) || "";
-		text = [text.slice(0, this.cursor.colPos), `<span class="${Editor.data.cursorClass}"></span>`, text.slice(this.cursor.colPos)].join("");
+		let cursorText = [text.slice(0, this.cursor.colPos), `<span class="${Editor.data.cursorClass}">|</span>`, text.slice(this.cursor.colPos)].join("");
+
 		let regex = new RegExp(nodeTypes.join("") + " \\w+", "g");
 
 		let html = text.replace(regex, Editor.htmlClasses.nodeType);
 
-		// Add cursor to desired position
+		// Remove all invisible lines
+		$("." + Editor.data.invisibleLineClass).remove();
+		// Copy the text into an invisible line that will be on top of the other line
+		let invisibleLine = this.getNewLine();
+		invisibleLine.classList.add(Editor.data.invisibleLineClass);
+		invisibleLine.innerHTML = cursorText;
+		element.parentNode.appendChild(invisibleLine);
 
 
 		element.innerHTML = html;
@@ -214,6 +220,7 @@ Editor.data = {
 	lineClass: "editor-line",
 	inputClass: "editor-input",
 	cursorClass: "editor-cursor",
+	invisibleLineClass: "editor-invisible-line",
 
 	dataTextAttribute: "data-plain-text"
 };
