@@ -1,15 +1,27 @@
+:root {
+	--white: #ffffff;
+	--black: #000000;
+	--pink: #f92672;
+	--green: #6aaf19;
+	--orange: #fd971f;
+	--purple: #ae81ff;
+	--cyan: #28c6e4;
+}
+
 body {
 	display: flex;
 	height: calc(100vh - 16px - 1px);
 	flex-direction: column;
 }
 
-#editor-area {}
+#editor-area {
+}
 
 .editor-line {
 	height: 20px;
-	font-family: monospace;
+	font-family: "Consolas";
 	font-size: 15px;
+	color: var(--black);
 }
 
 .editor-input {
@@ -17,6 +29,10 @@ body {
 	position: absolute;
 	top: -100px;
 	left: -100px;
+}
+
+.editor-node {
+	color: var(--pink);
 }
 
 .main-area {
@@ -36,6 +52,7 @@ body {
 	height: calc(100% - 5px);
 	white-space: nowrap;
 	tab-size: 4;
+	background-color: var(--white);
 }
 
 #cy {
