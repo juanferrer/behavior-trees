@@ -76,6 +76,8 @@ class Editor {
 				line = this.getLineFromNumber(this.cursor.linePos);
 				if (!line) this.cursor.linePos--;
 				break;
+			case "none":
+				break;
 		}
 
 		// Fix colPos if out of boundaries
@@ -105,7 +107,7 @@ class Editor {
 	}
 
 	/**
-	 * Insert a character in the desired position in the passed element
+	 * Insert a character in the specified position in the passed element
 	 * @param {string} char
 	 * @param {Number} position
 	 * @param {HTMLElement} element
@@ -117,6 +119,16 @@ class Editor {
 			[line.slice(0, position), char, line.slice(position)].join("")
 		);
 		this.moveCursor("right");
+	}
+
+	/**
+	 * Remove the character that is in the specified position in the passed element
+	 * @param {Number} position
+	 * @param {HTMLElement} element
+	 */
+	removeCharacterInPosition(position, element) {
+		let line = this.getLine(element);
+		element.setAttribute(Editor.data.dataTextAttribute, [line.slice(0, position - 1), line.slice(position)].join(""));
 	}
 
 	/**
@@ -290,12 +302,54 @@ Editor.eventHandlers = {
 				break;
 
 			case "Backspace":
+				editor.removeCharacterInPosition(editor.cursor.colPos, element);
+				editor.moveCursor("left");
+				editor.removeInputElements();
+				editor.addInputToElement(element);
 				break;
 
 			case "Delete":
+				editor.removeCharacterInPosition(editor.cursor.colPos + 1, element);
+				editor.moveCursor("none");
+				editor.removeInputElements();
+				editor.addInputToElement(element);
+				break;
+
+			case "Tab":
+				editor.insertCharacterInPosition("\t", editor.cursor.colPos, element);
 				break;
 
 			case "Shift":
+			case "CapsLock":
+			case "Control":
+			case "Alt":
+			case "Escape":
+			case "Windows":
+			case "ScrollLock":
+			case "NumLock":
+			case "Insert":
+			case "PageUp":
+			case "PageDown":
+			case "F1":
+			case "F2":
+			case "F3":
+			case "F4":
+			case "F5":
+			case "F6":
+			case "F7":
+			case "F8":
+			case "F9":
+			case "F10":
+			case "F11":
+			case "F12":
+				// Do nothing
+				break;
+
+			case "Home":
+				// TODO: Move to start of the line
+				break;
+			case "End":
+				// TODO: Move to end of the line
 				break;
 
 			case "ArrowLeft":
@@ -309,11 +363,7 @@ Editor.eventHandlers = {
 
 			default:
 				// Any other key pressed, inser the data into the cursor position
-				editor.insertCharacterInPosition(
-					key,
-					editor.cursor.colPos,
-					element
-				);
+				editor.insertCharacterInPosition(key, editor.cursor.colPos, element);
 				editor.removeInputElements();
 				editor.addInputToElement(element);
 				break;
