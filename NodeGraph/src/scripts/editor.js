@@ -58,6 +58,9 @@ class Editor {
      * @param {string} direction
      */
     moveCursor(direction) {
+		// Remove cursor
+		$("." + Editor.data.cursorClass).remove();
+
         let line = this.getLineFromNumber(this.cursor.linePos);
 
         switch (direction.toLowerCase()) {
@@ -97,7 +100,10 @@ class Editor {
             lineText = this.getLine(line);
             // Go to last character of line
             this.cursor.colPos = lineText.length;
-        }
+		}
+		
+		// Add cursor to line
+		this.redraw(line);
     }
 
     /**
@@ -192,9 +198,15 @@ class Editor {
      * @param {HTMLElement} element
      */
     redraw(element) {
-        let text = element.getAttribute(Editor.data.dataTextAttribute);
-        let regex = new RegExp(nodeTypes.join("") + " \\w+", "g");
-        let html = text.replace(regex, Editor.htmlClasses.nodeType);
+		let text = element.getAttribute(Editor.data.dataTextAttribute) || "";
+		text = [text.slice(0, this.cursor.colPos), `<span class="${Editor.data.cursorClass}"></span>`, text.slice(this.cursor.colPos)].join("")
+		let regex = new RegExp(nodeTypes.join("") + " \\w+", "g");
+		
+		let html = text.replace(regex, Editor.htmlClasses.nodeType);
+		
+		// Add cursor to desired position
+
+
         element.innerHTML = html;
     }
 }
@@ -203,12 +215,13 @@ class Editor {
 Editor.data = {
     lineClass: "editor-line",
     inputClass: "editor-input",
+    cursorClass: "editor-cursor",
 
     dataTextAttribute: "data-plain-text"
 };
 
 Editor.htmlClasses = {
-    nodeType: "<div class='editor-node'>$1</div>$2"
+    nodeType: "<span class='editor-node'>$1</span>$2"
 };
 
 // #endregion
@@ -239,7 +252,8 @@ Editor.eventHandlers = {
 
         debug.log(charNum);
 
-        // TODO: Create a blinking cursor
+		// Create a blinking cursor
+		editor.redraw(target);
 
         // Delete all other inputs
         editor.removeInputElements();
@@ -283,7 +297,9 @@ Editor.eventHandlers = {
             case "ArrowRight":
             case "ArrowUp":
             case "ArrowDown":
-                editor.moveCursor(key.replace("Arrow", "").toLowerCase());
+				editor.moveCursor(key.replace("Arrow", "").toLowerCase());
+				editor.removeInputElements();
+                editor.addInputToElement(element);
                 break;
 
             default:
@@ -293,7 +309,6 @@ Editor.eventHandlers = {
                     editor.cursor.colPos,
                     element
                 );
-                editor.redraw(element);
                 editor.removeInputElements();
                 editor.addInputToElement(element);
                 break;

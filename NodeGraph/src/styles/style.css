@@ -15,6 +15,7 @@ body {
 }
 
 #editor-area {
+	/* TODO */
 }
 
 .editor-line {
@@ -30,6 +31,23 @@ body {
 	top: -100px;
 	left: -100px;
 }
+
+.editor-cursor {
+	/* TODO */
+	height: 15px;
+    width: 2px;
+	background-color: var(--black);
+	animation: 1s blink step-end infinite;
+}
+
+@keyframes blink {
+	from, to {
+	  color: transparent;
+	}
+	50% {
+		color: var(--black);
+	}
+  }
 
 .editor-node {
 	color: var(--pink);
