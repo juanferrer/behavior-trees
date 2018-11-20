@@ -116,7 +116,7 @@ class Editor {
 		}
 
 		// Add cursor to line
-		this.redraw(line);
+		this.redraw(line, true);
 
 		this.addInputToElement(line);
 	}
@@ -220,28 +220,74 @@ class Editor {
 	 * Recalculate the element and trigger a line redraw
 	 * @param {HTMLElement} element
 	 */
-	redraw(element) {
+	redraw(element, addCursor) {
 		if (element) {
 
 			let text = element.getAttribute(Editor.data.dataTextAttribute) || "";
 			let cursorText = [text.slice(0, this.cursor.colPos), `<span class="${Editor.data.cursorClass}">|</span>`, text.slice(this.cursor.colPos)].join("");
 
-			let regex = new RegExp(nodeTypes.join("") + " \\w+", "g");
 
-			let html = text.replace(regex, Editor.htmlClasses.nodeType);
-
-			// Remove all invisible lines
-			$("." + Editor.data.invisibleLineClass).remove();
-			// Copy the text into an invisible line that will be on top of the other line
-			let invisibleLine = this.getNewLine();
-			invisibleLine.classList.remove(Editor.data.lineClass);
-			invisibleLine.classList.add(Editor.data.invisibleLineClass);
-			invisibleLine.innerHTML = cursorText;
-			element.parentNode.insertBefore(invisibleLine, element);
+			let html = text.replace(/ /g, "&nbsp;");
+			html = html.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
+			html = html.replace(/^(\s+)?([!?&|¬n*"^#])( \w+)/g, Editor.htmlClasses.nodeType);
 
 
+			if (addCursor) {
+				// Remove all invisible lines
+				$("." + Editor.data.invisibleLineClass).remove();
+				// Copy the text into an invisible line that will be on top of the other line
+				let invisibleLine = this.getNewLine();
+				invisibleLine.classList.remove(Editor.data.lineClass);
+				invisibleLine.classList.add(Editor.data.invisibleLineClass);
+				invisibleLine.innerHTML = cursorText;
+				element.parentNode.insertBefore(invisibleLine, element);
+			}
 			element.innerHTML = html;
 		}
+	}
+
+	/**
+	 * Get an array with all lines
+	 * @returns {string}
+	 */
+	getText() {
+		let lineElements = $("." + Editor.data.lineClass);
+		let lines = "";
+
+		Array.from(lineElements).forEach((l) => {
+			lines += this.getLine(l) + "\n";
+		});
+		return lines;
+	}
+
+	/**
+	 * Create an element for each line in the passed text
+	 * @param {string} text
+	 */
+	setText(text) {
+		let newLine;
+		let lines = text.split("\n");
+		lines.forEach((l) => {
+			newLine = this.getNewLine();
+			newLine.setAttribute(Editor.data.dataTextAttribute, l);
+			this.element.appendChild(newLine);
+			this.redraw(newLine, false);
+		});
+
+	}
+
+	/** Empty every line in editor */
+	reset() {
+		this.cursor = {
+			linePos: 0,
+			colPos: 0
+		};
+		while (this.element.firstChild) {
+			this.element.removeChild(this.element.firstChild);
+		}
+		// Create a single div element from the editor-line class
+		let newLine = this.getNewLine();
+		this.element.appendChild(newLine);
 	}
 }
 
@@ -256,7 +302,7 @@ Editor.data = {
 };
 
 Editor.htmlClasses = {
-	nodeType: "<span class='editor-node'>$1</span>$2"
+	nodeType: "$1<span class='editor-node'>$2</span>$3"
 };
 
 // #endregion
@@ -290,7 +336,7 @@ Editor.eventHandlers = {
 		debug.log(charNum);
 
 		// Create a blinking cursor
-		editor.redraw(target);
+		editor.redraw(target, true);
 
 		// Delete all other inputs
 		editor.removeInputElements();
@@ -330,7 +376,7 @@ Editor.eventHandlers = {
 					element.nextSibling
 				);
 
-				editor.redraw(element);
+				editor.redraw(element, true);
 				editor.cursor.colPos = 0;
 
 				//editor.addInputToElement(element.nextSibling);

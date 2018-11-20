@@ -1,4 +1,4 @@
-/* globals $, cytoscape, require, Editor */
+/* globals $, cytoscape, require, Editor, e */
 //function main() {
 // #region Cytoscape
 let wipCy = [];
@@ -235,12 +235,12 @@ const { dialog, app, BrowserWindow } = require("electron").remote;
 const fs = require("fs");
 
 const parentNodeTypes = ["&", "|", "¬", "n", "*", "^", '"', "#"];
-const nodeTypes = ["!", "?", "&", "|", "¬", "n", "*", '"', "#"];
 let pathToFileBeingEdited;
 
 /** Start editing a new file */
 function newFile() {
-	$("#text-editor")[0].value = "";
+	//$("#text-editor")[0].value = "";
+	editor.reset();
 	pathToFileBeingEdited = undefined;
 	parse();
 }
@@ -271,7 +271,8 @@ function open() {
 				}
 				pathToFileBeingEdited = filename;
 				// Do stuff with open file
-				$("#text-editor")[0].value = data;
+				//$("#text-editor")[0].value = data;
+				editor.setText(data);
 				$("#text-editor").change();
 			});
 		}
@@ -283,7 +284,8 @@ function save() {
 	if (!pathToFileBeingEdited) {
 		saveAs();
 	} else {
-		let content = $("#text-editor")[0].value;
+		//let content = $("#text-editor")[0].value;
+		let content = editor.getText();
 
 		fs.writeFile(pathToFileBeingEdited, content, err => {
 			if (err) {
@@ -299,7 +301,8 @@ function save() {
 
 /** Save file to a new path */
 function saveAs() {
-	let content = $("#text-editor")[0].value;
+	//let content = $("#text-editor")[0].value;
+	let content = editor.getText();
 
 	dialog.showSaveDialog(
 		require("electron").remote.getCurrentWindow(),
@@ -375,14 +378,14 @@ $(window).resize(() => {
 });
 
 /** Update render when text editor loses focus */
-/*$("#text-editor").change(() => {
+$("#text-editor").change(() => {
 	parse();
-});*/
+});
 
 /** Update render when text editor receives user input */
-/*$("#text-editor").on("input", () => {
+$("#text-editor").on("input", () => {
 	parse(true);
-});*/
+});
 
 /** Run BTML parser */
 $("#output").click(() => {
@@ -391,7 +394,9 @@ $("#output").click(() => {
 	let filepath;
 
 	filepath = app.getPath("temp") + "\\" + new Date().getTime() + ".btml";
-	fs.writeFile(filepath, $("#text-editor")[0].value, "utf-8", () => {
+	//fs.writeFile(filepath, $("#text-editor")[0].value, "utf-8", () => {
+	fs.writeFile(filepath, editor.getText(), "utf-8", () => {
+
 		outputToFile(language, filepath);
 	});
 
@@ -572,7 +577,8 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
 function parse(isRealTimeParsing = false) {
 	cy.elements().remove();
 	addNode("ROOT", undefined, "_", "ROOT");
-	addNodesToParent($("#text-editor")[0].value, "ROOT", "_", isRealTimeParsing);
+	//addNodesToParent($("#text-editor")[0].value, "ROOT", "_", isRealTimeParsing);
+	addNodesToParent(editor.getText(), "ROOT", "_", isRealTimeParsing);
 }
 
 // #endregion
@@ -592,7 +598,7 @@ let debug = {
 
 // #endregion
 
-window.editor = new Editor($("#text-editor"));
+let editor = new Editor($("#text-editor"));
 newFile();
 //}
 
