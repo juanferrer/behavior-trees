@@ -100,13 +100,19 @@ class Editor {
 				// Actually, just jump to the last character in the line
 				this.cursor.colPos = lineText.length;
 			}
-		} else if (this.cursor.colPos < 0 && this.cursor.linePos > 0) {
-			// Before start of line and not in first line
-			// Go up one line
-			line = this.getLineFromNumber(--this.cursor.linePos);
-			lineText = this.getLine(line);
-			// Go to last character of line
-			this.cursor.colPos = lineText.length;
+		} else if (this.cursor.colPos < 0) {
+			// Before start of line
+			if (this.cursor.linePos > 0) {
+				// Not in first line
+				// Go up one line
+				line = this.getLineFromNumber(--this.cursor.linePos);
+				lineText = this.getLine(line);
+				// Go to last character of line
+				this.cursor.colPos = lineText.length;
+			} else {
+				// This is the first line, just stay in position 0
+				this.cursor.colPos = 0;
+			}
 		}
 
 		// Add cursor to line
