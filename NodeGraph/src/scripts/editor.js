@@ -92,13 +92,14 @@ class Editor {
 					this.cursor.colPos = 0;
 				} else {
 					this.cursor.linePos--;
+					this.cursor.colPos = lineText.length;
+					// Get the previous line again
+					line = this.getLineFromNumber(this.cursor.linePos);
 				}
 			} else {
 				// Actually, just jump to the last character in the line
 				this.cursor.colPos = lineText.length;
 			}
-
-			this.cursor.colPos = lineText.length;
 		} else if (this.cursor.colPos < 0 && this.cursor.linePos > 0) {
 			// Before start of line and not in first line
 			// Go up one line
@@ -110,7 +111,7 @@ class Editor {
 
 		// Add cursor to line
 		this.redraw(line);
-		
+
 		this.addInputToElement(line);
 	}
 
@@ -158,11 +159,10 @@ class Editor {
 	getLineNumber(element) {
 		let i = 0;
 		let elements = $("." + Editor.data.lineClass);
-		while (elements[i] != element)
-		{
+		while (elements[i] != element) {
 			++i;
 		}
-			
+
 		return i;
 	}
 
@@ -193,14 +193,16 @@ class Editor {
 	 * @param {HTMLElement} element
 	 */
 	addInputToElement(element) {
-		let lineInput = document.createElement("INPUT");
-		lineInput.setAttribute("type", "text");
-		lineInput.classList.add(Editor.data.inputClass);
-		lineInput.addEventListener("keydown", e => {
-			Editor.eventHandlers.inputHandler(e, this);
-		});
-		element.appendChild(lineInput);
-		lineInput.focus();
+		if (element) {
+			let lineInput = document.createElement("INPUT");
+			lineInput.setAttribute("type", "text");
+			lineInput.classList.add(Editor.data.inputClass);
+			lineInput.addEventListener("keydown", e => {
+				Editor.eventHandlers.inputHandler(e, this);
+			});
+			element.appendChild(lineInput);
+			lineInput.focus();
+		}
 	}
 
 	/** Remove every editor input element in the editor */
@@ -213,24 +215,27 @@ class Editor {
 	 * @param {HTMLElement} element
 	 */
 	redraw(element) {
-		let text = element.getAttribute(Editor.data.dataTextAttribute) || "";
-		let cursorText = [text.slice(0, this.cursor.colPos), `<span class="${Editor.data.cursorClass}">|</span>`, text.slice(this.cursor.colPos)].join("");
+		if (element) {
 
-		let regex = new RegExp(nodeTypes.join("") + " \\w+", "g");
+			let text = element.getAttribute(Editor.data.dataTextAttribute) || "";
+			let cursorText = [text.slice(0, this.cursor.colPos), `<span class="${Editor.data.cursorClass}">|</span>`, text.slice(this.cursor.colPos)].join("");
 
-		let html = text.replace(regex, Editor.htmlClasses.nodeType);
+			let regex = new RegExp(nodeTypes.join("") + " \\w+", "g");
 
-		// Remove all invisible lines
-		$("." + Editor.data.invisibleLineClass).remove();
-		// Copy the text into an invisible line that will be on top of the other line
-		let invisibleLine = this.getNewLine();
-		invisibleLine.classList.remove(Editor.data.lineClass);
-		invisibleLine.classList.add(Editor.data.invisibleLineClass);
-		invisibleLine.innerHTML = cursorText;
-		element.parentNode.insertBefore(invisibleLine, element);
+			let html = text.replace(regex, Editor.htmlClasses.nodeType);
+
+			// Remove all invisible lines
+			$("." + Editor.data.invisibleLineClass).remove();
+			// Copy the text into an invisible line that will be on top of the other line
+			let invisibleLine = this.getNewLine();
+			invisibleLine.classList.remove(Editor.data.lineClass);
+			invisibleLine.classList.add(Editor.data.invisibleLineClass);
+			invisibleLine.innerHTML = cursorText;
+			element.parentNode.insertBefore(invisibleLine, element);
 
 
-		element.innerHTML = html;
+			element.innerHTML = html;
+		}
 	}
 }
 
@@ -298,16 +303,18 @@ Editor.eventHandlers = {
 		let element = inputElement.parentNode;
 		let key = event.key;
 
+		let text, line1, line2, newLine;
+
 		// Go through the possible types of key press
 		switch (key) {
 			case "Enter":
 				// Add a new line after the current node
 				editor.removeInputElements();
-				let text = editor.getLine(element);
-				let line1 = text.slice(0, editor.cursor.colPos);
-				let line2 = text.slice(editor.cursor.colPos);
+				text = editor.getLine(element);
+				line1 = text.slice(0, editor.cursor.colPos);
+				line2 = text.slice(editor.cursor.colPos);
 
-				let newLine = editor.getNewLine();
+				newLine = editor.getNewLine();
 				element.setAttribute(Editor.data.dataTextAttribute, line1);
 				newLine.setAttribute(Editor.data.dataTextAttribute, line2);
 
