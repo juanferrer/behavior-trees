@@ -16,7 +16,6 @@ class Editor {
 	 * @param {string} elementSelector Selector for element to substitute
 	 */
 	constructor(elementSelector) {
-		this.charWidth = 0;
 		this.cursor = {
 			linePos: 0,
 			colPos: 0
@@ -31,12 +30,13 @@ class Editor {
 
 			// Now store the width of the character
 			// TODO: Performant enough to be done on click?
-			let testElement = document.createElement("SPAN");
+			/*let testElement = document.createElement("SPAN");
 			const testStr = "Test";
 			testElement.innerHTML = testStr;
+			testElement.classList.add(Editor.data.lineClass);
 			this.element.appendChild(testElement);
 			this.charWidth = $(testElement).width() / testStr.length;
-			this.element.removeChild(testElement);
+			this.element.removeChild(testElement);*/
 
 			// Create a single div element from the editor-line class
 			let newLine = this.getNewLine();
@@ -70,6 +70,7 @@ class Editor {
 				break;
 			case "up":
 				if (this.cursor.linePos > 0) this.cursor.linePos--;
+				line = this.getLineFromNumber(this.cursor.linePos);
 				break;
 			case "down":
 				this.cursor.linePos++;
@@ -84,12 +85,17 @@ class Editor {
 		let lineText = this.getLine(line);
 		if (this.cursor.colPos > lineText.length) {
 			// After end of line
-			// Is there a line after this one?
-			line = this.getLineFromNumber(++this.cursor.linePos);
-			if (line) {
-				this.cursor.colPos = 0;
+			if (direction === "right") {
+				// Is there a line after this one?
+				line = this.getLineFromNumber(++this.cursor.linePos);
+				if (line) {
+					this.cursor.colPos = 0;
+				} else {
+					this.cursor.linePos--;
+				}
 			} else {
-				this.cursor.linePos--;
+				// Actually, just jump to the last character in the line
+				this.cursor.colPos = lineText.length;
 			}
 
 			this.cursor.colPos = lineText.length;
@@ -104,6 +110,8 @@ class Editor {
 
 		// Add cursor to line
 		this.redraw(line);
+		
+		this.addInputToElement(line);
 	}
 
 	/**
@@ -149,7 +157,12 @@ class Editor {
 	 */
 	getLineNumber(element) {
 		let i = 0;
-		while ((element = element.previousSibling) != null)++i;
+		let elements = $("." + Editor.data.lineClass);
+		while (elements[i] != element)
+		{
+			++i;
+		}
+			
 		return i;
 	}
 
@@ -159,14 +172,7 @@ class Editor {
 	 * @returns {HTMLElement}
 	 */
 	getLineFromNumber(number) {
-		let element = $("." + Editor.data.lineClass)[0],
-			i = 0;
-		while (element && i < number) {
-			++i;
-			element = element.nextSibling;
-		}
-
-		return element || element.previousSibling;
+		return $("." + Editor.data.lineClass)[number];
 	}
 
 	/**
@@ -218,9 +224,10 @@ class Editor {
 		$("." + Editor.data.invisibleLineClass).remove();
 		// Copy the text into an invisible line that will be on top of the other line
 		let invisibleLine = this.getNewLine();
+		invisibleLine.classList.remove(Editor.data.lineClass);
 		invisibleLine.classList.add(Editor.data.invisibleLineClass);
 		invisibleLine.innerHTML = cursorText;
-		element.parentNode.appendChild(invisibleLine);
+		element.parentNode.insertBefore(invisibleLine, element);
 
 
 		element.innerHTML = html;
@@ -255,14 +262,16 @@ Editor.eventHandlers = {
 	 */
 	clickHandler: (event, editor) => {
 		let target = event.target;
-		// Get coordinates of mouse click and element relative to screen
-		let mouseX = event.clientX,
-			elementX = window.scrollX + target.getBoundingClientRect().left;
+
+		// Use Chrome's behavior to find clicked character
+		var selection = window.getSelection();
+		let charNum = selection.focusOffset;
 
 		// Calculate which character in the line is closest to the click point
-		let charNum = (mouseX - elementX) / editor.charWidth;
+		//let charNum = Math.round(((mouseX - elementX) / editor.charWidth) - 0.75);
+
 		let line = editor.getLine(target);
-		if (charNum > line.length) charNum = Math.max(line.length - 1, 0);
+		if (charNum > line.length) charNum = Math.max(line.length, 0);
 
 		editor.cursor.linePos = editor.getLineNumber(target);
 		editor.cursor.colPos = charNum;
@@ -294,25 +303,39 @@ Editor.eventHandlers = {
 			case "Enter":
 				// Add a new line after the current node
 				editor.removeInputElements();
+				let text = editor.getLine(element);
+				let line1 = text.slice(0, editor.cursor.colPos);
+				let line2 = text.slice(editor.cursor.colPos);
+
+				let newLine = editor.getNewLine();
+				element.setAttribute(Editor.data.dataTextAttribute, line1);
+				newLine.setAttribute(Editor.data.dataTextAttribute, line2);
+
+
 				element.parentNode.insertBefore(
-					editor.getNewLine(),
+					newLine,
 					element.nextSibling
 				);
+
+				editor.redraw(element);
+				editor.cursor.colPos = 0;
+
+				//editor.addInputToElement(element.nextSibling);
 				editor.moveCursor("down");
 				break;
 
 			case "Backspace":
 				editor.removeCharacterInPosition(editor.cursor.colPos, element);
-				editor.moveCursor("left");
 				editor.removeInputElements();
-				editor.addInputToElement(element);
+				editor.moveCursor("left");
+				//editor.addInputToElement(element);
 				break;
 
 			case "Delete":
 				editor.removeCharacterInPosition(editor.cursor.colPos + 1, element);
-				editor.moveCursor("none");
 				editor.removeInputElements();
-				editor.addInputToElement(element);
+				editor.moveCursor("none");
+				//editor.addInputToElement(element);
 				break;
 
 			case "Tab":
@@ -356,9 +379,9 @@ Editor.eventHandlers = {
 			case "ArrowRight":
 			case "ArrowUp":
 			case "ArrowDown":
-				editor.moveCursor(key.replace("Arrow", "").toLowerCase());
 				editor.removeInputElements();
-				editor.addInputToElement(element);
+				editor.moveCursor(key.replace("Arrow", "").toLowerCase());
+				//editor.addInputToElement(element);
 				break;
 
 			default:

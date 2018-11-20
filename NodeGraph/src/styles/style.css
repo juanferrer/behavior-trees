@@ -26,9 +26,12 @@ body {
 }
 
 .editor-invisible-line {
+	pointer-events: none;
+	height: 20px;
+	font-family: "Consolas";
+	font-size: 15px;
 	color: transparent;
-	position: relative;
-	top: -20px;
+	position: absolute;
 }
 
 .editor-input {
@@ -39,17 +42,15 @@ body {
 }
 
 .editor-cursor {
+	color: var(--black);
 	position: relative;
-	left: -3px;
+	left: -4px;
 	animation: 1s blink step-end infinite;
 }
 
 @keyframes blink {
-	from, to {
-		color: transparent;
-	}
 	50% {
-		color: var(--black);
+		opacity: 0;
 	}
 }
 
