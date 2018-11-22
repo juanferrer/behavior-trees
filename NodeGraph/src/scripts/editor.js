@@ -13,15 +13,16 @@
 class Editor {
 	/**
 	 * Construct editor and return the newly created object
-	 * @param {string} elementSelector Selector for element to substitute
+	 * @param {string} editorSelector Selector for element to substitute
 	 */
-	constructor(elementSelector) {
+	constructor(editorSelector, numberLinesSelector) {
 		this.cursor = {
 			linePos: 0,
 			colPos: 0
 		};
 
-		this.element = $(elementSelector)[0];
+		this.element = $(editorSelector)[0];
+		this.lineSidebar = $(numberLinesSelector)[0];
 		if (this.element.nodeName === "DIV") {
 			// Remove all children from element
 			while (this.element.firstChild) {
@@ -41,6 +42,7 @@ class Editor {
 			// Create a single div element from the editor-line class
 			let newLine = this.getNewLine();
 			this.element.appendChild(newLine);
+			this.addNewNumberLine();
 		} else {
 			debug.error(
 				`Unexpected tag for editor element. Expected "DIV", found ${this.element.nodeName}`
@@ -184,7 +186,7 @@ class Editor {
 
 	/**
 	 * Create a new editor line
-	 * @param {HTMLElement}
+	 * @returns {HTMLElement}
 	 */
 	getNewLine() {
 		let newLine = document.createElement("DIV");
@@ -193,6 +195,24 @@ class Editor {
 			Editor.eventHandlers.clickHandler(e, this);
 		});
 		return newLine;
+	}
+
+	/** Append a new line number to the line sidebar */
+	addNewNumberLine() {
+		if (this.lineSidebar) {
+
+			let newLineNumber = document.createElement("DIV");
+			newLineNumber.classList.add(Editor.data.lineNumberClass);
+			newLineNumber.innerHTML = $("." + Editor.data.lineClass).length;
+			this.lineSidebar.appendChild(newLineNumber);
+		}
+	}
+
+	/** Remove the last line number from the line sidebar */
+	removeNumberLine() {
+		if (this.lineSidebar && this.lineSidebar.children.length > 1) {
+			this.lineSidebar.removeChild(this.lineSidebar.lastChild);
+		}
 	}
 
 	/**
@@ -227,14 +247,11 @@ class Editor {
 			// Put a marker where the cursor is going to end up
 			let cursorText = [text.slice(0, this.cursor.colPos), Editor.data.cursorMarker, text.slice(this.cursor.colPos)].join("");
 
-
-			let html = text;//.replace(/ /g, "&nbsp;");
+			let html = text;
 			html = html.replace(/\t/g, "    ");
 			// html = html.replace(/(\s+)?([!?&|¬n*"^#])(&nbsp;\w+)/g, Editor.htmlClasses.nodeType);
 			html = html.replace(/^(\s+)?([!?&|¬\d*"^#])( \w+)/gm, Editor.htmlClasses.nodeType);
 
-			//cursorText = cursorText.replace(/ /g, "&nbsp;");
-			//cursorText = cursorText.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
 			cursorText = cursorText.replace(/\t/g, "    ");
 			// Now replace the cursor marker with the correct element
 			cursorText = cursorText.replace(Editor.data.cursorMarker, `<span class="${Editor.data.cursorClass}">|</span>`);
@@ -277,10 +294,12 @@ class Editor {
 		$("." + Editor.data.invisibleLineClass).remove();
 		let newLine;
 		let lines = text.split("\n");
+
 		lines.forEach((l) => {
 			newLine = this.getNewLine();
 			newLine.setAttribute(Editor.data.dataTextAttribute, this.formatTextForLine(l));
 			this.element.appendChild(newLine);
+			this.addNewNumberLine();
 			this.redraw(newLine, false);
 		});
 
@@ -305,9 +324,14 @@ class Editor {
 		while (this.element.firstChild) {
 			this.element.removeChild(this.element.firstChild);
 		}
+
+		while (this.lineSidebar && this.lineSidebar.firstChild) {
+			this.lineSidebar.removeChild(this.lineSidebar.firstChild);
+		}
 		// Create a single div element from the editor-line class
 		let newLine = this.getNewLine();
 		this.element.appendChild(newLine);
+		this.addNewNumberLine();
 	}
 }
 
@@ -317,7 +341,9 @@ Editor.data = {
 	inputClass: "editor-input",
 	cursorClass: "editor-cursor",
 	invisibleLineClass: "editor-invisible-line",
+	lineNumberClass: "editor-line=number",
 
+	lineSidebar: "line-sidebar",
 	dataTextAttribute: "data-plain-text",
 	cursorMarker: "--CURSOR_MARKER--",
 };

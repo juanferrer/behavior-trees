@@ -239,7 +239,6 @@ let pathToFileBeingEdited;
 
 /** Start editing a new file */
 function newFile() {
-	//$("#text-editor")[0].value = "";
 	editor.reset();
 	pathToFileBeingEdited = undefined;
 	parse();
@@ -271,7 +270,6 @@ function open() {
 				}
 				pathToFileBeingEdited = filename;
 				// Do stuff with open file
-				//$("#text-editor")[0].value = data;
 				editor.setText(data);
 				$("#text-editor").change();
 			});
@@ -284,7 +282,6 @@ function save() {
 	if (!pathToFileBeingEdited) {
 		saveAs();
 	} else {
-		//let content = $("#text-editor")[0].value;
 		let content = editor.getText();
 
 		fs.writeFile(pathToFileBeingEdited, content, err => {
@@ -301,7 +298,6 @@ function save() {
 
 /** Save file to a new path */
 function saveAs() {
-	//let content = $("#text-editor")[0].value;
 	let content = editor.getText();
 
 	dialog.showSaveDialog(
@@ -577,7 +573,6 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
 function parse(isRealTimeParsing = false) {
 	cy.elements().remove();
 	addNode("ROOT", undefined, "_", "ROOT");
-	//addNodesToParent($("#text-editor")[0].value, "ROOT", "_", isRealTimeParsing);
 	addNodesToParent(editor.getText(), "ROOT", "_", isRealTimeParsing);
 }
 
@@ -598,7 +593,7 @@ let debug = {
 
 // #endregion
 
-let editor = new Editor($("#text-editor"));
+let editor = new Editor($("#text-editor"), "#line-sidebar");
 newFile();
 //}
 
