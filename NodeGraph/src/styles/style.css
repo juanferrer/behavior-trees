@@ -23,6 +23,7 @@ body {
 	font-family: "Consolas";
 	font-size: 15px;
 	color: var(--black);
+	white-space: pre;
 }
 
 .editor-invisible-line {
@@ -32,6 +33,7 @@ body {
 	font-size: 15px;
 	color: transparent;
 	position: absolute;
+	white-space: pre;
 }
 
 .editor-input {

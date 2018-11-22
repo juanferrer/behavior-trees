@@ -30,13 +30,13 @@ class Editor {
 
 			// Now store the width of the character
 			// TODO: Performant enough to be done on click?
-			/*let testElement = document.createElement("SPAN");
+			let testElement = document.createElement("SPAN");
 			const testStr = "Test";
 			testElement.innerHTML = testStr;
 			testElement.classList.add(Editor.data.lineClass);
 			this.element.appendChild(testElement);
 			this.charWidth = $(testElement).width() / testStr.length;
-			this.element.removeChild(testElement);*/
+			this.element.removeChild(testElement);
 
 			// Create a single div element from the editor-line class
 			let newLine = this.getNewLine();
@@ -228,12 +228,14 @@ class Editor {
 			let cursorText = [text.slice(0, this.cursor.colPos), Editor.data.cursorMarker, text.slice(this.cursor.colPos)].join("");
 
 
-			let html = text.replace(/ /g, "&nbsp;");
-			html = html.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
-			html = html.replace(/(\s+)?([!?&|¬n*"^#])(&nbsp;\w+)/g, Editor.htmlClasses.nodeType);
+			let html = text;//.replace(/ /g, "&nbsp;");
+			html = html.replace(/\t/g, "    ");
+			// html = html.replace(/(\s+)?([!?&|¬n*"^#])(&nbsp;\w+)/g, Editor.htmlClasses.nodeType);
+			html = html.replace(/(\s+)?([!?&|¬n*"^#])( \w+)/g, Editor.htmlClasses.nodeType);
 
-			cursorText = cursorText.replace(/ /g, "&nbsp;");
-			cursorText = cursorText.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
+			//cursorText = cursorText.replace(/ /g, "&nbsp;");
+			//cursorText = cursorText.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
+			cursorText = cursorText.replace(/\t/g, "    ");
 			// Now replace the cursor marker with the correct element
 			cursorText = cursorText.replace(Editor.data.cursorMarker, `<span class="${Editor.data.cursorClass}">|</span>`);
 
@@ -277,11 +279,21 @@ class Editor {
 		let lines = text.split("\n");
 		lines.forEach((l) => {
 			newLine = this.getNewLine();
-			newLine.setAttribute(Editor.data.dataTextAttribute, l);
+			newLine.setAttribute(Editor.data.dataTextAttribute, this.formatTextForLine(l));
 			this.element.appendChild(newLine);
 			this.redraw(newLine, false);
 		});
 
+	}
+
+	/**
+	 * Prepare the string to be inserted in a line
+	 * @param {string} text
+	 * @returns {string}
+	 */
+	formatTextForLine(text) {
+		let formattedLine = text.replace(/\t/g, "    ");
+		return formattedLine;
 	}
 
 	/** Empty every line in editor */
@@ -330,11 +342,11 @@ Editor.eventHandlers = {
 		let target = event.target;
 
 		// Use Chrome's behavior to find clicked character
-		var selection = window.getSelection();
-		let charNum = selection.focusOffset;
+		//var selection = window.getSelection();
+		//let charNum = selection.focusOffset;
 
 		// Calculate which character in the line is closest to the click point
-		//let charNum = Math.round(((mouseX - elementX) / editor.charWidth) - 0.75);
+		let charNum = Math.round(((event.clientX - target.getBoundingClientRect().left) / editor.charWidth));
 
 		let line = editor.getLine(target);
 		if (charNum > line.length) charNum = Math.max(line.length, 0);
@@ -426,7 +438,7 @@ Editor.eventHandlers = {
 					element.setAttribute(Editor.data.dataTextAttribute, line1);
 					editor.redraw(element);
 					editor.removeInputElements();
-					editor.moveCursor("none");		
+					editor.moveCursor("none");
 				} else {
 					editor.removeCharacterInPosition(editor.cursor.colPos + 1, element);
 					editor.removeInputElements();
