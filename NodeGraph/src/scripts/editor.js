@@ -223,8 +223,8 @@ class Editor {
 	 */
 	redraw(element, addCursor) {
 		if (element) {
-
 			let text = element.getAttribute(Editor.data.dataTextAttribute) || "";
+			// Put a marker where the cursor is going to end up
 			let cursorText = [text.slice(0, this.cursor.colPos), Editor.data.cursorMarker, text.slice(this.cursor.colPos)].join("");
 
 
@@ -234,7 +234,7 @@ class Editor {
 
 			cursorText = cursorText.replace(/ /g, "&nbsp;");
 			cursorText = cursorText.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
-			// Now replace marker with editor
+			// Now replace the cursor marker with the correct element
 			cursorText = cursorText.replace(Editor.data.cursorMarker, `<span class="${Editor.data.cursorClass}">|</span>`);
 
 			if (addCursor) {
@@ -397,26 +397,41 @@ Editor.eventHandlers = {
 				if (editor.cursor.colPos === 0 && editor.cursor.linePos > 0) {
 					// Ok, so we need to get combine the current line with the previous line
 					editor.moveCursor("left");
-					line1 = editor.getLineFromNumber(editor.cursor.linePos).getAttribute(Editor.data.dataTextAttribute);
+					element = editor.getLineFromNumber(editor.cursor.linePos);
+					line1 = element.getAttribute(Editor.data.dataTextAttribute);
 					line1 += editor.getLineFromNumber(editor.cursor.linePos + 1).getAttribute(Editor.data.dataTextAttribute);
 
 					$(editor.getLineFromNumber(editor.cursor.linePos + 1)).remove();
 
-					editor.getLineFromNumber(editor.cursor.linePos).setAttribute(Editor.data.dataTextAttribute, line1);
-					editor.redraw(editor.getLineFromNumber(editor.cursor.linePos));
+					element.setAttribute(Editor.data.dataTextAttribute, line1);
+					editor.redraw(element);
+					editor.removeInputElements();
+					editor.moveCursor("none");
 				} else {
 					editor.removeCharacterInPosition(editor.cursor.colPos, element);
 					editor.removeInputElements();
 					editor.moveCursor("left");
 				}
-				//editor.addInputToElement(element);
 				break;
 
 			case "Delete":
-				editor.removeCharacterInPosition(editor.cursor.colPos + 1, element);
-				editor.removeInputElements();
-				editor.moveCursor("none");
-				//editor.addInputToElement(element);
+				// Check if we're at the end of a line and not on the last line
+				if (editor.cursor.colPos === editor.getLine(element).length && editor.cursor.linePos < $("." + Editor.data.lineClass).length - 1) {
+					element = editor.getLineFromNumber(editor.cursor.linePos);
+					line1 = element.getAttribute(Editor.data.dataTextAttribute);
+					line1 += editor.getLineFromNumber(editor.cursor.linePos + 1).getAttribute(Editor.data.dataTextAttribute);
+
+					$(editor.getLineFromNumber(editor.cursor.linePos + 1)).remove();
+
+					element.setAttribute(Editor.data.dataTextAttribute, line1);
+					editor.redraw(element);
+					editor.removeInputElements();
+					editor.moveCursor("none");		
+				} else {
+					editor.removeCharacterInPosition(editor.cursor.colPos + 1, element);
+					editor.removeInputElements();
+					editor.moveCursor("none");
+				}
 				break;
 
 			case "Tab":
