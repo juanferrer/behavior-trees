@@ -260,11 +260,14 @@ class Editor {
 				// Remove all invisible lines
 				$("." + Editor.data.invisibleLineClass).remove();
 				// Copy the text into an invisible line that will be on top of the other line
+				let invisibleLineContainer = document.createElement("DIV");
+				invisibleLineContainer.style.height = "0px";
 				let invisibleLine = this.getNewLine();
 				invisibleLine.classList.remove(Editor.data.lineClass);
 				invisibleLine.classList.add(Editor.data.invisibleLineClass);
 				invisibleLine.innerHTML = cursorText;
-				element.parentNode.insertBefore(invisibleLine, element);
+				invisibleLineContainer.appendChild(invisibleLine);
+				element.parentNode.insertBefore(invisibleLineContainer, element);
 			}
 			element.innerHTML = html;
 		}
@@ -292,6 +295,7 @@ class Editor {
 		$("." + Editor.data.lineClass).remove();
 		$("." + Editor.data.inputClass).remove();
 		$("." + Editor.data.invisibleLineClass).remove();
+		$("." + Editor.data.lineNumberClass).remove();
 		let newLine;
 		let lines = text.split("\n");
 
@@ -300,6 +304,7 @@ class Editor {
 			newLine.setAttribute(Editor.data.dataTextAttribute, this.formatTextForLine(l));
 			this.element.appendChild(newLine);
 			this.addNewNumberLine();
+			this.removeNumberLine();
 			this.redraw(newLine, false);
 		});
 
@@ -341,7 +346,7 @@ Editor.data = {
 	inputClass: "editor-input",
 	cursorClass: "editor-cursor",
 	invisibleLineClass: "editor-invisible-line",
-	lineNumberClass: "editor-line=number",
+	lineNumberClass: "editor-line-number",
 
 	lineSidebar: "line-sidebar",
 	dataTextAttribute: "data-plain-text",
@@ -422,6 +427,7 @@ Editor.eventHandlers = {
 					newLine,
 					element.nextSibling
 				);
+				editor.addNewNumberLine();
 
 				editor.redraw(element, true);
 				editor.cursor.colPos = 0;
