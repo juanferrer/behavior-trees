@@ -38,6 +38,10 @@ body {
 	white-space: pre;
 }
 
+.editor-invisible-line-container {
+	height: 0px;
+}
+
 .editor-input {
 	opacity: 0;
 	position: absolute;

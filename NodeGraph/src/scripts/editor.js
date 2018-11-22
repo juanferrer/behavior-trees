@@ -259,9 +259,10 @@ class Editor {
 			if (addCursor) {
 				// Remove all invisible lines
 				$("." + Editor.data.invisibleLineClass).remove();
+				$("." + Editor.data.invisibleLineContainerClass).remove();
 				// Copy the text into an invisible line that will be on top of the other line
 				let invisibleLineContainer = document.createElement("DIV");
-				invisibleLineContainer.style.height = "0px";
+				invisibleLineContainer.classList.add(Editor.data.invisibleLineContainerClass);
 				let invisibleLine = this.getNewLine();
 				invisibleLine.classList.remove(Editor.data.lineClass);
 				invisibleLine.classList.add(Editor.data.invisibleLineClass);
@@ -295,6 +296,7 @@ class Editor {
 		$("." + Editor.data.lineClass).remove();
 		$("." + Editor.data.inputClass).remove();
 		$("." + Editor.data.invisibleLineClass).remove();
+		$("." + Editor.data.invisibleLineContainerClass).remove();
 		$("." + Editor.data.lineNumberClass).remove();
 		let newLine;
 		let lines = text.split("\n");
@@ -346,6 +348,7 @@ Editor.data = {
 	inputClass: "editor-input",
 	cursorClass: "editor-cursor",
 	invisibleLineClass: "editor-invisible-line",
+	invisibleLineContainerClass: "editor-invisible-line-container",
 	lineNumberClass: "editor-line-number",
 
 	lineSidebar: "line-sidebar",
