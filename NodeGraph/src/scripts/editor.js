@@ -1,4 +1,4 @@
-/* globals $, debug */
+/* globals $, debug, decoratorNodeTypes, compositeNodeTypes, leafNodeTypes */
 /**
  * This is the text editor and contains syntax highlighting and other goodies
  */
@@ -339,6 +339,24 @@ class Editor {
 		this.element.appendChild(newLine);
 		this.addNewNumberLine();
 	}
+
+	/**
+	 * Count the amount of tabs and groups of four spaces present in the line
+	 * @param {string} line
+	 * @returns {Number}
+	 */
+	countIndentationLevel(line) {
+		let level = 0;
+		while (line.startsWith("\t") || line.startsWith("    ")) {
+			if (line.startsWith("\t")) {
+				line = line.substr(1);
+			} else {
+				line = line.substr(4);
+			}
+			level++;
+		}
+		return level;
+	}
 }
 
 // #region Static properties
@@ -409,7 +427,8 @@ Editor.eventHandlers = {
 		let element = inputElement.parentNode;
 		let key = event.key;
 
-		let text, line1, line2, newLine;
+		let text, line1, line2, newLine, indentationLevel;
+		const oneIndentation = "    ";
 
 		// Go through the possible types of key press
 		switch (key) {
@@ -419,6 +438,36 @@ Editor.eventHandlers = {
 				text = editor.getLine(element);
 				line1 = text.slice(0, editor.cursor.colPos);
 				line2 = text.slice(editor.cursor.colPos);
+
+				indentationLevel = editor.countIndentationLevel(line1);
+
+				// Add correct indentation to line2
+				if (decoratorNodeTypes.includes(line1.trim()[0]) || $.isNumeric(line1.trim()[0]) || compositeNodeTypes.includes(line1.trim()[0])) {
+					// Indent one more level
+					line2 = oneIndentation.repeat(indentationLevel + 1) + line2;
+				} else if (leafNodeTypes.includes(line1.trim()[0])) {
+					// Find indentation level of last non-decorator parent and indent one level less than that
+					let parentLineNumber = editor.cursor.linePos - 1;
+					let parent = editor.getLineFromNumber(parentLineNumber);
+					let parentNodeType = editor.getLine(parent).trim()[0];
+					let parentIndentationLevel = editor.countIndentationLevel(editor.getLine(parent));
+					while (parentLineNumber > 0 && !compositeNodeTypes.includes(parentNodeType) &&
+						indentationLevel > parentIndentationLevel) {
+
+						indentationLevel = editor.countIndentationLevel(editor.getLine(parent));
+						parentLineNumber--;
+						parent = editor.getLineFromNumber(parentLineNumber);
+						parentNodeType = editor.getLine(parent).trim()[0];
+						parentIndentationLevel = editor.countIndentationLevel(editor.getLine(parent));
+					}
+					if (decoratorNodeTypes.includes(parentNodeType)) {
+						// First parent was a decorator node, indent one
+						line2 = oneIndentation.repeat(indentationLevel - 1) + line2;
+					} else /*if (compositeNodeTypes.includes(parentNodeType))*/ {
+						// First non-decorator parent is a composite, maintain indentation
+						line2 = oneIndentation.repeat(indentationLevel) + line2;
+					}
+				}
 
 				newLine = editor.getNewLine();
 				element.setAttribute(Editor.data.dataTextAttribute, line1);
@@ -432,8 +481,7 @@ Editor.eventHandlers = {
 				editor.addNewNumberLine();
 
 				editor.redraw(element, true);
-				editor.cursor.colPos = 0;
-
+				//editor.cursor.colPos = 0;
 				//editor.addInputToElement(element.nextSibling);
 				editor.moveCursor("down");
 				break;

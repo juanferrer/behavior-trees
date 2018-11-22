@@ -234,7 +234,10 @@ const { ipcRenderer } = require("electron");
 const { dialog, app, BrowserWindow } = require("electron").remote;
 const fs = require("fs");
 
-const parentNodeTypes = ["&", "|", "¬", "n", "*", "^", '"', "#"];
+const leafNodeTypes = ["!", "?", "#"];
+const decoratorNodeTypes = ["¬", "n", "*", "^", '"'];
+const compositeNodeTypes = ["&", "|"];
+const parentNodeTypes = leafNodeTypes.concat(decoratorNodeTypes, compositeNodeTypes);
 let pathToFileBeingEdited;
 
 /** Start editing a new file */
