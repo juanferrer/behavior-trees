@@ -230,7 +230,7 @@ class Editor {
 
 			let html = text.replace(/ /g, "&nbsp;");
 			html = html.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
-			html = html.replace(/^(\s+)?([!?&|¬n*"^#])( \w+)/g, Editor.htmlClasses.nodeType);
+			html = html.replace(/(\s+)?([!?&|¬n*"^#])(&nbsp;\w+)/g, Editor.htmlClasses.nodeType);
 
 			cursorText = cursorText.replace(/ /g, "&nbsp;");
 			cursorText = cursorText.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
