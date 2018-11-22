@@ -54,8 +54,9 @@ class Editor {
 	/**
 	 * Move selection according to pressed key
 	 * @param {string} direction
+	 * @param {Number} amount
 	 */
-	moveCursor(direction) {
+	moveCursor(direction, amount = 1) {
 		// Remove cursor
 		$("." + Editor.data.cursorClass).remove();
 
@@ -63,19 +64,19 @@ class Editor {
 
 		switch (direction.toLowerCase()) {
 			case "left":
-				this.cursor.colPos--;
+				this.cursor.colPos -= amount;
 				break;
 			case "right":
-				this.cursor.colPos++;
+				this.cursor.colPos += amount;
 				break;
 			case "up":
-				if (this.cursor.linePos > 0) this.cursor.linePos--;
+				if (this.cursor.linePos > 0) this.cursor.linePos -= amount;
 				line = this.getLineFromNumber(this.cursor.linePos);
 				break;
 			case "down":
-				this.cursor.linePos++;
+				this.cursor.linePos += amount;
 				line = this.getLineFromNumber(this.cursor.linePos);
-				if (!line) this.cursor.linePos--;
+				if (!line) this.cursor.linePos -= amount;
 				break;
 			case "none":
 				break;
@@ -133,7 +134,7 @@ class Editor {
 			Editor.data.dataTextAttribute,
 			[line.slice(0, position), char, line.slice(position)].join("")
 		);
-		this.moveCursor("right");
+		this.moveCursor("right", char.length);
 	}
 
 	/**
@@ -224,13 +225,17 @@ class Editor {
 		if (element) {
 
 			let text = element.getAttribute(Editor.data.dataTextAttribute) || "";
-			let cursorText = [text.slice(0, this.cursor.colPos), `<span class="${Editor.data.cursorClass}">|</span>`, text.slice(this.cursor.colPos)].join("");
+			let cursorText = [text.slice(0, this.cursor.colPos), Editor.data.cursorMarker, text.slice(this.cursor.colPos)].join("");
 
 
 			let html = text.replace(/ /g, "&nbsp;");
 			html = html.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
 			html = html.replace(/^(\s+)?([!?&|¬n*"^#])( \w+)/g, Editor.htmlClasses.nodeType);
 
+			cursorText = cursorText.replace(/ /g, "&nbsp;");
+			cursorText = cursorText.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
+			// Now replace marker with editor
+			cursorText = cursorText.replace(Editor.data.cursorMarker, `<span class="${Editor.data.cursorClass}">|</span>`);
 
 			if (addCursor) {
 				// Remove all invisible lines
@@ -265,6 +270,9 @@ class Editor {
 	 * @param {string} text
 	 */
 	setText(text) {
+		$("." + Editor.data.lineClass).remove();
+		$("." + Editor.data.inputClass).remove();
+		$("." + Editor.data.invisibleLineClass).remove();
 		let newLine;
 		let lines = text.split("\n");
 		lines.forEach((l) => {
@@ -298,7 +306,8 @@ Editor.data = {
 	cursorClass: "editor-cursor",
 	invisibleLineClass: "editor-invisible-line",
 
-	dataTextAttribute: "data-plain-text"
+	dataTextAttribute: "data-plain-text",
+	cursorMarker: "--CURSOR_MARKER--",
 };
 
 Editor.htmlClasses = {
@@ -384,9 +393,22 @@ Editor.eventHandlers = {
 				break;
 
 			case "Backspace":
-				editor.removeCharacterInPosition(editor.cursor.colPos, element);
-				editor.removeInputElements();
-				editor.moveCursor("left");
+				// Check if we're at the start of a line and not on the first line
+				if (editor.cursor.colPos === 0 && editor.cursor.linePos > 0) {
+					// Ok, so we need to get combine the current line with the previous line
+					editor.moveCursor("left");
+					line1 = editor.getLineFromNumber(editor.cursor.linePos).getAttribute(Editor.data.dataTextAttribute);
+					line1 += editor.getLineFromNumber(editor.cursor.linePos + 1).getAttribute(Editor.data.dataTextAttribute);
+
+					$(editor.getLineFromNumber(editor.cursor.linePos + 1)).remove();
+
+					editor.getLineFromNumber(editor.cursor.linePos).setAttribute(Editor.data.dataTextAttribute, line1);
+					editor.redraw(editor.getLineFromNumber(editor.cursor.linePos));
+				} else {
+					editor.removeCharacterInPosition(editor.cursor.colPos, element);
+					editor.removeInputElements();
+					editor.moveCursor("left");
+				}
 				//editor.addInputToElement(element);
 				break;
 
@@ -398,7 +420,11 @@ Editor.eventHandlers = {
 				break;
 
 			case "Tab":
-				editor.insertCharacterInPosition("\t", editor.cursor.colPos, element);
+				editor.insertCharacterInPosition("    ", editor.cursor.colPos, element);
+				editor.removeInputElements();
+				editor.addInputToElement(element);
+				// Make sure you don't deselect the editor
+				event.preventDefault();
 				break;
 
 			case "Shift":
