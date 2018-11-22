@@ -306,10 +306,9 @@ class Editor {
 			newLine.setAttribute(Editor.data.dataTextAttribute, this.formatTextForLine(l));
 			this.element.appendChild(newLine);
 			this.addNewNumberLine();
-			this.removeNumberLine();
 			this.redraw(newLine, false);
 		});
-
+		this.removeNumberLine();
 	}
 
 	/**

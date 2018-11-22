@@ -23,6 +23,7 @@ body {
 	height: 20px;
 	font-family: "Consolas";
 	font-size: 15px;
+	line-height: 20px;
 	color: var(--black);
 	white-space: pre;
 }
@@ -32,6 +33,7 @@ body {
 	height: 20px;
 	font-family: "Consolas";
 	font-size: 15px;
+	line-height: 20px;
 	color: transparent;
 	position: relative;
 	top: 0px;
@@ -99,6 +101,7 @@ body {
 	text-align: right;
 	padding-right: 10px;
 	color: var(--dark-grey);
+	line-height: 20px;
 }
 
 #cy {
