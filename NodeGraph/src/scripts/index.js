@@ -1,4 +1,4 @@
-/* globals $, cytoscape, require, Editor, e */
+/* globals $, cytoscape, require, Editor */
 //function main() {
 // #region Cytoscape
 let wipCy = [];

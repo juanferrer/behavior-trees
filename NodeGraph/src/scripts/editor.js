@@ -1,4 +1,4 @@
-/* globals $, debug, nodeTypes */
+/* globals $, debug */
 /**
  * This is the text editor and contains syntax highlighting and other goodies
  */
