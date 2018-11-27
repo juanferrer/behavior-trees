@@ -129,9 +129,11 @@ class Editor {
 			}
 		}
 
-		// Add cursor to line
+		// Add blinking cursor to line
 		this.redraw(line, true);
 
+		// Add an invisible input element before removing them
+		this.removeInputElements();
 		this.addInputToElement(line);
 	}
 
@@ -411,12 +413,7 @@ Editor.eventHandlers = {
 		let line = editor.getLineFromNumber(editor.cursor.linePos);
 		// Right at the end of the line
 		editor.cursor.colPos = editor.getLine(line).length;
-		editor.redraw(line, true);
-		// Delete all other inputs
-		editor.removeInputElements();
-
-		// Create an invisible input
-		editor.addInputToElement(line);
+		editor.moveCursor("none");
 		event.stopPropagation();
 	},
 	/**
@@ -441,14 +438,7 @@ Editor.eventHandlers = {
 
 		debug.log(charNum);
 
-		// Create a blinking cursor
-		editor.redraw(target, true);
-
-		// Delete all other inputs
-		editor.removeInputElements();
-
-		// Create an invisible input
-		editor.addInputToElement(target);
+		editor.moveCursor("none");
 	},
 
 	/**
@@ -514,9 +504,8 @@ Editor.eventHandlers = {
 				);
 				editor.addNewNumberLine();
 
+				// Redraw line before moving to next line
 				editor.redraw(element, true);
-				//editor.cursor.colPos = 0;
-				//editor.addInputToElement(element.nextSibling);
 				editor.moveCursor("down");
 				break;
 
@@ -630,8 +619,9 @@ Editor.eventHandlers = {
 			default:
 				// Any other key pressed, inser the data into the cursor position
 				editor.insertCharacterInPosition(key, editor.cursor.colPos, element);
-				editor.removeInputElements();
-				editor.addInputToElement(element);
+				moveCursor("none");
+				/*editor.removeInputElements();
+				editor.addInputToElement(element);*/
 				break;
 		}
 
