@@ -115,6 +115,8 @@ class Editor {
 				lineText = this.getLine(line);
 				// Go to last character of line
 				this.cursor.colPos = lineText.length;
+				// And delete the line number
+				this.removeNumberLine();
 			} else {
 				// This is the first line, just stay in position 0
 				this.cursor.colPos = 0;
@@ -523,6 +525,7 @@ Editor.eventHandlers = {
 					element.setAttribute(Editor.data.dataTextAttribute, line1);
 					editor.redraw(element);
 					editor.removeInputElements();
+					editor.removeNumberLine()
 					editor.moveCursor("none");
 				} else {
 					editor.removeCharacterInPosition(editor.cursor.colPos + 1, element);
