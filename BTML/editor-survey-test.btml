@@ -1,0 +1,10 @@
+* Loop
+    & Sequence
+        " Timer
+            ! Action
+        | Selector
+            & Sequence
+                ? Condition
+                2 Repeater
+                    ! Action
+            ! Action

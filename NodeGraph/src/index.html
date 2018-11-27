@@ -9,7 +9,11 @@
 
 <body>
 	<div id="editor-area" class="main-area">
-		<div id="text"><textarea id="text-editor"></textarea></div>
+		<div id="text">
+			<div id="line-sidebar"></div>
+			<!-- <textarea id="text-editor"></textarea> -->
+			<div id="text-editor"></div>
+		</div>
 		<div id="cy"></div>
 	</div>
 	<div class="button-area">
@@ -26,6 +30,7 @@
 <script src="3rd-party/cytoscape.min.js"></script>
 <script src="3rd-party/dagre.js"></script>
 <script src="3rd-party/cytoscape-dagre.js"></script>
+<script src="scripts/editor.js"></script>
 <script src="scripts/index.js"></script>
 
 <!-- Insert this line after script imports -->
