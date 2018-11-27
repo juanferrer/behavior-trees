@@ -23,6 +23,12 @@ class Editor {
 
 		this.element = $(editorSelector)[0];
 		this.lineSidebar = $(numberLinesSelector)[0];
+
+		// Add click handler to text area
+		this.element.parentNode.addEventListener("click", e => {
+			Editor.eventHandlers.areaClickHandler(e, this);
+		});
+
 		if (this.element.nodeName === "DIV") {
 			// Remove all children from element
 			while (this.element.firstChild) {
@@ -151,7 +157,11 @@ class Editor {
 	 */
 	removeCharacterInPosition(position, element) {
 		let line = this.getLine(element);
-		element.setAttribute(Editor.data.dataTextAttribute, [line.slice(0, position - 1), line.slice(position)].join(""));
+		if (position === 0) {
+			element.setAttribute(Editor.data.dataTextAttribute, line.substr(1));
+		} else {
+			element.setAttribute(Editor.data.dataTextAttribute, [line.slice(0, position - 1), line.slice(position)].join(""));
+		}
 	}
 
 	/**
@@ -197,7 +207,7 @@ class Editor {
 		let newLine = document.createElement("DIV");
 		newLine.classList.add(Editor.data.lineClass);
 		newLine.addEventListener("click", e => {
-			Editor.eventHandlers.clickHandler(e, this);
+			Editor.eventHandlers.lineClickHandler(e, this);
 		});
 		return newLine;
 	}
@@ -245,6 +255,7 @@ class Editor {
 	/**
 	 * Recalculate the element and trigger a line redraw
 	 * @param {HTMLElement} element
+	 * @param {Boolean} addCursor
 	 */
 	redraw(element, addCursor) {
 		if (element) {
@@ -394,7 +405,25 @@ Editor.eventHandlers = {
 	 * @param {Event} event
 	 * @param {Editor} editor
 	 */
-	clickHandler: (event, editor) => {
+	areaClickHandler: (event, editor) => {
+		// Set the cursor at the last line
+		editor.cursor.linePos = $("." + Editor.data.lineClass).length - 1;
+		let line = editor.getLineFromNumber(editor.cursor.linePos);
+		// Right at the end of the line
+		editor.cursor.colPos = editor.getLine(line).length;
+		editor.redraw(line, true);
+		// Delete all other inputs
+		editor.removeInputElements();
+
+		// Create an invisible input
+		editor.addInputToElement(line);
+		event.stopPropagation();
+	},
+	/**
+	 * @param {Event} event
+	 * @param {Editor} editor
+	 */
+	lineClickHandler: (event, editor) => {
 		let target = event.target;
 
 		// Use Chrome's behavior to find clicked character
@@ -535,11 +564,24 @@ Editor.eventHandlers = {
 				break;
 
 			case "Tab":
-				editor.insertCharacterInPosition("    ", editor.cursor.colPos, element);
-				editor.removeInputElements();
-				editor.addInputToElement(element);
-				// Make sure you don't deselect the editor
-				event.preventDefault();
+				if (event.shiftKey) {
+					// Shift + Tab
+					if (editor.getLine(element).startsWith(" ")) {
+						
+						editor.removeCharacterInPosition(0, element);
+						editor.removeCharacterInPosition(0, element);
+						editor.removeCharacterInPosition(0, element);
+						editor.removeCharacterInPosition(0, element);
+						editor.moveCursor("left", 4);
+					}
+					} else {
+						// Normal Tab
+						editor.insertCharacterInPosition("    ", editor.cursor.colPos, element);
+					}
+					editor.removeInputElements();
+					editor.addInputToElement(element);
+					// Make sure you don't deselect the editor
+					event.preventDefault();
 				break;
 
 			case "Shift":
@@ -573,6 +615,8 @@ Editor.eventHandlers = {
 				break;
 			case "End":
 				// TODO: Move to end of the line
+				editor.cursor.colPos = editor.getLine(element).length;
+				editor.moveCursor("none");
 				break;
 
 			case "ArrowLeft":
@@ -581,7 +625,6 @@ Editor.eventHandlers = {
 			case "ArrowDown":
 				editor.removeInputElements();
 				editor.moveCursor(key.replace("Arrow", "").toLowerCase());
-				//editor.addInputToElement(element);
 				break;
 
 			default:
