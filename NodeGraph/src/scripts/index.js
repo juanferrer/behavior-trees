@@ -237,7 +237,7 @@ const fs = require("fs");
 const leafNodeTypes = ["!", "?", "#"];
 const decoratorNodeTypes = ["¬", "n", "*", "^", '"'];
 const compositeNodeTypes = ["&", "|"];
-const parentNodeTypes = leafNodeTypes.concat(decoratorNodeTypes, compositeNodeTypes);
+const parentNodeTypes = compositeNodeTypes.concat(decoratorNodeTypes);
 let pathToFileBeingEdited;
 
 /** Start editing a new file */
@@ -500,7 +500,7 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
 	let parents = [{ id: parentId, childNo: 0, type: parentType }];
 	let parent;
 
-	let lines = content.split("\n");
+	let lines = content.split("\n").filter(l => l);
 
 	let nodeId;
 

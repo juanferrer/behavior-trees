@@ -78,7 +78,10 @@ class Editor {
 			case "down":
 				this.cursor.linePos += amount;
 				line = this.getLineFromNumber(this.cursor.linePos);
-				if (!line) this.cursor.linePos -= amount;
+				if (!line) {
+					this.cursor.linePos -= amount;
+					line = this.getLineFromNumber(this.cursor.linePos);
+				}
 				break;
 			case "none":
 				break;
