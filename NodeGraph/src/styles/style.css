@@ -1,3 +1,14 @@
+:root {
+	--white: #ffffff;
+	--dark-grey: #888888;
+	--black: #000000;
+	--pink: #f92672;
+	--green: #6aaf19;
+	--orange: #fd971f;
+	--purple: #ae81ff;
+	--cyan: #28c6e4;
+}
+
 body {
 	display: flex;
 	height: calc(100vh - 16px - 1px);
@@ -5,7 +16,56 @@ body {
 }
 
 #editor-area {
+	background-color: var(--white);
+}
 
+.editor-line {
+	height: 20px;
+	font-family: "Consolas";
+	font-size: 15px;
+	line-height: 20px;
+	color: var(--black);
+	white-space: pre;
+}
+
+.editor-invisible-line {
+	pointer-events: none;
+	height: 20px;
+	font-family: "Consolas";
+	font-size: 15px;
+	line-height: 20px;
+	color: transparent;
+	position: relative;
+	top: 0px;
+	white-space: pre;
+}
+
+.editor-invisible-line-container {
+	height: 0px;
+}
+
+.editor-input {
+	opacity: 0;
+	position: absolute;
+	top: -100px;
+	left: -100px;
+}
+
+.editor-cursor {
+	color: var(--black);
+	position: relative;
+	left: -4px;
+	animation: 1s blink step-end infinite;
+}
+
+@keyframes blink {
+	50% {
+		opacity: 0;
+	}
+}
+
+.editor-node {
+	color: var(--pink);
 }
 
 .main-area {
@@ -18,13 +78,30 @@ body {
 #text {
 	width: 50%;
 	height: 100%;
+	display: flex;
+	overflow-y: auto;
 }
 
 #text-editor {
-	width: calc(100% - 8px);
-	height: calc(100% - 5px);
+	width: calc(100% - 40px);
+	height: 100%;
 	white-space: nowrap;
 	tab-size: 4;
+	background-color: transparent;
+}
+
+#line-sidebar {
+	width: 40px;
+	height: 100%;
+}
+
+.editor-line-number {
+	height: 20px;
+	font-size: 15px;
+	text-align: right;
+	padding-right: 10px;
+	color: var(--dark-grey);
+	line-height: 20px;
 }
 
 #cy {

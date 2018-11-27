@@ -1,4 +1,4 @@
-/* globals $, cytoscape, require  */
+/* globals $, cytoscape, require, Editor */
 //function main() {
 // #region Cytoscape
 let wipCy = [];
@@ -203,16 +203,15 @@ function addNode(nodeId, parentId, nodeType, nodeName) {
 				break;
 		}
 
-		let node = wipCy[nodeId] = {
+		wipCy[nodeId] = {
 			group: "nodes",
 			data: { id: nodeId, label: nodeName },
 			classes: classes
 		};
 
-		let edge;
 		if (parentId) {
 			let edgeId = parentId + "to" + nodeId;
-			edge = wipCy[edgeId] = {
+			wipCy[edgeId] = {
 				group: "edges",
 				data: {
 					id: edgeId,
@@ -235,13 +234,15 @@ const { ipcRenderer } = require("electron");
 const { dialog, app, BrowserWindow } = require("electron").remote;
 const fs = require("fs");
 
-const parentNodeTypes = ["&", "|", "¬", "n", "*", "^", '"', "#"];
+const leafNodeTypes = ["!", "?", "#"];
+const decoratorNodeTypes = ["¬", "n", "*", "^", '"'];
+const compositeNodeTypes = ["&", "|"];
+const parentNodeTypes = compositeNodeTypes.concat(decoratorNodeTypes);
 let pathToFileBeingEdited;
-let lineCount = 0;
 
 /** Start editing a new file */
 function newFile() {
-	$("#text-editor")[0].value = "";
+	editor.reset();
 	pathToFileBeingEdited = undefined;
 	parse();
 }
@@ -272,7 +273,7 @@ function open() {
 				}
 				pathToFileBeingEdited = filename;
 				// Do stuff with open file
-				$("#text-editor")[0].value = data;
+				editor.setText(data);
 				$("#text-editor").change();
 			});
 		}
@@ -284,7 +285,7 @@ function save() {
 	if (!pathToFileBeingEdited) {
 		saveAs();
 	} else {
-		let content = $("#text-editor")[0].value;
+		let content = editor.getText();
 
 		fs.writeFile(pathToFileBeingEdited, content, err => {
 			if (err) {
@@ -300,7 +301,7 @@ function save() {
 
 /** Save file to a new path */
 function saveAs() {
-	let content = $("#text-editor")[0].value;
+	let content = editor.getText();
 
 	dialog.showSaveDialog(
 		require("electron").remote.getCurrentWindow(),
@@ -343,7 +344,7 @@ function openPreferences() {
 		// Update renderer if needed
 	});
 
-    /*preferencesWindow.once("ready-to-show", () => {
+	/*preferencesWindow.once("ready-to-show", () => {
         preferencesWindow.show();
     });*/
 }
@@ -392,7 +393,9 @@ $("#output").click(() => {
 	let filepath;
 
 	filepath = app.getPath("temp") + "\\" + new Date().getTime() + ".btml";
-	fs.writeFile(filepath, $("#text-editor")[0].value, "utf-8", () => {
+	//fs.writeFile(filepath, $("#text-editor")[0].value, "utf-8", () => {
+	fs.writeFile(filepath, editor.getText(), "utf-8", () => {
+
 		outputToFile(language, filepath);
 	});
 
@@ -400,10 +403,10 @@ $("#output").click(() => {
 		// Run a local copy of the parser
 		let executablePath = ".\\BTMLPARSERCPP.exe";
 		let parameters = [l, p];
-		let child = require("child_process").execFile(
+		require("child_process").execFile(
 			executablePath,
 			parameters,
-			(err, stdout, stderr) => {
+			(err, stdout) => {
 				if (err) {
 					debug.error(err);
 					return;
@@ -497,7 +500,7 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
 	let parents = [{ id: parentId, childNo: 0, type: parentType }];
 	let parent;
 
-	let lines = content.split("\n");
+	let lines = content.split("\n").filter(l => l);
 
 	let nodeId;
 
@@ -505,7 +508,7 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
 		if (line.trim()) {
 			// Make sure we replace spaces and tabs
 			// Might add as an option
-			line = line.replace(/    /g, "\t");
+			line = line.replace(/ {4}/g, "\t");
 
 			tabNum = countTabs(line);
 			while (tabNum < parents.length - 1) {
@@ -550,7 +553,7 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
 					let content = fs.readFileSync(subtreeFilename, "utf-8");
 					addNodesToParent(content, nodeId, nodeType, isRealTimeParsing);
 				} else {
-
+					//
 				}
 			}
 		}
@@ -573,7 +576,7 @@ function addNodesToParent(content, parentId, parentType, isRealTimeParsing) {
 function parse(isRealTimeParsing = false) {
 	cy.elements().remove();
 	addNode("ROOT", undefined, "_", "ROOT");
-	addNodesToParent($("#text-editor")[0].value, "ROOT", "_", isRealTimeParsing);
+	addNodesToParent(editor.getText(), "ROOT", "_", isRealTimeParsing);
 }
 
 // #endregion
@@ -593,6 +596,7 @@ let debug = {
 
 // #endregion
 
+let editor = new Editor($("#text-editor"), "#line-sidebar");
 newFile();
 //}
 
