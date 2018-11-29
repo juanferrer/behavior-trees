@@ -1,15 +1,5 @@
 /* globals $, debug, decoratorNodeTypes, compositeNodeTypes, leafNodeTypes */
-/**
- * This is the text editor and contains syntax highlighting and other goodies
- */
-
-// TODO:
-// When editor created, spawn divs with editor-line class inside div element
-// Add events for editor-line class:
-// 		- onClick: Show a cursor and create an invisible input right on the cursor. On
-//		  input, update the underlying div to show the new character added. If character
-// 		  is enter close this div and create a new one under it
-
+/** This is the text editor and contains syntax highlighting and other goodies */
 class Editor {
 	/**
 	 * Construct editor and return the newly created object
@@ -551,17 +541,18 @@ Editor.eventHandlers = {
 					editor.moveCursor("none");
 				}
 				break;
-
+	
 			case "Tab":
 				if (event.shiftKey) {
 					// Shift + Tab
-					if (editor.getLine(element).startsWith(" ")) {
-						
-						editor.removeCharacterInPosition(0, element);
-						editor.removeCharacterInPosition(0, element);
-						editor.removeCharacterInPosition(0, element);
-						editor.removeCharacterInPosition(0, element);
-						editor.moveCursor("left", 4);
+					line1 = editor.getLine(element);
+					if (line1.startsWith(" ")) {
+						// Count the number of spaces until we complete a tab
+						let spacesToCompleteTab = (line1.length - line1.trimLeft().length) % 4 || 4;
+						for (let i = 0; i < spacesToCompleteTab; ++i) {
+							editor.removeCharacterInPosition(0, element);
+						}
+						editor.moveCursor("left", spacesToCompleteTab);
 					}
 					} else {
 						// Normal Tab
@@ -619,7 +610,7 @@ Editor.eventHandlers = {
 			default:
 				// Any other key pressed, inser the data into the cursor position
 				editor.insertCharacterInPosition(key, editor.cursor.colPos, element);
-				moveCursor("none");
+				editor.moveCursor("none");
 				/*editor.removeInputElements();
 				editor.addInputToElement(element);*/
 				break;
