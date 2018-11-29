@@ -53,8 +53,9 @@ class Editor {
 	 * Move selection according to pressed key
 	 * @param {string} direction
 	 * @param {Number} amount
+	 * @param {Boolean} isDeleting
 	 */
-	moveCursor(direction, amount = 1) {
+	moveCursor(direction, amount =  1, isDeleting = false) {
 		// Remove cursor
 		$("." + Editor.data.cursorClass).remove();
 
@@ -111,8 +112,10 @@ class Editor {
 				lineText = this.getLine(line);
 				// Go to last character of line
 				this.cursor.colPos = lineText.length;
-				// And delete the line number
-				this.removeNumberLine();
+				if (isDeleting) {
+					// And delete the line number
+					this.removeNumberLine();
+				}
 			} else {
 				// This is the first line, just stay in position 0
 				this.cursor.colPos = 0;
@@ -503,7 +506,7 @@ Editor.eventHandlers = {
 				// Check if we're at the start of a line and not on the first line
 				if (editor.cursor.colPos === 0 && editor.cursor.linePos > 0) {
 					// Ok, so we need to get combine the current line with the previous line
-					editor.moveCursor("left");
+					editor.moveCursor("left", 1, true);
 					element = editor.getLineFromNumber(editor.cursor.linePos);
 					line1 = element.getAttribute(Editor.data.dataTextAttribute);
 					line1 += editor.getLineFromNumber(editor.cursor.linePos + 1).getAttribute(Editor.data.dataTextAttribute);
@@ -513,11 +516,11 @@ Editor.eventHandlers = {
 					element.setAttribute(Editor.data.dataTextAttribute, line1);
 					editor.redraw(element);
 					editor.removeInputElements();
-					editor.moveCursor("none");
+					editor.moveCursor("none", 1, true);
 				} else {
 					editor.removeCharacterInPosition(editor.cursor.colPos, element);
 					editor.removeInputElements();
-					editor.moveCursor("left");
+					editor.moveCursor("left", 1, true);
 				}
 				break;
 
@@ -534,11 +537,11 @@ Editor.eventHandlers = {
 					editor.redraw(element);
 					editor.removeInputElements();
 					editor.removeNumberLine()
-					editor.moveCursor("none");
+					editor.moveCursor("none", 1, true);
 				} else {
 					editor.removeCharacterInPosition(editor.cursor.colPos + 1, element);
 					editor.removeInputElements();
-					editor.moveCursor("none");
+					editor.moveCursor("none", 1, true);
 				}
 				break;
 	
@@ -552,7 +555,7 @@ Editor.eventHandlers = {
 						for (let i = 0; i < spacesToCompleteTab; ++i) {
 							editor.removeCharacterInPosition(0, element);
 						}
-						editor.moveCursor("left", spacesToCompleteTab);
+						editor.moveCursor("left", spacesToCompleteTab, true);
 					}
 					} else {
 						// Normal Tab
