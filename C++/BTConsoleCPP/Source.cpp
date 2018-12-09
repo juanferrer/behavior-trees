@@ -193,8 +193,8 @@ void function()
 						.Do("Unlock door", UnlockDoor)
 						.Do("Break door down", BreakDoor)
 						.End()
-					/*.Ignore("Try to close door")
-						.Do("Close door", CloseDoor)*/
+					.Ignore("Try to close door")
+						.Do("Close door", CloseDoor)
 					.End()
 
 				.Sequence("Check if anyone comes")
