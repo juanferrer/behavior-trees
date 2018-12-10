@@ -6,6 +6,10 @@ TagManager:
   tags:
   - Worktop
   - Oven
+  - Table
+  - Waiter
+  - Customer
+  - Chef
   layers:
   - Default
   - TransparentFX

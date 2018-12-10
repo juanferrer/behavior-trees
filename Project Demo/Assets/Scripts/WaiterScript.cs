@@ -1,19 +1,32 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using FluentBehaviorTree;
 
 public class WaiterScript : MonoBehaviour
-{
-	BehaviorTree bt;        // The behaviour tree of this agent
-	GameObject queue,       // Constant reference, the queue is always the same
-			   kitchen,     // Constant reference, the kitchen is always the same
-			   table;       // Variable reference, the specific table is set  when assessing priority
+{	
+	/// <summary>
+    /// The behaviour tree of this agent
+    /// </summary>
+	BehaviorTree bt;
 
-	bool ShouldReceiveCustomer,     //
-		ShouldAttendCustoemr,       //
-		ShouldServeFood,            //
-		ShouldBringBill;            //
+	/// <summary>
+	/// Queue object. Constant reference, the queue is always the same
+	/// </summary>
+	GameObject queue;
+
+	/// <summary>
+	/// Queue object. Constant reference, the queue is always the same
+	/// </summary>
+	GameObject kitchen;
+
+	/// <summary>
+	/// Table object. Variable reference, the specific table is set when assessing priorit
+	/// </summary>		   
+	GameObject table;
+
+	bool ShouldReceiveCustomer,
+		ShouldAttendCustoemr,
+		ShouldServeFood,
+		ShouldBringBill;
 
 	static private Status GoTo(Vector3 pos)
 	{
@@ -80,10 +93,10 @@ public class WaiterScript : MonoBehaviour
 						.Do("GiveBillToCustomer", () => { return Status.ERROR; })
 						.Do("GetMoneyFromCustomer", () => { return Status.ERROR; })
 						.Do("CleanTable", () => { return Status.ERROR; })
+						.End()
 					.End()
 				.End()
-			.End()
-		.End();
+			.End();
 
 	}
 
