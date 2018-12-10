@@ -71,11 +71,11 @@ string getLambda(string type, bool needsCPP)
 string parse(string filename, string language, bool isBase = false)
 {
 	string output = "";
+	bool convertingToCPP = (language == "C++" || language == "c++");
 
 	ifstream ifile(filename.c_str());
 	if (ifile.good())
 	{
-		bool convertingToCPP = (language == "C++" || language == "c++");
 		if (!convertingToCPP && language != "C#" && language != "c#")
 		{
 			cout << "No language specified: " << language << endl;
@@ -163,6 +163,11 @@ string parse(string filename, string language, bool isBase = false)
 			levelsOpen--;
 		}
 		if (isBase) output += "\n.End();";
+	}
+	else if (!isBase)
+	{
+		// Try to add a subtree node to it, even if it fails to do so correctly
+		output += "\n.Do(\"" + filename + "\", " + getLambda("action", convertingToCPP) + ")";
 	}
 
 	return output;
