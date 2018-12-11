@@ -6,12 +6,10 @@
                 ? ShouldReceiveCustomer
                 ! GoToQueue
                 ! BringCustomerToTable
-                ! GiveMenuToCustomer
             & AttendCustomer
                 ? ShouldAttendCustomer
                 ! GoToTable
                 ! GetOrderFromCustomer
-                ! GetMenuFromCustomer
                 ! GoToKitchen
                 ! GiveOrderToKitchen
             & ServeFood

@@ -10,6 +10,11 @@ TagManager:
   - Waiter
   - Customer
   - Chef
+  - Food
+  - Menu
+  - Order
+  - Bill
+  - Money
   layers:
   - Default
   - TransparentFX
