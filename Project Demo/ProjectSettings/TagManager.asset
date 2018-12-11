@@ -11,7 +11,6 @@ TagManager:
   - Customer
   - Chef
   - Food
-  - Menu
   - Order
   - Bill
   - Money
