@@ -16,5 +16,10 @@ public class QueueScript : MonoBehaviour
 		
 	}
 
+	public Vector3 GetNextPosition()
+	{
+        return gameObject.transform.position;
+	}
+
 
 }

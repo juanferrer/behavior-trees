@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using FluentBehaviorTree;
 using Data;
+using UnityEngine.AI;
 
 public class CustomerScript : MonoBehaviour
 {
@@ -19,7 +20,7 @@ public class CustomerScript : MonoBehaviour
 	/// <summary>
 	/// Queue object. Constant reference, queue is always the same
 	/// </summary>
-	GameObject queue;
+	QueueScript queue;
 
 	/// <summary>
 	/// Table object. Variable reference, set when received by waiter
@@ -34,6 +35,9 @@ public class CustomerScript : MonoBehaviour
 	/// <summary>
 	/// Time available for customer to perform all activities
 	/// </summary>
+	
+	NavMeshAgent agent;
+
 	int AvailableTime;
 	Food FoodToOrder;
 
@@ -45,13 +49,25 @@ public class CustomerScript : MonoBehaviour
 	/// <returns></returns>
 	private Status GoTo(Vector3 pos)
 	{
-		bool reachedPos = false,
-			 onTheWay = false;
-		// TODO: Use Unity's meshnav to travel to position
+        // Set a new destination
+        if (agent.isStopped)
+        //if (!Mathf.Approximately(agent.destination.x, pos.x) || !Mathf.Approximately(agent.destination.z, pos.z))
+		{
+			agent.destination = pos;
+            agent.isStopped = false;
+            return Status.RUNNING;
+        }
 
-		if (reachedPos) return Status.SUCCESS;
-		else if (onTheWay) return Status.RUNNING;
-		else return Status.FAILURE;
+        bool reachedPos = !agent.pathPending && (agent.remainingDistance <= agent.stoppingDistance) && (!agent.hasPath || agent.velocity.sqrMagnitude == 0f);
+        bool onTheWay = agent.remainingDistance != Mathf.Infinity && (agent.remainingDistance > agent.stoppingDistance);
+
+        if (reachedPos)
+        {
+            agent.isStopped = true;
+            return Status.SUCCESS;
+        }
+        else if (onTheWay) return Status.RUNNING;
+        else return Status.FAILURE;
 	}
 
 	/// <summary>
@@ -73,26 +89,35 @@ public class CustomerScript : MonoBehaviour
 		return status;
 	}
 
+	private Status StartQueue()
+	{
+		return Status.FAILURE;
+	}
+
 	// Use this for initialization
 	void Start()
 	{
-		// TODO: Get references to each object
+		// Get references to each object
 		gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerScript>();
-		queue = gm.queue;
+		queue = gm.queue.GetComponent<QueueScript>();
 		exit = gm.exit;
+		agent = GetComponent<NavMeshAgent>();
+        agent.isStopped = true;
 
-		leaveSequence = new BehaviorTreeBuilder("")
+        // Declare BTs
+
+        leaveSequence = new BehaviorTreeBuilder("")
 		.Sequence("LeaveSequence")
 			.If("WaitedTooLong", () => { return false; })
 			.Do("Leave", () => { return Leave(); })
 			.End()
 		.End();
 
-		// TODO: Declare BT
 		bt = new BehaviorTreeBuilder("")
 		.RepeatUntilFail("Loop")
 			.Sequence("Sequence")
-				.Do("GoToQueue", () => { return GoTo(queue); })
+				.Do("GoToQueue", () => { return GoTo(queue.GetNextPosition()); })
+				.Do("StartQueue", () => { return StartQueue(); })
 				.Selector("Selector")
 					.Selector("HasBeenReceived")
 						.Do("LeaveSequence", leaveSequence)
