@@ -20,10 +20,15 @@ public class RecipientScript : MonoBehaviour
 		{
 			inventory[obj.tag] = obj;
 		}
+		else
+		{
+			// TODO: What to do it recipient already has object with tag?
+			// Multiple foods? Bills?
+		}
 	}
 
 	/// <summary>
-	///  Get object from recipient, which loses possession of it
+	///  Get object with tag from recipient, which loses possession of it
 	/// </summary>
 	/// <param name="tag"></param>
 	/// <returns></returns>
@@ -40,7 +45,7 @@ public class RecipientScript : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Check whether recipient has object
+	/// Check whether recipient has object with tag
 	/// </summary>
 	/// <param name="tag"></param>
 	/// <returns></returns>

@@ -14,6 +14,7 @@ TagManager:
   - Order
   - Bill
   - Money
+  - Position
   layers:
   - Default
   - TransparentFX

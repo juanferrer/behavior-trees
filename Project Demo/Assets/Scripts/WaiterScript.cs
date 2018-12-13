@@ -3,6 +3,8 @@ using FluentBehaviorTree;
 
 public class WaiterScript : MonoBehaviour
 {
+	GameManagerScript gm;
+
 	/// <summary>
 	/// The behaviour tree of this agent
 	/// </summary>
@@ -14,7 +16,7 @@ public class WaiterScript : MonoBehaviour
 	GameObject queue;
 
 	/// <summary>
-	/// Queue object. Constant reference, queue is always the same
+	/// Queue object. Constant reference, kitchen is always the same
 	/// </summary>
 	GameObject kitchen;
 
@@ -38,6 +40,11 @@ public class WaiterScript : MonoBehaviour
 		ShouldServeFood,
 		ShouldBringBill;
 
+	/// <summary>
+	/// Use Unity's meshnav to travel to given position
+	/// </summary>
+	/// <param name="pos"></param>
+	/// <returns></returns>
 	private Status GoTo(Vector3 pos)
 	{
 		bool reachedPos = false,
@@ -50,7 +57,7 @@ public class WaiterScript : MonoBehaviour
 	}
 
 	/// <summary>
-	/// 
+	/// Get position from object and call overloaded GoTo
 	/// </summary>
 	/// <param name="objectPos"></param>
 	/// <returns></returns>
@@ -109,8 +116,9 @@ public class WaiterScript : MonoBehaviour
 
 	private Status CleanTable(GameObject table)
 	{
-		table.GetComponent<TableScript>().Clean();
-		return table.GetComponent<TableScript>().IsClean ? Status.SUCCESS : Status.FAILURE;
+		var tableScript = table.GetComponent<TableScript>();
+		tableScript.Clean();
+		return tableScript.IsClean ? Status.SUCCESS : Status.FAILURE;
 	}
 
 	private Status AssessPriority()
@@ -119,8 +127,10 @@ public class WaiterScript : MonoBehaviour
 
 		// We need to keep dishes warm, so that's first
 		// TODO: Check if any dish is ready
+		
 
 		// There needs to be free tables before we receive a new customer
+
 
 		//
 		return Status.ERROR;
@@ -130,6 +140,9 @@ public class WaiterScript : MonoBehaviour
 	void Start()
 	{
 		// TODO: Get references to each object
+		gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerScript>();
+		kitchen = gm.kitchen;
+		queue = gm.queue;
 
 		// Declare BT
 		bt = new BehaviorTreeBuilder("")
@@ -159,10 +172,10 @@ public class WaiterScript : MonoBehaviour
 					.Sequence("BringBill")
 						.If("ShouldBringBill", () => { return ShouldBringBill; })
 						.Do("GoToKitchen", () => { return GoTo(kitchen); })
-						.Do("PickupBill", () => { return Status.ERROR; })
+						.Do("PickupBill", () => { return GetFrom("Bill", kitchen); })
 						.Do("GoToTable", () => { return GoTo(table); })
-						.Do("GiveBillToCustomer", () => { return Status.ERROR; })
-						.Do("GetMoneyFromCustomer", () => { return Status.ERROR; })
+						.Do("GiveBillToCustomer", () => { return GiveTo("Bill", customer); })
+						.Do("GetMoneyFromCustomer", () => { return GetFrom("Money", customer); })
 						.Do("CleanTable", () => { return CleanTable(table); })
 						.End()
 					.End()
