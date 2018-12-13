@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 33583842429953052}
   - component: {fileID: 23718158957014066}
   - component: {fileID: 65710978912903016}
+  - component: {fileID: 114401937217578960}
   m_Layer: 0
   m_Name: Table
   m_TagString: Table
@@ -57,7 +58,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: 1ce24b150aa4a3747bf2797a8912c70b, type: 2}
+  - {fileID: 2100000, guid: a3c7ae66a197d584d8b2a4cd2ca07309, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -96,3 +97,14 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114401937217578960
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1933581191941268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d47b840e94c109146a924b3148b788e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

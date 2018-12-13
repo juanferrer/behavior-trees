@@ -108,7 +108,7 @@ public class CustomerScript : MonoBehaviour
 						.Do("LeaveSequence", leaveSequence)
 						.If("IsBeingServed", () => { return false; })
 						.Do("Eat", () => { return Status.ERROR; })
-						.Wait("Wait", 0)
+						.Wait("Wait", 5)
 							.Do("RequestBill", () => { return Status.ERROR; })
 						.End()
 					.Selector("HasReceivedBill")
@@ -130,6 +130,6 @@ public class CustomerScript : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-
+		bt.Tick();
 	}
 }

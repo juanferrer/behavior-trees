@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class QueueScript : MonoBehaviour
 {
-	
-
 	// Use this for initialization
 	void Start ()
 	{
