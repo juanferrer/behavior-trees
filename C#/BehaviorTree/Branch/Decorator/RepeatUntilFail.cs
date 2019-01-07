@@ -26,13 +26,10 @@ namespace FluentBehaviorTree
         /// <returns></returns>
         protected override Status tick()
         {
-            do
-            {
-                this.Result = child.Tick();
-                if (this.Result == Status.ERROR) return this.Result;
-            } while (this.Result != Status.FAILURE);
+            this.Result = child.Tick();
 
-            this.Result = Status.SUCCESS;
+            if (this.Result == Status.FAILURE) this.Result = Status.SUCCESS;
+
             return this.Result;
         }
     }

@@ -9,6 +9,7 @@ namespace fluentBehaviorTree
 	{
 	private:
 		int mN;
+		int mAttempts;
 
 	public:
 		Node* copy() override;

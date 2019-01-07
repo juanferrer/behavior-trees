@@ -9,6 +9,7 @@ namespace FluentBehaviorTree
     public class Repeater : Decorator
     {
         private int n;
+        private int attempts;
 
         public Repeater(string name, int times = 0)
         {
@@ -29,27 +30,23 @@ namespace FluentBehaviorTree
         /// <returns></returns>
         protected override Status tick()
         {
-            if (n == 0)
-            {
-                while (true)
-                {
-                    this.Result = child.Tick();
+            this.Result = child.Tick();
+            // If something went wrong, crash here
+            if (this.Result == Status.ERROR) return this.Result;
+            // If the child completed, count as an attempt
+            if (this.Result != Status.RUNNING) ++attempts;
 
-                    if (this.Result == Status.ERROR) return this.Result;
-                }
-            }
-            else
+            if (attempts >= n)
             {
-                for (int i = 0; i < n; ++i)
-                {
-                    do
-                    {
-                        this.Result = child.Tick();
-                        if (this.Result == Status.ERROR) return this.Result;
-                    } while (child.IsOpen);
-                }
+                // This was last tick, return SUCCESS
+                this.Result = Status.SUCCESS;
             }
-            this.Result = Status.SUCCESS;
+            else if (attempts < n || n == 0)
+            {
+                // Needs to keep going or it repeats forever, return RUNNING
+                this.Result = Status.RUNNING;
+            }
+
             return this.Result;
         }
     }

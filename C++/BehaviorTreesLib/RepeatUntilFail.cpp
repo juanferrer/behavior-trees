@@ -25,13 +25,10 @@ namespace fluentBehaviorTree
 	// Repeat until FAILURE
 	EStatus RepeatUntilFail::tickNode()
 	{
-		do
-		{
-			this->setResult(mChild->tick());
-			if (this->getResult() == EStatus::ERROR) return this->getResult();
-		} while (this->getResult() != EStatus::FAILURE);
+		this->setResult(mChild->tick());
 
-		this->setResult(EStatus::SUCCESS);
+		if (this->getResult() == EStatus::FAILURE) this->setResult(EStatus::SUCCESS);
+
 		return this->getResult();
 	}
 }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿
+using UnityEngine;
 using FluentBehaviorTree;
 using Data;
 using UnityEngine.AI;
@@ -53,7 +54,8 @@ public class CustomerScript : MonoBehaviour
         if (agent.isStopped)
         //if (!Mathf.Approximately(agent.destination.x, pos.x) || !Mathf.Approximately(agent.destination.z, pos.z))
 		{
-			agent.destination = pos;
+			//agent.destination = pos;
+            agent.SetDestination(pos);
             agent.isStopped = false;
             return Status.RUNNING;
         }
@@ -152,9 +154,11 @@ public class CustomerScript : MonoBehaviour
 		AvailableTime = Random.Range(Globals.MinWaitTime, Globals.MaxWaitTime);
 	}
 
+    bool stopBT = false;
+
 	// Update is called once per frame
 	void Update()
 	{
-		bt.Tick();
+        bt.Tick();
 	}
 }

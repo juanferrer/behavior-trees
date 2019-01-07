@@ -181,7 +181,8 @@ void function()
 		.End();
 	
 	BehaviorTree tree = BehaviorTreeBuilder("Enter room")
-		.RepeatUntilFail("Base loop")
+		//.RepeatUntilFail("Base loop")
+		.Repeat("Base loop", 5)
 			.Selector("Find an entrance")
 
 				.Sequence("Try door")
@@ -212,7 +213,13 @@ void function()
 			.End();
 
 
-	tree.tick();
+	EStatus tickResult;
+	long frameNo = 0;
+	do {
+		tickResult = tree.tick();
+		cout << "Frame " << frameNo << endl;
+		frameNo++;
+	} while (tickResult != EStatus::SUCCESS);
 	//openDoor.tick();
 	//testTree.tick();
 

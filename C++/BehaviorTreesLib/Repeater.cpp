@@ -26,27 +26,24 @@ namespace fluentBehaviorTree
 	// Repeat n times and return
 	EStatus Repeater::tickNode()
 	{
-		if (mN == 0)
-		{
-			while (true)
-			{
-				this->setResult(mChild->tick());
+		this->setResult(mChild->tick());
+		// If something went wrong, crash here
+		if (this->getResult() == EStatus::ERROR) return this->getResult();
+		// If the child completed, count as an attempt
+		if (this->getResult() != EStatus::RUNNING) ++mAttempts;
 
-				if (this->getResult() == EStatus::ERROR) return this->getResult();
-			}
-		}
-		else
+		if (mAttempts >= mN)
 		{
-			for (int i = 0; i < mN; ++i)
-			{
-				do
-				{
-					this->setResult(mChild->tick());
-					if (this->getResult() == EStatus::ERROR) return this->getResult();
-				} while (mChild->isOpen());
-			}
+			// This was last tick, return SUCCESS
+			this->setResult(EStatus::SUCCESS);
 		}
-		this->setResult(EStatus::SUCCESS);
+		else if (mAttempts < mN || mN == 0)
+		{
+			// Needs to keep going or it repeats forever, return RUNNING
+			this->setResult(EStatus::RUNNING);
+		}
+		
+
 		return this->getResult();
 	}
 }
