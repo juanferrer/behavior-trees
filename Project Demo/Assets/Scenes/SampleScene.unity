@@ -98,7 +98,7 @@ NavMeshSettings:
   m_BuildSettings:
     serializedVersion: 2
     agentTypeID: 0
-    agentRadius: 1
+    agentRadius: 0.75
     agentHeight: 2
     agentSlope: 45
     agentClimb: 0.75
@@ -106,10 +106,10 @@ NavMeshSettings:
     maxJumpAcrossDistance: 0
     minRegionArea: 2
     manualCellSize: 0
-    cellSize: 0.33333334
+    cellSize: 0.25
     manualTileSize: 0
     tileSize: 256
-    accuratePlacement: 1
+    accuratePlacement: 0
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 23800000, guid: 0425ee873b674d148909f28d4af95b23, type: 2}
@@ -1589,53 +1589,8 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4504873327175138, guid: 667819d3fd8540d40942197cd1b9dd89, type: 2}
       propertyPath: m_RootOrder
-      value: 8
+      value: 7
       objectReference: {fileID: 0}
-    - target: {fileID: 120379240205735132, guid: 667819d3fd8540d40942197cd1b9dd89,
-        type: 2}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 65867448577326758, guid: 667819d3fd8540d40942197cd1b9dd89,
-        type: 2}
-      propertyPath: m_Center.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 65867448577326758, guid: 667819d3fd8540d40942197cd1b9dd89,
-        type: 2}
-      propertyPath: m_Size.y
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 65867448577326758, guid: 667819d3fd8540d40942197cd1b9dd89,
-        type: 2}
-      propertyPath: m_Size.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 65867448577326758, guid: 667819d3fd8540d40942197cd1b9dd89,
-        type: 2}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 195898257364810160, guid: 667819d3fd8540d40942197cd1b9dd89,
-        type: 2}
-      propertyPath: m_BaseOffset
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 195898257364810160, guid: 667819d3fd8540d40942197cd1b9dd89,
-        type: 2}
-      propertyPath: m_Height
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 195898257364810160, guid: 667819d3fd8540d40942197cd1b9dd89,
-        type: 2}
-      propertyPath: m_Radius
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 120379240205735132, guid: 667819d3fd8540d40942197cd1b9dd89,
-        type: 2}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: fc0c97c24948dbb46af185d005777f46, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 667819d3fd8540d40942197cd1b9dd89, type: 2}
   m_IsPrefabAsset: 0
@@ -1668,7 +1623,7 @@ Transform:
   - {fileID: 1803376244}
   - {fileID: 276253565}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1498484058
 GameObject:
@@ -2160,6 +2115,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4063230391406824, guid: 9740097d65b5a374b890992c9d23be06,
     type: 2}
   m_PrefabInternal: {fileID: 1861597438}
+--- !u!1 &1941254453 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1933581191941268, guid: 9740097d65b5a374b890992c9d23be06,
+    type: 2}
+  m_PrefabInternal: {fileID: 1742534421}
 --- !u!1001 &2003060866
 Prefab:
   m_ObjectHideFlags: 0
@@ -2249,6 +2209,9 @@ MonoBehaviour:
   kitchen: {fileID: 1446263588}
   queue: {fileID: 1803376243}
   exit: {fileID: 624156520}
+  customerPrefab: {fileID: 1117080702200402, guid: 667819d3fd8540d40942197cd1b9dd89,
+    type: 2}
+  table: {fileID: 1941254453}
 --- !u!4 &2019232492
 Transform:
   m_ObjectHideFlags: 0

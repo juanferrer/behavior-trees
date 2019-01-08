@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class QueueScript : MonoBehaviour
 {
+    private List<CustomerScript> customerQueue;
 	// Use this for initialization
 	void Start ()
 	{
-		
-	}
+		customerQueue = new List<CustomerScript>();
+    }
 	
 	// Update is called once per frame
 	void Update ()
@@ -16,10 +17,32 @@ public class QueueScript : MonoBehaviour
 		
 	}
 
+    /// <summary>
+    /// Get the next position in the queue
+    /// </summary>
+    /// <returns></returns>
 	public Vector3 GetNextPosition()
 	{
-        return gameObject.transform.position;
+        var nextPosition = gameObject.transform.position;
+        nextPosition.x += (customerQueue.Count * 3.0f);
+        return nextPosition;
 	}
 
+    public CustomerScript GetNextCustomer()
+    {
+        return customerQueue[0];
+    }
 
+    /// <summary>
+    /// Allow customer to start queuing
+    /// </summary>
+    public void StartQueue(CustomerScript customer)
+    {
+        customerQueue.Add(customer);
+    }
+
+    public void LeaveQueue(CustomerScript customer)
+    {
+        customerQueue.Remove(customer);
+    }
 }

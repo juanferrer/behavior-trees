@@ -13,7 +13,11 @@ public class PathRendererScript : MonoBehaviour {
     void Start()
     {
         line = GetComponent<LineRenderer>(); // Get the line renderer
-        agent = GetComponent<NavMeshAgent>(); // Get the agent
+        agent = GetComponent<NavMeshAgent>(); // Get the agent  
+    }
+
+    private void Update()
+    {
         StartCoroutine(GetPath());
     }
 
@@ -25,7 +29,7 @@ public class PathRendererScript : MonoBehaviour {
 
         DrawPath(agent.path);
 
-        agent.isStopped = true; // Add this if you don't want to move the agent
+        //agent.isStopped = true; // Add this if you don't want to move the agent
 
         yield return null;
     }

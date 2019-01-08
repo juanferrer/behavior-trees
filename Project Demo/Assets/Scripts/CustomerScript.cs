@@ -16,7 +16,7 @@ public class CustomerScript : MonoBehaviour
 	/// <summary>
 	///	Subtree called inside the main bt
 	/// </summary>
-	BehaviorTree leaveSequence;
+	BehaviorTree leaveCheck;
 
 	/// <summary>
 	/// Queue object. Constant reference, queue is always the same
@@ -39,16 +39,25 @@ public class CustomerScript : MonoBehaviour
 	
 	NavMeshAgent agent;
 
-	int AvailableTime;
-	Food FoodToOrder;
+	int availableTime;
+	Food foodToOrder;
+    const float customerWaitingTime = 5.0f;
+    float timeWaited = 0.0f;
+    bool isInQueue = false;
+    bool isInTable = false;
+
+    bool hasBeenReceived = true;
+    bool hasBeenAttended = false;
+    bool hasBeenServed = false;
+    bool hasReceivedBill = false;
 
 
-	/// <summary>
-	/// Use Unity's meshnav to travel to given position
-	/// </summary>
-	/// <param name="pos"></param>
-	/// <returns></returns>
-	private Status GoTo(Vector3 pos)
+    /// <summary>
+    /// Use Unity's meshnav to travel to given position
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <returns></returns>
+    private Status GoTo(Vector3 pos)
 	{
         // Set a new destination
         if (agent.isStopped)
@@ -87,14 +96,46 @@ public class CustomerScript : MonoBehaviour
 	private Status Leave()
 	{
 		var status = GoTo(exit);
-		// Send this to pool or destroy
-		return status;
+        // If it was in Queue, leave queue
+        queue.GetComponent<QueueScript>().LeaveQueue(this);
+        if (status == Status.SUCCESS) gameObject.SetActive(false);
+        // Send this to pool or destroy
+        return status;
 	}
 
 	private Status StartQueue()
 	{
-		return Status.FAILURE;
+        queue.GetComponent<QueueScript>().StartQueue(this);
+        isInQueue = true;
+		return Status.SUCCESS;
 	}
+
+    private Status SitInTable()
+    {
+        // Register to table events?
+        isInTable = true;
+        return Status.SUCCESS;
+    }
+
+    private Status Eat()
+    {
+        // Destroy food from table
+        return Status.SUCCESS;
+    }
+
+    private Status Wait()
+    {
+        timeWaited += Time.deltaTime;
+        if (timeWaited > customerWaitingTime) return Status.FAILURE;
+        return Status.SUCCESS;
+    }
+
+
+    public void StartReceiving(GameObject newTable)
+    {
+        hasBeenReceived = true;
+        table = newTable;
+    }
 
 	// Use this for initialization
 	void Start()
@@ -108,39 +149,49 @@ public class CustomerScript : MonoBehaviour
 
         // Declare BTs
 
-        leaveSequence = new BehaviorTreeBuilder("")
-		.Sequence("LeaveSequence")
-			.If("WaitedTooLong", () => { return false; })
-			.Do("Leave", () => { return Leave(); })
-			.End()
-		.End();
+        leaveCheck = new BehaviorTreeBuilder("")
+            .Selector("LeaveSelector")
+                .Do("Wait", Wait)
+                .Do("Leave", () => { return Leave(); })
+                .End()     
+		    .End();
 
 		bt = new BehaviorTreeBuilder("")
-		.RepeatUntilFail("Loop")
 			.Sequence("Sequence")
-				.Do("GoToQueue", () => { return GoTo(queue.GetNextPosition()); })
-				.Do("StartQueue", () => { return StartQueue(); })
-				.Selector("Selector")
-					.Selector("HasBeenReceived")
-						.Do("LeaveSequence", leaveSequence)
-						.If("IsBeingReceived", () => { return false; })
-						.Do("GoToTable", () => { return GoTo(table); })
+                .Selector("QueueSelector")
+                    .If("InQueue", () => { return isInQueue; })
+                    .Sequence("MoveToQueueSequence")
+				        .Do("GoToQueue", () => { return GoTo(queue.GetNextPosition()); })
+				        .Do("StartQueue", StartQueue)
+                        .End()
+                    .End()
+                .Sequence("Sequence")
+					.Sequence("BeReceived")
+                        .If("HasBeenReceived", () => { return hasBeenReceived; })
+                        .Selector("ReceiveSelector")
+                            .If("InTable", () => { return isInTable; })
+                            .Sequence("MoveToTableSequence")
+                                .Do("GoToTable", () => { return GoTo(table); })
+                                .Do("SitInTable", SitInTable)
+                                .End()                                
+                            .Do("LeaveCheck", leaveCheck)
+                            .End()
 						.End()
-					.Selector("HasBeenAttended")
-						.Do("LeaveSequence", leaveSequence)
-						.If("IsBeingAttended", () => { return false; })
+					.Selector("BeAttended")
+						.Do("LeaveCheck", leaveCheck)
+						.If("HasBeenAttended", () => { return hasBeenAttended; })
 						.Do("MakeOrder", () => { return Status.ERROR; })
 						.End()
-					.Selector("HasBeenServed")
-						.Do("LeaveSequence", leaveSequence)
-						.If("IsBeingServed", () => { return false; })
-						.Do("Eat", () => { return Status.ERROR; })
+					.Selector("BeServed")
+						.Do("LeaveCheck", leaveCheck)
+						.If("HasBeenServed", () => { return hasBeenServed; })
 						.Wait("Wait", 5)
-							.Do("RequestBill", () => { return Status.ERROR; })
+						    .Do("Eat", Eat)
+						.Do("RequestBill", () => { return Status.ERROR; })
 						.End()
-					.Selector("HasReceivedBill")
-						.Do("LeaveSequence", leaveSequence)
-						.If("HasReceivedBill", () => { return false; })
+					.Selector("ReceiveBill")
+						.Do("LeaveCheck", leaveCheck)
+						.If("HasReceivedBill", () => { return hasReceivedBill; })
 						.Do("PayBill", () => { return Status.ERROR; })
 						.Do("Leave", () => { return Leave(); })
 						.End()
@@ -149,9 +200,9 @@ public class CustomerScript : MonoBehaviour
 			.End();
 		// TODO: Set properties of customer
 		var values = System.Enum.GetValues(typeof(Data.Food));
-		FoodToOrder = (Food)values.GetValue(Random.Range(0, values.Length));
+		foodToOrder = (Food)values.GetValue(Random.Range(0, values.Length));
 
-		AvailableTime = Random.Range(Globals.MinWaitTime, Globals.MaxWaitTime);
+		availableTime = Random.Range(Globals.MinWaitTime, Globals.MaxWaitTime);
 	}
 
     bool stopBT = false;
