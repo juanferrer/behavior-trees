@@ -24,12 +24,13 @@ public class QueueScript : MonoBehaviour
 	public Vector3 GetNextPosition()
 	{
         var nextPosition = gameObject.transform.position;
-        nextPosition.x += (customerQueue.Count * 3.0f);
+        nextPosition.x -= (customerQueue.Count * 3.0f);
         return nextPosition;
 	}
 
     public CustomerScript GetNextCustomer()
     {
+        if (customerQueue.Count == 0) return null;
         return customerQueue[0];
     }
 

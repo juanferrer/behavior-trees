@@ -69,7 +69,7 @@ public class CustomerScript : MonoBehaviour
             return Status.RUNNING;
         }
 
-        bool reachedPos = !agent.pathPending && (agent.remainingDistance <= agent.stoppingDistance) && (!agent.hasPath || agent.velocity.sqrMagnitude == 0f);
+        bool reachedPos = /*!agent.pathPending && */(agent.remainingDistance <= agent.stoppingDistance) && (!agent.hasPath || Mathf.Approximately(agent.velocity.sqrMagnitude, 0.0f));
         bool onTheWay = agent.remainingDistance != Mathf.Infinity && (agent.remainingDistance > agent.stoppingDistance);
 
         if (reachedPos)
@@ -93,35 +93,12 @@ public class CustomerScript : MonoBehaviour
 		return GoTo(pos);
 	}
 
-	private Status Leave()
-	{
-		var status = GoTo(exit);
-        // If it was in Queue, leave queue
-        queue.GetComponent<QueueScript>().LeaveQueue(this);
-        if (status == Status.SUCCESS) gameObject.SetActive(false);
-        // Send this to pool or destroy
-        return status;
-	}
-
 	private Status StartQueue()
 	{
-        queue.GetComponent<QueueScript>().StartQueue(this);
+        queue.StartQueue(this);
         isInQueue = true;
 		return Status.SUCCESS;
 	}
-
-    private Status SitInTable()
-    {
-        // Register to table events?
-        isInTable = true;
-        return Status.SUCCESS;
-    }
-
-    private Status Eat()
-    {
-        // Destroy food from table
-        return Status.SUCCESS;
-    }
 
     private Status Wait()
     {
@@ -130,11 +107,74 @@ public class CustomerScript : MonoBehaviour
         return Status.SUCCESS;
     }
 
-
-    public void StartReceiving(GameObject newTable)
+    private Status Leave()
     {
+        var status = GoTo(exit);
+        // If it was in Queue, leave queue
+        queue.LeaveQueue(this);
+        if (status == Status.SUCCESS) gameObject.SetActive(false);
+        // Send this to pool or destroy
+        return status;
+    }
+
+    private Status SitInTable()
+    {
+        // TODO
+        // Register to table events?
+        isInTable = true;
+        return Status.SUCCESS;
+    }
+
+    private Status MakeOrder()
+    {
+        // TODO
+        return Status.SUCCESS;
+    }
+
+    private Status Eat()
+    {
+        // Destroy food from table
+        // TODO
+        return Status.SUCCESS;
+    }
+
+    private Status RequestBill()
+    {
+        // TODO
+        return Status.SUCCESS;
+    }
+
+    private Status PayBill()
+    {
+        // TODO
+        return Status.SUCCESS;
+    }
+
+    public void Receive(GameObject newTable)
+    {
+        timeWaited = 0.0f;
         hasBeenReceived = true;
+        queue.LeaveQueue(this);
+        isInQueue = false;
         table = newTable;
+    }
+
+    public void Attend()
+    {
+        timeWaited = 0.0f;
+        hasBeenAttended = true;
+    }
+
+    public void Serve()
+    {
+        timeWaited = 0.0f;
+        hasBeenServed = true;
+    }
+
+    public void BringBill()
+    {
+        timeWaited = 0.0f;
+        hasReceivedBill = true;
     }
 
 	// Use this for initialization
@@ -167,33 +207,33 @@ public class CustomerScript : MonoBehaviour
                     .End()
                 .Sequence("Sequence")
 					.Sequence("BeReceived")
+                        .Do("LeaveCheck", leaveCheck)
                         .If("HasBeenReceived", () => { return hasBeenReceived; })
                         .Selector("ReceiveSelector")
                             .If("InTable", () => { return isInTable; })
                             .Sequence("MoveToTableSequence")
                                 .Do("GoToTable", () => { return GoTo(table); })
                                 .Do("SitInTable", SitInTable)
-                                .End()                                
-                            .Do("LeaveCheck", leaveCheck)
+                                .End()                                                      
                             .End()
 						.End()
-					.Selector("BeAttended")
+					.Sequence("BeAttended")
 						.Do("LeaveCheck", leaveCheck)
 						.If("HasBeenAttended", () => { return hasBeenAttended; })
-						.Do("MakeOrder", () => { return Status.ERROR; })
+						.Do("MakeOrder", MakeOrder)
 						.End()
-					.Selector("BeServed")
+					.Sequence("BeServed")
 						.Do("LeaveCheck", leaveCheck)
 						.If("HasBeenServed", () => { return hasBeenServed; })
-						.Wait("Wait", 5)
+						.Wait("Wait", 5000)
 						    .Do("Eat", Eat)
-						.Do("RequestBill", () => { return Status.ERROR; })
+						.Do("RequestBill", RequestBill)
 						.End()
-					.Selector("ReceiveBill")
+					.Sequence("ReceiveBill")
 						.Do("LeaveCheck", leaveCheck)
 						.If("HasReceivedBill", () => { return hasReceivedBill; })
-						.Do("PayBill", () => { return Status.ERROR; })
-						.Do("Leave", () => { return Leave(); })
+						.Do("PayBill", PayBill)
+						.Do("Leave", Leave)
 						.End()
 					.End()
 				.End()
