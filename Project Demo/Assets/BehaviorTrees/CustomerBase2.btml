@@ -1,0 +1,20 @@
+& Sequence
+    | QueueSelector
+        ? NeedsToStartQueue
+        ! DoQueue
+    | BeReceivedSelector
+        ? NeedsToBeReceived
+        ! BeReceived
+    | BeAttendedSelector
+        ? NeedsToBeAttended
+        ! BeAttended
+    | BeServedSelector
+        ? NeedsToBeServed
+        ! BeServed
+    | EatSelector
+        ? NeedsToEat
+        ! Eat
+    | ReceiveBillSeletor
+        ? NeedsToReceiveBill
+        ! ReceiveBill
+    ! Leave
