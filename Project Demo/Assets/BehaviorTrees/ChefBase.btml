@@ -1,5 +1,0 @@
-* Loop
-    & Sequence
-        ! AssessPriority
-        | Selector
-            ! Dummy

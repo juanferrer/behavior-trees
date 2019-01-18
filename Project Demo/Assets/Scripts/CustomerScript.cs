@@ -43,10 +43,12 @@ public class CustomerScript : MonoBehaviour
 	Food foodToOrder;
     const float customerWaitingTime = 5;
     float timeWaited = 0;
+    float timeEating = 3;
     bool isInQueue = false;
     bool isInTable = false;
 
-    bool needsToStartQueue = true;
+    bool waiterInTable = false;
+    bool waiterInQueue = false;
     bool hasBeenReceived = false;
     bool hasBeenAttended = false;
     bool hasBeenServed = false;
@@ -77,6 +79,7 @@ public class CustomerScript : MonoBehaviour
 
         if (reachedPos)
         {
+            Debug.Log("Customer reached destination: " + pos.ToString("G2"));
             agent.isStopped = true;
             return Status.SUCCESS;
         }
@@ -99,7 +102,6 @@ public class CustomerScript : MonoBehaviour
 	private Status StartQueue()
 	{
         queue.StartQueue(this);
-        needsToStartQueue = false;
         isInQueue = true;
         Debug.Log("Start queue");
         return Status.SUCCESS;
@@ -117,19 +119,21 @@ public class CustomerScript : MonoBehaviour
         var status = GoTo(exit);
         // If it was in Queue, leave queue
         isInQueue = false;
+        isInTable = false;
         queue.LeaveQueue(this);
-        Debug.Log("Leave");
         if (status == Status.SUCCESS) gameObject.SetActive(false);
         // Send this to pool or destroy
+        Debug.Log("Customer left");
         return status;
-    }
+	}
 
     private Status SitInTable()
     {
         // TODO
-        Debug.Log("Sit in table");
         // Register to table events?
         timeWaited = 0;
+        Debug.Log("Customer sitting in table");
+        hasBeenReceived = true;
         isInTable = true;
         return Status.SUCCESS;
     }
@@ -137,51 +141,54 @@ public class CustomerScript : MonoBehaviour
     private Status MakeOrder()
     {
         // TODO
+        timeWaited = 0;
         Debug.Log("Make order");
+        hasBeenAttended = true;
         return Status.SUCCESS;
     }
 
     private Status Eat()
     {
+        // Reset, so that the customer doesn't leave while eating
+        timeWaited = 0;
         // Destroy food from table
-        hasFinishedEating = true;
-        Debug.Log("Eat");
-        // TODO
-        return Status.SUCCESS;
-    }
+        if (!hasBeenServed) hasBeenServed = true;
+        timeEating -= Time.deltaTime;
 
-    private Status RequestBill()
-    {
-        // TODO
-        Debug.Log("Request bill");
-        return Status.SUCCESS;
+        if (timeEating <= 0)
+        {
+            hasFinishedEating = true;
+            Debug.Log("Customer finished eating");
+            return Status.SUCCESS;
+        }
+        return Status.RUNNING;
     }
 
     private Status PayBill()
     {
         // TODO
+        Debug.Log("Customer payed bill");
         return Status.SUCCESS;
     }
 
     public void Receive(GameObject newTable)
     {
         timeWaited = 0;
-        hasBeenReceived = true;
         queue.LeaveQueue(this);
         isInQueue = false;
+        waiterInQueue = true;
         table = newTable;
     }
 
     public void Attend()
     {
         timeWaited = 0;
-        hasBeenAttended = true;
+        waiterInTable = true;
     }
 
     public void Serve()
     {
         timeWaited = 0;
-        hasBeenServed = true;
         hasReceivedFood = true;
     }
 
@@ -210,122 +217,41 @@ public class CustomerScript : MonoBehaviour
                 .End()
             .End();
 
-        /*bt = new BehaviorTreeBuilder("")
-            .Sequence("Sequence")
-                .Selector("QueueSelector")
-                    .If("InQueue", () => { return isInQueue; })
-                    .Sequence("MoveToQueueSequence")
-                        .Do("GoToQueue", () => { return GoTo(queue.GetNextPosition()); })
-                        .Do("StartQueue", StartQueue)
-                        .End()
-                    .End()
-                .Sequence("Sequence")
-                    .Selector("BeReceived")
-                        .If("HasBeenReceived", () => { return hasBeenReceived; })
-                        .Sequence("BeReceivedSequence")
-                            .Do("LeaveCheck", leaveCheck)
-                            .If("HasBeenReceived", () => { return hasBeenReceived; })
-                            .Selector("ReceiveSelector")
-                                .If("InTable", () => { return isInTable; })
-                                .Sequence("MoveToTableSequence")
-                                    .Do("GoToTable", () => { return GoTo(table); })
-                                    .Do("SitInTable", SitInTable)
-                                    .End()
-                                .End()
-                            .End()
-                        .End()
-                    .Selector("BeAttended")
-                        .If("HasBeenAttended", () => { return hasBeenAttended; })
-                        .Sequence("BeAttendedSequence")
-                            .Do("LeaveCheck", leaveCheck)
-                            .If("HasBeenAttended", () => { return hasBeenAttended; })
-                            .Do("MakeOrder", MakeOrder)
-                            .End()
-                        .End()
-                    .Selector("BeServed")
-                        .If("HasFinishedEating", () => { return hasFinishedEating; })
-                        .Sequence("Eat")
-						    .Do("LeaveCheck", leaveCheck)
-						    .If("HasBeenServed", () => { return hasBeenServed; })
-						    .Wait("Wait", 5000)
-						        .Do("Eat", Eat)
-						    .Do("RequestBill", RequestBill)
-						    .End()
-                        .End()
-					.Sequence("ReceiveBill")
-						.Do("LeaveCheck", leaveCheck)
-						.If("HasReceivedBill", () => { return hasReceivedBill; })
-						.Do("PayBill", PayBill)
-						.Do("Leave", Leave)
-						.End()
-					.End()
-				.End()
-			.End();
-            */
-
         // Debug DLL in Unity:
         // https://www.robinryf.com/blog/2016/04/10/convert-pdb-to-mdb.html
         bt = new BehaviorTreeBuilder("")
             .Selector("Selector")
                 .Sequence("QueueSequence")
-                    .If("NeedsToStartQueue", () => { return needsToStartQueue; })
-                    .Selector("NeedsToGoToQueueSelector")
-                        .If("IsInQueue", () => { return isInQueue; })
-                        .Sequence("StartQueueSequence")
-                            .Do("GoToQueue", () => { return GoTo(queue.GetNextPosition()); })
-                            .Do("StartQueue", StartQueue)
-                            .End()
-                        .End()
+                    .If("NeedsToStartQueue", () => { return !isInQueue && !hasBeenReceived; })
+                    .Do("GoToQueue", () => { return GoTo(queue.GetNextPosition()); })
+                    .Do("StartQueue", StartQueue)
                     .End()
                 .Sequence("TableSequence")
-                    .Selector("WaitInQueueOrGoToTable")
-                        .Sequence("WaitInQueue")
-                            .If("NeedsToGetATable", () => {return (isInQueue && !hasBeenReceived); })
-                            .Do("LeaveCheck", leaveCheck)
-                            .End()
-                        .Selector("NeedsToGoToTableSelector")
-                            .Sequence("SitInTableSequence")
-                                .Not("IsNotInTable")
-                                    .If("IsInTable", () => { return isInTable; })
-                                .Do("GoToTable", () => { return GoTo(table); })
-                                .Do("SitInTable", SitInTable)
-                                .End()
-                            .End()
-                        .End()
+                    .If("NeedsToGetATable", () => { return !hasBeenReceived; })
+                    .Do("LeaveCheck", leaveCheck)
+                    .If("ReadyToBeReceived", () => { return waiterInQueue; })
+                    .Do("GoToTable", () => { return GoTo(table); })
+                    .Do("SitInTable", SitInTable)
                     .End()
                 .Sequence("BeAttendedSequence")
-                    .Selector("WaitInTableOrMakeOrder")
-                        .Sequence("WaitInTable")
-                            .If("NeedsToBeAttended", () => { return ( isInTable && hasBeenReceived && !hasBeenAttended); })
-                            .Do("LeaveCheck", leaveCheck)
-                            .End()
-                        .Selector("MakeOrderSelector")
-                            .If("HasBeenAttended", () => { return hasBeenAttended; })
-                            .Sequence("MakeOrder")
-                                .Do("MakeOrder", MakeOrder)
-                                .End()
-                            .End()
-                        .End()
+                    .If("NeedsToBeAttended", () => { return ( isInTable && hasBeenReceived && !hasBeenAttended); })
+                    .Do("LeaveCheck", leaveCheck)
+                    .If("ReadyToBeAttended", () => { return waiterInTable; })
+                    .Do("MakeOrder", MakeOrder)
                     .End()
-                .Sequence("BeServedSequence")
-                    .Sequence("WaitInTable")
-                        .If("NeedsToBeServed", () => { return isInTable && hasBeenAttended && !hasBeenServed; })
-                        .Do("LeaveCheck", leaveCheck)
-                        .End()
-                    .Selector("EatSelector")
-                        .If("HasFinishedEating", () => { return hasFinishedEating; })
-                        .Do("Eat", Eat)
-                        .End()
+                .Sequence("BeServedAndEatSequence")
+                    .If("NeedsToBeServed", () => { return isInTable && hasBeenAttended && !hasBeenServed && !hasFinishedEating; })
+                    .Do("LeaveCheck", leaveCheck)
+                    .If("HasFood", () => { return hasReceivedFood;  })
+                    .Do("Eat", Eat)
                     .End()
-                /*.Selector("EatSelector")
-                    .If("HasFinishedEating", () => { return hasFinishedEating; })
-                    .Do("Eat", () => { return Status.ERROR; })
-                    .End()
-                .Selector("ReceiveBillSeletor")
+                .Sequence("WaitForBillSequence")
+                    .If("NeedsToReceiveBill", () => { return isInTable && hasFinishedEating; })
+                    .Do("LeaveCheck", leaveCheck)
                     .If("HasReceivedBill", () => { return hasReceivedBill; })
-                    .Do("ReceiveBill", () => { return Status.ERROR; })
-                    .End()*/
-                .Do("Leave", Leave)
+                    .Do("PayBill", PayBill)
+                    .Do("Leave", Leave)
+                    .End()
                 .End()
             .End();
 

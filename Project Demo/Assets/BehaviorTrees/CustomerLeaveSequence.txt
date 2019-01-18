@@ -1,6 +1,0 @@
-BehaviorTree tree = new BehaviorTreeBuilder("")
-.Sequence("LeaveSequence")
-.If("WaitedTooLong",() => { return false; })
-.Do("Leave", () => { return Status.ERROR; })
-.End()
-.End();

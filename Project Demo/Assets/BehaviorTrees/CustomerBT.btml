@@ -1,0 +1,27 @@
+| Selector
+    & Queue
+        ? NeedsToStartQueue
+        ! GoToQueue
+        ! StartQueue
+    & Table
+        ? NeedsToGetATable
+        # LeaveCheck.btml
+        ? ReadyToBeReceived
+        ! GoToTable
+        ! SitInTable
+    & BeAttended
+        ? NeedsToBeAttended
+        # LeaveCheck.btml
+        ? ReadyToBeAttended
+        ! MakeOrder
+    & BeServedAndEat
+        ? NeedsToBeServed
+        # LeaveCheck.btml
+        ? HasFood
+        ! Eat
+    & WaitForBill
+        ? NeedsToReceiveBill
+        # LeaveCheck.btml
+        ? HasReceivedBill
+        ! PayBill
+        ! Leave

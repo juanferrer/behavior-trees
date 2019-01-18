@@ -1,3 +1,0 @@
-& LeaveSequence
-    ? WaitedTooLong
-    ! Leave

@@ -17,13 +17,14 @@ public class GameManagerScript : MonoBehaviour
 
     private CustomerScript customer;
 
-    public int RightMostCamX;
-    public int LeftMostCamX;
-    public int CamSpeed;
+    public float LeftMostCamPos;
+    public float RightMostCamPos;
+    public float CamSpeed;
 
 	// Use this for initialization
 	void Start ()
 	{
+        camera = GameObject.FindGameObjectWithTag("MainCamera");
         queueScript = queue.GetComponent<QueueScript>();
         tableList.AddRange(GameObject.FindGameObjectsWithTag("Table"));
         camera = GameObject.FindGameObjectWithTag("MainCamera");
@@ -32,16 +33,16 @@ public class GameManagerScript : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
-        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         {
-            if (camera.transform.position.x < LeftMostCamX)
+            if (camera.transform.position.x < LeftMostCamPos)
             {
                 camera.transform.Translate(-CamSpeed * Time.deltaTime, 0.0f, 0.0f);
             }
         }
-        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         {
-            if (camera.transform.position.x > RightMostCamX)
+            if (camera.transform.position.x > RightMostCamPos)
             {
                 camera.transform.Translate(CamSpeed * Time.deltaTime, 0.0f, 0.0f);
             }
