@@ -9,7 +9,7 @@ public class CookScript : MonoBehaviour
 
     GameManagerScript gm;
     NavMeshAgent agent;
-
+    BlackboardScript blackboard;
     BehaviorTree bt;
     GameObject kitchen;
     GameObject table;
@@ -84,34 +84,11 @@ public class CookScript : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        bt = new BehaviorTreeBuilder("")
-            .Sequence("Sequence")
-                .Do("AssessPriority", AssessPriority)
-                .Selector("Selector")
-                    .Sequence("ReceiveCustomerSequence")
-                        .If("ShouldReceiveCustomer", () => { return queueIsNotEmpty && noOneIsReceiving; })
-                        .Do("GoToQueue", () => { return GoTo(queue); })
-                        .Do("FindAndEmptyTable", FindAnEmptyTable)
-                        .Do("SendCustomerToTable", () => { return SendCustomerToTable(table); })
-                        .End()
-                    /*.Sequence("AttendCustomerSequence")
-                        .If("ShouldAttendCustmer", () => { return false; })
-                        .Do("GetOrderFromCustomer", GetOrderFromCustomer)
-                        .End()
-                    .Sequence("ServeFoodSequence")
-                        .If("ShouldServeFood", () => { return false; })
-                        .Do("BringFoodToCustomer", BringFoodToCustomer)
-                        .Do("GoToTable", () => { return GoTo(table); })
-                        .End()
-                    .Sequence("BillingSequence")
-                        .If("ShouldBringBill", () => { return false; })
-                        .Do("GoToKitchen", () => { return GoTo(kitchen); })
-                        .Do("BringBillToCustomer", BringBillToCustomer)
-                        .Do("CleanTable", () => { return Clean(table); })
-                        .End()
-                    .End()*/
-                .End()
-            .End();
+        gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerScript>();
+        blackboard = gm.GetComponent<BlackboardScript>();
+        queue = gm.queue.GetComponent<QueueScript>();
+        agent = GetComponent<NavMeshAgent>();
+        agent.isStopped = true;
     }
 
     // Update is called once per frame

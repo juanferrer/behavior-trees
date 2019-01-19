@@ -763,7 +763,7 @@ GameObject:
   - component: {fileID: 624156521}
   m_Layer: 0
   m_Name: Exit
-  m_TagString: Position
+  m_TagString: Exit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1411,12 +1411,12 @@ GameObject:
   - component: {fileID: 1384189399}
   - component: {fileID: 1384189398}
   m_Layer: 0
-  m_Name: Cook
+  m_Name: Waiter
   m_TagString: Customer
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!195 &1384189398
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1795,9 +1795,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1446263589}
+  - component: {fileID: 1446263590}
   m_Layer: 0
   m_Name: Kitchen
-  m_TagString: Untagged
+  m_TagString: Kitchen
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1815,6 +1816,17 @@ Transform:
   m_Father: {fileID: 485924681}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1446263590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1446263588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12f3d8c9abde22d47b2429bf5676e30d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1454046659
 Prefab:
   m_ObjectHideFlags: 0
@@ -2298,7 +2310,7 @@ GameObject:
   - component: {fileID: 1803376245}
   m_Layer: 0
   m_Name: Queue
-  m_TagString: Position
+  m_TagString: Queue
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -2464,9 +2476,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2953a2b6236024940b81a45ab68b0d03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  kitchen: {fileID: 1446263588}
-  queue: {fileID: 1803376243}
-  queueScript: {fileID: 0}
+  kitchen: {fileID: 0}
+  queue: {fileID: 0}
   exit: {fileID: 624156520}
   customerPrefab: {fileID: 1117080702200402, guid: 667819d3fd8540d40942197cd1b9dd89,
     type: 2}
@@ -2474,6 +2485,7 @@ MonoBehaviour:
   LeftMostCamPos: 16
   RightMostCamPos: -15
   CamSpeed: 10
+  blackboard: {fileID: 0}
 --- !u!4 &2019232492
 Transform:
   m_ObjectHideFlags: 0

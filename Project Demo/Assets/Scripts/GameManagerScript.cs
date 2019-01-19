@@ -5,13 +5,10 @@ using UnityEngine;
 public class GameManagerScript : MonoBehaviour
 {
 
-	public GameObject kitchen;
-	public GameObject queue;
-    [HideInInspector]
-    public QueueScript queueScript;
+	public KitchenScript kitchen;
+    public QueueScript queue;
 	public GameObject exit;
     public GameObject customerPrefab;
-    [HideInInspector]
     public List<GameObject> tableList;
     private new GameObject camera;
 
@@ -20,16 +17,17 @@ public class GameManagerScript : MonoBehaviour
     public float LeftMostCamPos;
     public float RightMostCamPos;
     public float CamSpeed;
-    public Blackboard blackboard;
+    public BlackboardScript blackboard;
 
 	// Use this for initialization
 	void Start ()
 	{
         camera = GameObject.FindGameObjectWithTag("MainCamera");
-        queueScript = queue.GetComponent<QueueScript>();
+        queue = GameObject.FindGameObjectWithTag("Queue").GetComponent<QueueScript>();
+        kitchen = GameObject.FindGameObjectWithTag("Kitchen").GetComponent<KitchenScript>();
         tableList.AddRange(GameObject.FindGameObjectsWithTag("Table"));
         camera = GameObject.FindGameObjectWithTag("MainCamera");
-        blackboard = new Blackboard();
+        blackboard = GetComponent<BlackboardScript>();
     }
 	
 	// Update is called once per frame
@@ -60,8 +58,8 @@ public class GameManagerScript : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             Debug.Log("Receiving customer");
-            customer = queueScript.GetNextCustomer();
-            queueScript.GetNextCustomer().Receive(tableList[Random.Range(0, tableList.Count)]);
+            customer = queue.GetNextCustomer();
+            queue.GetNextCustomer().Receive(tableList[Random.Range(0, tableList.Count)].GetComponent<TableScript>());
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha2))

@@ -11,7 +11,7 @@ public class TableScript : MonoBehaviour
 		IsClean = true;
 	}
 
-	public void SetCustomer(GameObject customer)
+	public void SetCustomer(CustomerScript customer)
 	{
 		// TODO: Add a new customer to this table
 
@@ -22,7 +22,7 @@ public class TableScript : MonoBehaviour
 
 	public bool IsOccupied { get; private set; }
 
-	public GameObject Customer { get; private set; }
+	public CustomerScript Customer { get; private set; }
 
 
 	// Use this for initialization

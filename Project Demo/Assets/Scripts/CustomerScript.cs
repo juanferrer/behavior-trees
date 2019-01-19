@@ -8,35 +8,11 @@ public class CustomerScript : MonoBehaviour
 {
 
 	GameManagerScript gm;
-	/// <summary>
-	/// The behaviour tree of this agent
-	/// </summary>
 	BehaviorTree bt;
-
-	/// <summary>
-	///	Subtree called inside the main bt
-	/// </summary>
 	BehaviorTree leaveCheck;
-
-	/// <summary>
-	/// Queue object. Constant reference, queue is always the same
-	/// </summary>
 	QueueScript queue;
-
-	/// <summary>
-	/// Table object. Variable reference, set when received by waiter
-	/// </summary>
-	GameObject table;
-
-	/// <summary>
-	/// Exit object. Constant reference, exit is always the same
-	/// </summary>
+	TableScript table;
 	GameObject exit;
-
-	/// <summary>
-	/// Time available for customer to perform all activities
-	/// </summary>
-	
 	NavMeshAgent agent;
 
 	int availableTime;
@@ -66,9 +42,7 @@ public class CustomerScript : MonoBehaviour
 	{
         // Set a new destination
         if (agent.isStopped)
-        //if (!Mathf.Approximately(agent.destination.x, pos.x) || !Mathf.Approximately(agent.destination.z, pos.z))
 		{
-			//agent.destination = pos;
             agent.SetDestination(pos);
             agent.isStopped = false;
             return Status.RUNNING;
@@ -90,11 +64,11 @@ public class CustomerScript : MonoBehaviour
 	/// <summary>
 	/// Get position from object and call overloaded GoTo
 	/// </summary>
-	/// <param name="objectPos"></param>
+	/// <param name="obj"></param>
 	/// <returns></returns>
-	private Status GoTo(GameObject objectPos)
+	private Status GoTo(MonoBehaviour obj)
 	{
-		Vector3 pos = objectPos.transform.position;
+		Vector3 pos = obj.transform.position;
 
 		return GoTo(pos);
 	}
@@ -116,7 +90,7 @@ public class CustomerScript : MonoBehaviour
 
     private Status Leave()
     {
-        var status = GoTo(exit);
+        var status = GoTo(exit.transform.position);
         // If it was in Queue, leave queue
         isInQueue = false;
         isInTable = false;
@@ -171,7 +145,7 @@ public class CustomerScript : MonoBehaviour
         return Status.SUCCESS;
     }
 
-    public void Receive(GameObject newTable)
+    public void Receive(TableScript newTable)
     {
         timeWaited = 0;
         queue.LeaveQueue(this);
@@ -203,7 +177,7 @@ public class CustomerScript : MonoBehaviour
     {
         // Get references to each object
         gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerScript>();
-        queue = gm.queue.GetComponent<QueueScript>();
+        queue = gm.queue;
         exit = gm.exit;
         agent = GetComponent<NavMeshAgent>();
         agent.isStopped = true;

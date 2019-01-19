@@ -5,35 +5,13 @@ public class WaiterScript : MonoBehaviour
 {
 	GameManagerScript gm;
 
-	/// <summary>
-	/// The behaviour tree of this agent
-	/// </summary>
+
 	BehaviorTree bt;
-
-	/// <summary>
-	/// Queue object. Constant reference, queue is always the same
-	/// </summary>
-	GameObject queue;
-
-	/// <summary>
-	/// Queue object. Constant reference, kitchen is always the same
-	/// </summary>
-	GameObject kitchen;
-
-	/// <summary>
-	/// Table object. Variable reference, set when assessing priority
-	/// </summary>		   
-	GameObject table;
-
-	/// <summary>
-	/// Customer object. Variable reference, set when receiving customer
-	/// </summary>
-	GameObject customer;
-
-	/// <summary>
-	/// Food object. Variable reference, set when bringing foot to table
-	/// </summary>
-	GameObject food;
+	QueueScript queue;
+	KitchenScript kitchen;	   
+	TableScript table;
+	CustomerScript customer;
+	FoodScript food;
 
 	bool ShouldReceiveCustomer,
 		ShouldAttendCustomer,
@@ -59,24 +37,16 @@ public class WaiterScript : MonoBehaviour
 	/// <summary>
 	/// Get position from object and call overloaded GoTo
 	/// </summary>
-	/// <param name="objectPos"></param>
+	/// <param name="obj"></param>
 	/// <returns></returns>
-	private Status GoTo(GameObject objectPos)
+	private Status GoTo(MonoBehaviour obj)
 	{
-		Vector3 pos = objectPos.transform.position;
+		Vector3 pos = obj.transform.position;
 
 		return GoTo(pos);
 	}
 
-	private Status BringCustomerToTable()
-	{
-		// TODO: Find a free table. Was it not set when assessing priority?
-
-		table.GetComponent<TableScript>().SetCustomer(customer);
-		return table.GetComponent<TableScript>().IsOccupied ? Status.SUCCESS : Status.FAILURE;
-	}
-
-	private Status GiveTo(string tag, GameObject recipient)
+	private Status GiveTo(string tag, MonoBehaviour recipient)
 	{
 		// Get a reference to the my script
 		var giverScript = this.GetComponent<RecipientScript>();
@@ -95,7 +65,7 @@ public class WaiterScript : MonoBehaviour
 		return Status.ERROR;
 	}
 
-	private Status GetFrom(string tag, GameObject giver)
+	private Status GetFrom(string tag, MonoBehaviour giver)
 	{
 		// Get a reference to the giver's script
 		var giverScript = giver.GetComponent<RecipientScript>();
@@ -114,18 +84,19 @@ public class WaiterScript : MonoBehaviour
 		return Status.ERROR;
 	}
 
-	private Status CleanTable(GameObject table)
+    /// <summary>
+    /// Decide what to do next and set the value of the appropriate boolean
+    /// </summary>
+    /// <returns></returns>
+    private Status AssessPriority()
 	{
-		var tableScript = table.GetComponent<TableScript>();
-		tableScript.Clean();
-		return tableScript.IsClean ? Status.SUCCESS : Status.FAILURE;
-	}
+        // TODO
 
-	private Status AssessPriority()
-	{
-		// TODO
-
-		// We need to keep dishes warm, so that's first
+        // We need to keep dishes warm, so that's first
+        if (kitchen)
+        {
+            ShouldServeFood = true;
+        }
 		// TODO: Check if any dish is ready
 		
 
@@ -136,13 +107,33 @@ public class WaiterScript : MonoBehaviour
 		return Status.ERROR;
 	}
 
-	// Use this for initialization
-	void Start()
+    private Status FindAnEmptyTable()
+    {
+        return Status.ERROR;
+    }
+
+    private Status SendCustomerToTable()
+    {
+        // TODO: Find a free table
+
+        table.SetCustomer(customer);
+        return table.GetComponent<TableScript>().IsOccupied ? Status.SUCCESS : Status.FAILURE;
+    }
+
+        private Status CleanTable(TableScript table)
+    {
+        var tableScript = table.GetComponent<TableScript>();
+        tableScript.Clean();
+        return tableScript.IsClean ? Status.SUCCESS : Status.FAILURE;
+    }
+
+    // Use this for initialization
+    void Start()
 	{
 		// TODO: Get references to each object
 		gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerScript>();
 		kitchen = gm.kitchen;
-		queue = gm.queue;
+        queue = gm.queue;
 
 		// Declare BT
 		bt = new BehaviorTreeBuilder("")
@@ -152,8 +143,8 @@ public class WaiterScript : MonoBehaviour
 				.Selector("Selector")
 					.Sequence("ReceiveCustomer")
 						.If("ShouldReceiveCustomer", () => { return ShouldReceiveCustomer; })
-						.Do("GoToQueue", () => { return GoTo(queue); })
-						.Do("BringCustomerToTable", () => { return BringCustomerToTable(); })
+						.Do("GoToQueue", () => { return GoTo(queue.transform.position); })
+						.Do("SendCustomerToTable", SendCustomerToTable)
 					.End()
 					.Sequence("AttendCustomer")
 						.If("ShouldAttendCustomer", () => { return ShouldAttendCustomer; })

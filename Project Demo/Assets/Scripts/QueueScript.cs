@@ -5,10 +5,12 @@ using UnityEngine;
 public class QueueScript : MonoBehaviour
 {
     private List<CustomerScript> customerQueue;
+    private bool waiterInQueue;
 	// Use this for initialization
 	void Start ()
 	{
 		customerQueue = new List<CustomerScript>();
+        waiterInQueue = false;
     }
 	
 	// Update is called once per frame
@@ -37,6 +39,11 @@ public class QueueScript : MonoBehaviour
     public int CustomerCount()
     {
         return customerQueue.Count;
+    }
+
+    public bool IsWaiterInQueue()
+    {
+        return waiterInQueue;
     }
 
     /// <summary>

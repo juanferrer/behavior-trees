@@ -9,12 +9,14 @@ TagManager:
   - Table
   - Waiter
   - Customer
-  - Chef
   - Food
   - Order
   - Bill
   - Money
-  - Position
+  - Kitchen
+  - Cook
+  - Exit
+  - Queue
   layers:
   - Default
   - TransparentFX
