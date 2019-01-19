@@ -34,6 +34,11 @@ public class QueueScript : MonoBehaviour
         return customerQueue[0];
     }
 
+    public int CustomerCount()
+    {
+        return customerQueue.Count;
+    }
+
     /// <summary>
     /// Allow customer to start queuing
     /// </summary>

@@ -1,0 +1,17 @@
+& Sequence
+    ! AssessPriority
+    | Selector
+        & ReceiveCustomerSequence
+            ? ShouldReceiveCustomer
+            ! SendCustomerToTable
+        & AttendCustomerSequence
+            ? ShouldAttendCustmer
+            ! GetOrderFromCustomer
+        & ServeFoodSequence
+            ? ShouldServeFood
+            ! BringFoodToCustomer
+        & BillingSequence
+            ? ShouldBringBill
+            ! BringBillToCustomer
+            ! CleanTable
+        

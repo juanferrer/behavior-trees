@@ -20,6 +20,7 @@ public class GameManagerScript : MonoBehaviour
     public float LeftMostCamPos;
     public float RightMostCamPos;
     public float CamSpeed;
+    public Blackboard blackboard;
 
 	// Use this for initialization
 	void Start ()
@@ -28,6 +29,7 @@ public class GameManagerScript : MonoBehaviour
         queueScript = queue.GetComponent<QueueScript>();
         tableList.AddRange(GameObject.FindGameObjectsWithTag("Table"));
         camera = GameObject.FindGameObjectWithTag("MainCamera");
+        blackboard = new Blackboard();
     }
 	
 	// Update is called once per frame
