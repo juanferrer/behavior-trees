@@ -6,6 +6,7 @@ public class BlackboardScript : MonoBehaviour
 {
     private GameManagerScript gm;
     private QueueScript queue;
+    public List<TableScript> tables;
 
     public int CustomersInQueueCount { get; private set; }
     public bool WaiterInQueue { get; private set; }
@@ -20,6 +21,7 @@ public class BlackboardScript : MonoBehaviour
     {
         gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerScript>();
         queue = gm.queue.GetComponent<QueueScript>();
+        tables.AddRange(GameObject.FindGameObjectsWithTag("Table"));
     }
 
     private void LateUpdate()

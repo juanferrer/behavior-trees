@@ -9,7 +9,6 @@ public class GameManagerScript : MonoBehaviour
     public QueueScript queue;
 	public GameObject exit;
     public GameObject customerPrefab;
-    public List<GameObject> tableList;
     private new GameObject camera;
 
     private CustomerScript customer;
@@ -25,7 +24,6 @@ public class GameManagerScript : MonoBehaviour
         camera = GameObject.FindGameObjectWithTag("MainCamera");
         queue = GameObject.FindGameObjectWithTag("Queue").GetComponent<QueueScript>();
         kitchen = GameObject.FindGameObjectWithTag("Kitchen").GetComponent<KitchenScript>();
-        tableList.AddRange(GameObject.FindGameObjectsWithTag("Table"));
         camera = GameObject.FindGameObjectWithTag("MainCamera");
         blackboard = GetComponent<BlackboardScript>();
     }

@@ -12,11 +12,13 @@ public class WaiterScript : MonoBehaviour
 	TableScript table;
 	CustomerScript customer;
 	FoodScript food;
+    BlackboardScript blackboard;
 
-	bool ShouldReceiveCustomer,
-		ShouldAttendCustomer,
-		ShouldServeFood,
-		ShouldBringBill;
+    bool shouldReceiveCustomer,
+        shouldAttendCustomer,
+        shouldServeFood,
+        shouldBringBill,
+        isPerformingAction;
 
 	/// <summary>
 	/// Use Unity's meshnav to travel to given position
@@ -90,21 +92,30 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status AssessPriority()
 	{
-        // TODO
+        if (isPerformingAction) return Status.SUCCESS;
+
+        shouldReceiveCustomer = false;
+        shouldAttendCustomer = false;
+        shouldServeFood = false;
+        shouldBringBill = false;
+        isPerformingAction = false;
 
         // We need to keep dishes warm, so that's first
-        if (kitchen)
+        if (kitchen.IsFoodPrepared())
         {
-            ShouldServeFood = true;
+            shouldServeFood = true;
+            return Status.SUCCESS;
         }
-		// TODO: Check if any dish is ready
-		
 
-		// There needs to be free tables before we receive a new customer
+        // There needs to be free tables before we receive a new customer
+        if (blackboard.EmptyTablesCount() > 0)
+        {
+
+        }
 
 
-		//
-		return Status.ERROR;
+        //
+        return Status.ERROR;
 	}
 
     private Status FindAnEmptyTable()
@@ -134,34 +145,41 @@ public class WaiterScript : MonoBehaviour
 		gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerScript>();
 		kitchen = gm.kitchen;
         queue = gm.queue;
+        blackboard = gm.blackboard;
 
-		// Declare BT
-		bt = new BehaviorTreeBuilder("")
+        shouldReceiveCustomer = false;
+        shouldAttendCustomer = false;
+        shouldServeFood = false;
+        shouldBringBill = false;
+        isPerformingAction = false;
+
+        // Declare BT
+        bt = new BehaviorTreeBuilder("")
 		.RepeatUntilFail("Loop")
 			.Sequence("Sequence")
 				.Do("AssessPriority", AssessPriority)
 				.Selector("Selector")
 					.Sequence("ReceiveCustomer")
-						.If("ShouldReceiveCustomer", () => { return ShouldReceiveCustomer; })
+						.If("ShouldReceiveCustomer", () => { return shouldReceiveCustomer; })
 						.Do("GoToQueue", () => { return GoTo(queue.transform.position); })
 						.Do("SendCustomerToTable", SendCustomerToTable)
 					.End()
 					.Sequence("AttendCustomer")
-						.If("ShouldAttendCustomer", () => { return ShouldAttendCustomer; })
+						.If("ShouldAttendCustomer", () => { return shouldAttendCustomer; })
 						.Do("GoToTable", () => { return GoTo(table); })
 						.Do("GetOrderFromCustomer", () => { return GetFrom("order", customer); })
 						.Do("GoToKitchen", () => { return GoTo(kitchen); })
 						.Do("GiveOrderToKitchen", () => { return GiveTo("order", kitchen); })
 					.End()
 					.Sequence("ServeFood")
-						.If("ShouldServeFood", () => { return ShouldServeFood; })
+						.If("ShouldServeFood", () => { return shouldServeFood; })
 						.Do("GoToKitchen", () => { return GoTo(kitchen); })
 						.Do("PickupFood", () => { return GetFrom("food", kitchen); })
 						.Do("GoToTable", () => { return GoTo(table); })
 						.Do("GiveFoodToCustomer", () => { return GiveTo("food", customer); })
 					.End()
 					.Sequence("BringBill")
-						.If("ShouldBringBill", () => { return ShouldBringBill; })
+						.If("ShouldBringBill", () => { return shouldBringBill; })
 						.Do("GoToKitchen", () => { return GoTo(kitchen); })
 						.Do("PickupBill", () => { return GetFrom("Bill", kitchen); })
 						.Do("GoToTable", () => { return GoTo(table); })
