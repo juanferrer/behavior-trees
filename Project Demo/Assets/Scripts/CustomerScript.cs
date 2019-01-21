@@ -242,7 +242,6 @@ public class CustomerScript : MonoBehaviour
             .End();
 
         // TODO: Set properties of customer
-        var values = System.Enum.GetValues(typeof(Data.Food));
 
 		availableTime = UnityEngine.Random.Range(Globals.MinWaitTime, Globals.MaxWaitTime);
 	}
