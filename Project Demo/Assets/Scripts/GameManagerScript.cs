@@ -53,11 +53,11 @@ public class GameManagerScript : MonoBehaviour
             GameObject.Instantiate(customerPrefab, newPos, Quaternion.identity);
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        /*if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             Debug.Log("Receiving customer");
             customer = queue.GetNextCustomer();
-            queue.GetNextCustomer().Receive(tableList[Random.Range(0, tableList.Count)].GetComponent<TableScript>());
+            queue.GetNextCustomer().Receive(blackboard.GetEmptyTable());       
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha2))
@@ -76,6 +76,6 @@ public class GameManagerScript : MonoBehaviour
         {
             Debug.Log("Bringing bill to customer");
             customer.BringBill();
-        }
+        }*/
     }
 }

@@ -14,9 +14,18 @@ namespace Data
 		Dish3,
 	}
 
-	static public class Globals
+    public enum ItemType
+    {
+        NONE,
+        ORDER,
+        FOOD,
+        BILL,
+        MONEY
+    }
+
+    static public class Globals
 	{
 		static public int MinWaitTime = 20;
-		static public int MaxWaitTime = 500;
+		static public int MaxWaitTime = 100;
 	}
 }

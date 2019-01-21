@@ -1,11 +1,12 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Data;
 
 public class RecipientScript : MonoBehaviour
 {
 
-	private Dictionary<string, GameObject> inventory;
+	private Dictionary<ItemType, GameObject> inventory;
 
 	/// <summary>
 	/// Give object to recipient
@@ -13,12 +14,12 @@ public class RecipientScript : MonoBehaviour
 	/// <param name="obj"></param>
 	public void Give(GameObject obj)
 	{
-		// TODO: Receive object
-
+        // TODO: Receive object
+        ItemType type;
 		// Process type of object
-		if (!Has(obj.tag))
+		if (Enum.TryParse(obj.tag.ToUpper(), out type) && !Has(type))
 		{
-			inventory[obj.tag] = obj;
+			inventory[type] = obj;
 		}
 		else
 		{
@@ -32,7 +33,7 @@ public class RecipientScript : MonoBehaviour
 	/// </summary>
 	/// <param name="tag"></param>
 	/// <returns></returns>
-	public GameObject Get(string tag)
+	public GameObject Get(ItemType tag)
 	{
 		GameObject obj = null;
 		if (Has(tag))
@@ -49,9 +50,9 @@ public class RecipientScript : MonoBehaviour
 	/// </summary>
 	/// <param name="tag"></param>
 	/// <returns></returns>
-	public bool Has(string tag)
+	public bool Has(ItemType tag)
 	{
-		if (tag == null) return false;
+		if (tag == ItemType.NONE) return false;
 		return inventory.ContainsKey(tag);
 	}
 
@@ -61,7 +62,7 @@ public class RecipientScript : MonoBehaviour
 	// Use this for initialization
 	void Start()
 	{
-		inventory = new Dictionary<string, GameObject>();
+		inventory = new Dictionary<ItemType, GameObject>();
 	}
 
 	// Update is called once per frame
