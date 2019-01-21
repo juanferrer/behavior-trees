@@ -7,11 +7,12 @@ namespace Data
 	/// <summary>
 	/// Range of available dishes
 	/// </summary>
-	enum Food
+	public enum FoodType
 	{
-		Dish1,
-		Dish2,
-		Dish3,
+        NONE,
+		DISH1,
+		DISH2,
+		DISH3,
 	}
 
     public enum ItemType
@@ -21,6 +22,12 @@ namespace Data
         FOOD,
         BILL,
         MONEY
+    }
+
+    public struct Food
+    {
+        public TableScript table;
+        public FoodType food;
     }
 
     static public class Globals

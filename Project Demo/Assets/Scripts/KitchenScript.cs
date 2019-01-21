@@ -1,16 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Data;
 
 public class KitchenScript : MonoBehaviour
 {
 
-    private List<FoodScript> foodPrepared;
+    private List<Food> foodPrepared;
+    private List<Food> orders;
+    private List<TableScript> bills;
 
 	// Use this for initialization
 	void Start ()
     {
-        foodPrepared = new List<FoodScript>();
+        foodPrepared = new List<Food>();
+        orders = new List<Food>();
+        bills = new List<TableScript>();
 	}
 	
 	// Update is called once per frame
@@ -18,20 +23,39 @@ public class KitchenScript : MonoBehaviour
     {	
 	}
 
-    public FoodScript GetFoodPrepared()
+    public Food GetFoodPrepared()
     {
-        FoodScript plate = foodPrepared[0];
+        Food plate = foodPrepared[0];
         foodPrepared.RemoveAt(0);
+        bills.Add(plate.table);
         return plate;
     }
 
-    public void AddFoodPrepared(FoodScript plate)
+    public void AddFoodPrepared(Food food)
     {
-        foodPrepared.Add(plate);
+        foodPrepared.Add(food);
+        orders.Remove(food);
     }
 
     public bool IsFoodPrepared()
     {
         return foodPrepared.Count > 0;
+    }
+
+    public void AddOrder(Food food)
+    {
+        orders.Add(food);
+    }
+
+    public bool IsBillReady()
+    {
+        return bills.Count > 0;
+    }
+
+    public TableScript GetBill()
+    {
+        TableScript bill = bills[0];
+        bills.RemoveAt(0);
+        return bill;
     }
 }

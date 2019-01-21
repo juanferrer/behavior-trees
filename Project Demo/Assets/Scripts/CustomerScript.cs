@@ -3,6 +3,7 @@ using UnityEngine;
 using FluentBehaviorTree;
 using Data;
 using UnityEngine.AI;
+using System;
 
 public class CustomerScript : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class CustomerScript : MonoBehaviour
 	TableScript table;
 	GameObject exit;
 	NavMeshAgent agent;
+    public Inventory Inventory;
 
 	int availableTime;
 	Food foodToOrder;
@@ -114,7 +116,8 @@ public class CustomerScript : MonoBehaviour
     private Status DecideFood()
     {
         Debug.Log("Customer decided what to order");
-        GetComponent<RecipientScript>().Give(RecipientScript.ItemType.ORDER, );
+        var values = Enum.GetValues(typeof(Food));
+        foodToOrder = (Food)values.GetValue(UnityEngine.Random.Range(0, values.Length));
         return Status.SUCCESS;
     }
 
@@ -184,6 +187,8 @@ public class CustomerScript : MonoBehaviour
         exit = gm.exit;
         agent = GetComponent<NavMeshAgent>();
         agent.isStopped = true;
+        Inventory = new Inventory();
+        Inventory.money = true;
 
         // Declare BTs
 
@@ -211,7 +216,7 @@ public class CustomerScript : MonoBehaviour
                     .Do("SitInTable", SitInTable)
                     .End()
                 .Sequence("DecideWhatToOrder")
-                    .If("NoFoodDecided", () => { return !GetComponent<RecipientScript>().Has(ItemType.ORDER); })
+                    .If("NoFoodDecided", () => { return Inventory.Has(ItemType.FOOD); })
                     .Do("DecideFood", DecideFood)
                     .End()
                 .Sequence("BeAttendedSequence")
@@ -238,9 +243,8 @@ public class CustomerScript : MonoBehaviour
 
         // TODO: Set properties of customer
         var values = System.Enum.GetValues(typeof(Data.Food));
-		foodToOrder = (Food)values.GetValue(Random.Range(0, values.Length));
 
-		availableTime = Random.Range(Globals.MinWaitTime, Globals.MaxWaitTime);
+		availableTime = UnityEngine.Random.Range(Globals.MinWaitTime, Globals.MaxWaitTime);
 	}
 
 	// Update is called once per frame

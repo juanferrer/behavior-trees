@@ -13,8 +13,8 @@ public class WaiterScript : MonoBehaviour
 	KitchenScript kitchen;	   
 	TableScript table;
 	CustomerScript customer;
-	FoodScript food;
     BlackboardScript blackboard;
+    public Inventory Inventory;
 
     bool shouldReceiveCustomer,
         shouldAttendCustomer,
@@ -62,43 +62,27 @@ public class WaiterScript : MonoBehaviour
         return GoTo(pos);
     }
 
-    private Status GiveTo(ItemType tag, MonoBehaviour recipient)
-	{
-		// Get a reference to the my script
-		var giverScript = this.GetComponent<RecipientScript>();
-		// Make sure I have object
-		if (giverScript.Has(tag))
-		{
-			var obj = giverScript.Get(tag);
-			if (obj != null)
-			{
-				// If so, give object to recipient
-				recipient.GetComponent<RecipientScript>().Give(obj);
-				return Status.SUCCESS;
-			}
-			else { return Status.FAILURE; }
-		}
-		return Status.ERROR;
-	}
+    private Status GiveOrderToKitchen()
+    {
+        kitchen.AddOrder(Inventory.order);
+        Inventory.order = new Food();
+        return Status.SUCCESS;
+    }
 
-	private Status GetFrom(ItemType tag, MonoBehaviour giver)
-	{
-		// Get a reference to the giver's script
-		var giverScript = giver.GetComponent<RecipientScript>();
-		// Make sure giver has object
-		if (giverScript.Has(tag))
-		{
-			var obj = giverScript.Get(tag);
-			if (obj != null)
-			{
-				// If so, give object to self
-				GetComponent<RecipientScript>().Give(obj);
-				return Status.SUCCESS;
-			}
-			else { return Status.FAILURE; }
-		}
-		return Status.ERROR;
-	}
+    private Status GetFoodFromKitchen()
+    {
+        Inventory.food = kitchen.GetFoodPrepared();
+        table = Inventory.food.table;
+
+        return Status.SUCCESS;
+    }
+
+    private Status GetBillFromKitchen()
+    {
+        Inventory.bill = true;
+        table = kitchen.GetBill();
+        return Status.SUCCESS;
+    }
 
     private Status GetCustomerToAttend()
     {
@@ -108,7 +92,7 @@ public class WaiterScript : MonoBehaviour
 
     private Status AttendCustomer()
     {
-        GetFrom(ItemType.ORDER, customer);
+        Inventory.GetFrom(ItemType.ORDER, customer.Inventory);
         customer.Attend();
 
         return Status.SUCCESS;
@@ -200,6 +184,7 @@ public class WaiterScript : MonoBehaviour
         blackboard = gm.blackboard;
         agent = GetComponent<NavMeshAgent>();
         agent.isStopped = true;
+        Inventory = new Inventory();
 
         shouldReceiveCustomer = false;
         shouldAttendCustomer = false;
@@ -217,29 +202,29 @@ public class WaiterScript : MonoBehaviour
 						.If("ShouldReceiveCustomer", () => { return shouldReceiveCustomer; })
 						.Do("GoToQueue", () => { return GoTo(queue); })
 						.Do("SendCustomerToTable", SendCustomerToTable)
-					.End()
+					    .End()
 					.Sequence("AttendCustomer")
 						.If("ShouldAttendCustomer", () => { return shouldAttendCustomer; })
                         .Do("GetCustomerToAttend", GetCustomerToAttend)
 						.Do("GoToCustomer", () => { return GoTo(customer); })
 						.Do("Attend", AttendCustomer)
 						.Do("GoToKitchen", () => { return GoTo(kitchen); })
-						.Do("GiveOrderToKitchen", () => { return GiveTo(ItemType.ORDER, kitchen); })
-					.End()
+						.Do("GiveOrderToKitchen", GiveOrderToKitchen)
+					    .End()
 					.Sequence("ServeFood")
 						.If("ShouldServeFood", () => { return shouldServeFood; })
 						.Do("GoToKitchen", () => { return GoTo(kitchen); })
-						.Do("PickupFood", () => { return GetFrom(ItemType.FOOD, kitchen); })
+						.Do("PickupFood", GetFoodFromKitchen)
 						.Do("GoToTable", () => { return GoTo(table); })
-						.Do("GiveFoodToCustomer", () => { return GiveTo(ItemType.ORDER, customer); })
-					.End()
+						.Do("GiveFoodToCustomer", () => { return Inventory.GiveTo(ItemType.ORDER, customer.Inventory); })
+					    .End()
 					.Sequence("BringBill")
 						.If("ShouldBringBill", () => { return shouldBringBill; })
 						.Do("GoToKitchen", () => { return GoTo(kitchen); })
-						.Do("PickupBill", () => { return GetFrom(ItemType.BILL, kitchen); })
+						.Do("PickupBill", GetBillFromKitchen)
 						.Do("GoToTable", () => { return GoTo(table); })
-						.Do("GiveBillToCustomer", () => { return GiveTo(ItemType.BILL, customer); })
-						.Do("GetMoneyFromCustomer", () => { return GetFrom(ItemType.MONEY, customer); })
+						.Do("GiveBillToCustomer", () => { return Inventory.GiveTo(ItemType.BILL, customer.Inventory); })
+						.Do("GetMoneyFromCustomer", () => { return Inventory.GetFrom(ItemType.MONEY, customer.Inventory); })
 						.Do("CleanTable", () => { return CleanTable(table); })
 						.End()
                     .Do("JustWait", () => { return Status.SUCCESS; })
