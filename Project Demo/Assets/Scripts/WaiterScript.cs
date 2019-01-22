@@ -5,22 +5,22 @@ using Data;
 
 public class WaiterScript : MonoBehaviour
 {
-	GameManagerScript gm;
-    NavMeshAgent agent;
+    GameManagerScript gm;           // Game manager
+    NavMeshAgent agent;             // Navigation agent
+    BehaviorTree bt;                // Behaviour tree
+    QueueScript queue;              // Queue
+    KitchenScript kitchen;          // Kitchen
+    TableScript table;              // Usually empty. Set when going to a certain table
+    CustomerScript customer;        // Usually empty. Set when interacting with a customer
+    BlackboardScript blackboard;    // Global information
+    public Inventory Inventory;     // Inventory of entity
 
-    BehaviorTree bt;
-	QueueScript queue;
-	KitchenScript kitchen;	   
-	TableScript table;
-	CustomerScript customer;
-    BlackboardScript blackboard;
-    public Inventory Inventory;
-
-    bool shouldReceiveCustomer,
-        shouldAttendCustomer,
-        shouldServeFood,
-        shouldBringBill,
-        isPerformingAction;
+    bool shouldReceiveCustomer;
+    bool shouldAttendCustomer;
+    bool shouldBringOrder;
+    bool shouldServeFood;
+    bool shouldBringBill;
+    bool isPerformingAction;
 
     /// <summary>
     /// Use Unity's meshnav to travel to given position
@@ -62,34 +62,68 @@ public class WaiterScript : MonoBehaviour
         return GoTo(pos);
     }
 
+    /// <summary>
+    /// Transfer order from entity's inventory to kitchen
+    /// </summary>
+    /// <returns></returns>
     private Status GiveOrderToKitchen()
     {
+        Debug.Log("Waiter left order in kitchen");
         kitchen.AddOrder(Inventory.order);
         Inventory.order = new Food();
         return Status.SUCCESS;
     }
 
+    /// <summary>
+    /// Get prepared food from kitchen's inventory
+    /// </summary>
+    /// <returns></returns>
     private Status GetFoodFromKitchen()
     {
+        Debug.Log("Waiter got food from kitchen");
         Inventory.food = kitchen.GetFoodPrepared();
         table = Inventory.food.table;
+        return Status.SUCCESS;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private Status ServeFood()
+    {
+        Inventory.GiveTo(ItemType.ORDER, customer.Inventory);
+        customer.Serve();
 
         return Status.SUCCESS;
     }
 
+    /// <summary>
+    /// Get bill from kitchen's inventory
+    /// </summary>
+    /// <returns></returns>
     private Status GetBillFromKitchen()
     {
+        Debug.Log("Waiter got bill from kitchen");
         Inventory.bill = true;
         table = kitchen.GetBill();
         return Status.SUCCESS;
     }
 
+    /// <summary>
+    /// Check what customer has not been attended yet
+    /// </summary>
+    /// <returns></returns>
     private Status GetCustomerToAttend()
     {
         customer = blackboard.GetTableToAttend().Customer;
         return Status.SUCCESS;
     }
 
+    /// <summary>
+    /// Attend customer and get their order
+    /// </summary>
+    /// <returns></returns>
     private Status AttendCustomer()
     {
         Inventory.GetFrom(ItemType.ORDER, customer.Inventory);
@@ -103,15 +137,23 @@ public class WaiterScript : MonoBehaviour
     /// </summary>
     /// <returns></returns>
     private Status AssessPriority()
-	{
+    {
         // TODO: Add?
         //if (isPerformingAction) return Status.SUCCESS;
 
+        shouldBringOrder = false;
         shouldReceiveCustomer = false;
         shouldAttendCustomer = false;
         shouldServeFood = false;
         shouldBringBill = false;
         isPerformingAction = false;
+
+        // Do we have a customer's order? We should be taking that to the kitchen
+        if (Inventory.Has(ItemType.ORDER))
+        {
+            isPerformingAction = shouldBringOrder = true;
+            return Status.SUCCESS;
+        }
 
         // We need to keep dishes warm, so that's first
         if (kitchen.IsFoodPrepared())
@@ -132,10 +174,11 @@ public class WaiterScript : MonoBehaviour
         // Someone is already receiving customers or there is noone to receive
         // Bring bill to customers, lest they leave without paying
         // STOP THE SINPA! (https://en.wiktionary.org/wiki/sinpa)
-        if (false)
+        if (kitchen.IsBillReady())
         {
             // TODO
             isPerformingAction = shouldBringBill = true;
+            return Status.SUCCESS;
         }
 
         // Since the bills have been taken care of, check if any sitting customer
@@ -143,20 +186,24 @@ public class WaiterScript : MonoBehaviour
         if (blackboard.CustomersToAttendCount > 0)
         {
             isPerformingAction = shouldAttendCustomer = true;
+            return Status.SUCCESS;
         }
 
         // Wait, I guess? You're still getting paid, tho
         isPerformingAction = false;
 
         return Status.SUCCESS;
-	}
+    }
 
+    /// <summary>
+    /// Get an empty table and send the first customer from the queue to that table
+    /// </summary>
+    /// <returns></returns>
     private Status SendCustomerToTable()
     {
         table = blackboard.GetEmptyTable();
         customer = queue.GetNextCustomer();
         customer.Receive(table);
-        table.SetCustomer(customer);
 
         // Now that the customer has been received, so prepare for next customer
         customer = null;
@@ -166,7 +213,12 @@ public class WaiterScript : MonoBehaviour
         return Status.SUCCESS;
     }
 
-        private Status CleanTable(TableScript table)
+    /// <summary>
+    /// Clean the table after client left
+    /// </summary>
+    /// <param name="table"></param>
+    /// <returns></returns>
+    private Status CleanTable(TableScript table)
     {
         var tableScript = table.GetComponent<TableScript>();
         tableScript.Clean();
@@ -176,15 +228,16 @@ public class WaiterScript : MonoBehaviour
 
     // Use this for initialization
     void Start()
-	{
-		// TODO: Get references to each object
-		gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerScript>();
-		kitchen = gm.kitchen;
+    {
+        // TODO: Get references to each object
+        gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerScript>();
+        kitchen = gm.kitchen;
         queue = gm.queue;
         blackboard = gm.blackboard;
         agent = GetComponent<NavMeshAgent>();
         agent.isStopped = true;
         Inventory = new Inventory();
+
 
         shouldReceiveCustomer = false;
         shouldAttendCustomer = false;
@@ -194,49 +247,55 @@ public class WaiterScript : MonoBehaviour
 
         // Declare BT
         bt = new BehaviorTreeBuilder("")
-		.RepeatUntilFail("Loop")
-			.Sequence("Sequence")
-				.Do("AssessPriority", AssessPriority)
-				.Selector("Selector")
-					.Sequence("ReceiveCustomer")
-						.If("ShouldReceiveCustomer", () => { return shouldReceiveCustomer; })
-						.Do("GoToQueue", () => { return GoTo(queue); })
-						.Do("SendCustomerToTable", SendCustomerToTable)
-					    .End()
-					.Sequence("AttendCustomer")
-						.If("ShouldAttendCustomer", () => { return shouldAttendCustomer; })
+        .RepeatUntilFail("Loop")
+            .Sequence("Sequence")
+                .Do("AssessPriority", AssessPriority)
+                .Selector("Selector")
+                    .Sequence("ReceiveCustomer")
+                        .If("ShouldReceiveCustomer", () => { return shouldReceiveCustomer; })
+                        .Do("GoToQueue", () => { return GoTo(queue); })
+                        .Do("SendCustomerToTable", SendCustomerToTable)
+                        .End()
+                    .Sequence("AttendCustomer")
+                        .If("ShouldAttendCustomer", () => { return shouldAttendCustomer; })
                         .Do("GetCustomerToAttend", GetCustomerToAttend)
-						.Do("GoToCustomer", () => { return GoTo(customer); })
-						.Do("Attend", AttendCustomer)
-						.Do("GoToKitchen", () => { return GoTo(kitchen); })
-						.Do("GiveOrderToKitchen", GiveOrderToKitchen)
-					    .End()
-					.Sequence("ServeFood")
-						.If("ShouldServeFood", () => { return shouldServeFood; })
-						.Do("GoToKitchen", () => { return GoTo(kitchen); })
-						.Do("PickupFood", GetFoodFromKitchen)
-						.Do("GoToTable", () => { return GoTo(table); })
-						.Do("GiveFoodToCustomer", () => { return Inventory.GiveTo(ItemType.ORDER, customer.Inventory); })
-					    .End()
-					.Sequence("BringBill")
-						.If("ShouldBringBill", () => { return shouldBringBill; })
-						.Do("GoToKitchen", () => { return GoTo(kitchen); })
-						.Do("PickupBill", GetBillFromKitchen)
-						.Do("GoToTable", () => { return GoTo(table); })
-						.Do("GiveBillToCustomer", () => { return Inventory.GiveTo(ItemType.BILL, customer.Inventory); })
-						.Do("GetMoneyFromCustomer", () => { return Inventory.GetFrom(ItemType.MONEY, customer.Inventory); })
-						.Do("CleanTable", () => { return CleanTable(table); })
-						.End()
+                        .Do("GoToCustomer", () => { return GoTo(customer); })
+                        .Do("Attend", AttendCustomer)
+                        .End()
+                    .Sequence("BringOrder")
+                        .If("ShouldBringOrder", () => { return shouldBringOrder; })
+                        .Do("GoToKitchen", () => { return GoTo(kitchen); })
+                        .Do("GiveOrderToKitchen", GiveOrderToKitchen)
+                        .End()
+                    .Sequence("GetFood")
+                        .If("ShouldServeFood", () => { return shouldServeFood && !Inventory.Has(ItemType.FOOD); })
+                        .Do("GoToKitchen", () => { return GoTo(kitchen); })
+                        .Do("PickupFood", GetFoodFromKitchen)
+                        .End()
+                    .Sequence("BringFoodToTable")
+                        .If("ShouldServeFood", () => { return shouldServeFood && Inventory.Has(ItemType.FOOD); })
+                        .Do("GoToTable", () => { return GoTo(table); })
+                        .Do("GiveFoodToCustomer", ServeFood)
+                        .End()
+                    .Sequence("BringBill")
+                        .If("ShouldBringBill", () => { return shouldBringBill; })
+                        .Do("GoToKitchen", () => { return GoTo(kitchen); })
+                        .Do("PickupBill", GetBillFromKitchen)
+                        .Do("GoToTable", () => { return GoTo(table); })
+                        .Do("GiveBillToCustomer", () => { return Inventory.GiveTo(ItemType.BILL, customer.Inventory); })
+                        .Do("GetMoneyFromCustomer", () => { return Inventory.GetFrom(ItemType.MONEY, customer.Inventory); })
+                        .Do("CleanTable", () => { return CleanTable(table); })
+                        .End()
                     .Do("JustWait", () => { return Status.SUCCESS; })
-					.End()
-				.End()
-			.End();
+                    .End()
+                .End()
+            .End();
 
-	}
+    }
 
-	// Update is called once per frame
-	void Update()
-	{
-		bt.Tick();
-	}
+    // Update is called once per frame
+    void Update()
+    {
+        bt.Tick();
+    }
 }

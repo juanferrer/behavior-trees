@@ -6,14 +6,14 @@ using UnityEngine.AI;
 [RequireComponent(typeof(LineRenderer))]
 public class PathRendererScript : MonoBehaviour {
 
-    private LineRenderer line; //to hold the line Renderer
-    private Transform target; //to hold the transform of the target
-    private NavMeshAgent agent; //to hold the agent of this gameObject
+    private LineRenderer line;
+    private Transform targetPos;
+    private NavMeshAgent agent;
 
     void Start()
     {
-        line = GetComponent<LineRenderer>(); // Get the line renderer
-        agent = GetComponent<NavMeshAgent>(); // Get the agent  
+        line = GetComponent<LineRenderer>();
+        agent = GetComponent<NavMeshAgent>(); 
     }
 
     private void Update()
@@ -23,27 +23,28 @@ public class PathRendererScript : MonoBehaviour {
 
     IEnumerator GetPath()
     {
-        line.SetPosition(0, transform.position); // Set the line's origin
+        line.SetPosition(0, transform.position);
 
+        // Draw after everything else has been calculated
         yield return new WaitForEndOfFrame();
 
         DrawPath(agent.path);
-
-        //agent.isStopped = true; // Add this if you don't want to move the agent
 
         yield return null;
     }
 
     void DrawPath(NavMeshPath path)
     {
-        if (path.corners.Length < 2) // If the path has 1 or no corners, there is no need
+        // If less than two corners, there is no path
+        if (path.corners.Length < 2)
             return;
 
-        line.positionCount = path.corners.Length; // Set the array of positions to the amount of corners
+        line.positionCount = path.corners.Length;
 
-        for (var i = 1; i < path.corners.Length; i++)
+        // Add each corner to the line renderer
+        for (var i = 1; i < path.corners.Length; ++i)
         {
-            line.SetPosition(i, path.corners[i]); // Go through each corner and set that to the line renderer's position
+            line.SetPosition(i, path.corners[i]);
         }
     }
 }

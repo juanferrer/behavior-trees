@@ -53,29 +53,10 @@ public class GameManagerScript : MonoBehaviour
             GameObject.Instantiate(customerPrefab, newPos, Quaternion.identity);
         }
 
-        /*if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (Input.GetKeyDown(KeyCode.F))
         {
-            Debug.Log("Receiving customer");
-            customer = queue.GetNextCustomer();
-            queue.GetNextCustomer().Receive(blackboard.GetEmptyTable());       
+            Debug.Log("Preparing food");
+            kitchen.AddFoodPrepared(kitchen.GetOrder()); 
         }
-
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            Debug.Log("Attending customer");
-            customer.Attend();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            Debug.Log("Serving customer");
-            customer.Serve();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            Debug.Log("Bringing bill to customer");
-            customer.BringBill();
-        }*/
     }
 }

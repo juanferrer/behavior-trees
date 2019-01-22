@@ -7,23 +7,23 @@ using System;
 
 public class CustomerScript : MonoBehaviour
 {
-	GameManagerScript gm;
-	BehaviorTree bt;
-	BehaviorTree leaveCheck;
-	QueueScript queue;
-	TableScript table;
-	GameObject exit;
-	NavMeshAgent agent;
-    public Inventory Inventory;
+    GameManagerScript gm;           // Game manager
+    NavMeshAgent agent;             // Navigation agent
+    BehaviorTree bt;                // Behaviour tree
+    BehaviorTree leaveCheck;        // Subtree to check whether available time has passed
+    QueueScript queue;              // Queue
+    KitchenScript kitchen;          // Kitchen
+    TableScript table;              // Usually empty. Set when going to a certain table
+    GameObject exit;                // Exit
+    BlackboardScript blackboard;    // Global information
+    public Inventory Inventory;     // Inventory of entity
 
-	int availableTime;
-	Food foodToOrder;
+    int availableTime;
     float timeWaited = 0;
     float timeEating = 3;
 
     bool isInQueue = false;
     bool isInTable = false;
-    //bool isBeingAttended = false;
     bool isBeingReceived = false;
     public bool HasBeenReceived { get; private set; } = false;
     public bool HasBeenAttended { get; private set; } = false;
@@ -73,6 +73,10 @@ public class CustomerScript : MonoBehaviour
 		return GoTo(pos);
 	}
 
+    /// <summary>
+    /// Go to queue and start queueing
+    /// </summary>
+    /// <returns></returns>
 	private Status StartQueue()
 	{
         queue.StartQueue(this);
@@ -81,6 +85,10 @@ public class CustomerScript : MonoBehaviour
         return Status.SUCCESS;
 	}
 
+    /// <summary>
+    /// Wait and check if available time has passed
+    /// </summary>
+    /// <returns></returns>
     private Status Wait()
     {
         timeWaited += Time.deltaTime;
@@ -88,6 +96,10 @@ public class CustomerScript : MonoBehaviour
         return Status.SUCCESS;
     }
 
+    /// <summary>
+    /// Go to exit and leave
+    /// </summary>
+    /// <returns></returns>
     private Status Leave()
     {
         var status = GoTo(exit.transform.position);
@@ -101,6 +113,10 @@ public class CustomerScript : MonoBehaviour
         return status;
 	}
 
+    /// <summary>
+    /// Sit in assigned table
+    /// </summary>
+    /// <returns></returns>
     private Status SitInTable()
     {
         // TODO
@@ -110,30 +126,29 @@ public class CustomerScript : MonoBehaviour
         HasBeenReceived = true;
         isBeingReceived = false;
         isInTable = true;
+        table.SetCustomer(this);
         return Status.SUCCESS;
     }
 
+    /// <summary>
+    /// Read menu and decide what to order
+    /// </summary>
+    /// <returns></returns>
     private Status DecideFood()
     {
         Debug.Log("Customer decided what to order");
-        var values = Enum.GetValues(typeof(Food));
-        foodToOrder = (Food)values.GetValue(UnityEngine.Random.Range(0, values.Length));
+        var values = Enum.GetValues(typeof(FoodType));
+        Inventory.order.food = (FoodType)values.GetValue(UnityEngine.Random.Range(0, values.Length));
+        Inventory.order.table = table;
         return Status.SUCCESS;
     }
 
-    private Status MakeOrder()
-    {
-        // TODO
-        //timeWaited = 0;
-        Debug.Log("Make order");
-        HasBeenAttended = true;
-        return Status.SUCCESS;
-    }
-
+    /// <summary>
+    /// Eat ordered food
+    /// </summary>
+    /// <returns></returns>
     private Status Eat()
     {
-        // Reset, so that the customer doesn't leave while eating
-        //timeWaited = 0;
         // Destroy food from table
         if (!HasBeenServed) HasBeenServed = true;
         timeEating -= Time.deltaTime;
@@ -147,6 +162,10 @@ public class CustomerScript : MonoBehaviour
         return Status.RUNNING;
     }
 
+    /// <summary>
+    /// Pay bill before leaving
+    /// </summary>
+    /// <returns></returns>
     private Status PayBill()
     {
         // TODO
@@ -154,15 +173,21 @@ public class CustomerScript : MonoBehaviour
         return Status.SUCCESS;
     }
 
+    /// <summary>
+    /// Be received
+    /// </summary>
+    /// <param name="newTable"></param>
     public void Receive(TableScript newTable)
     {
-        //timeWaited = 0;
         queue.LeaveQueue(this);
         isInQueue = false;
         isBeingReceived = true;
         table = newTable;
     }
 
+    /// <summary>
+    /// Be attended
+    /// </summary>
     public void Attend()
     {
         HasBeenAttended = true;
@@ -216,14 +241,12 @@ public class CustomerScript : MonoBehaviour
                     .Do("SitInTable", SitInTable)
                     .End()
                 .Sequence("DecideWhatToOrder")
-                    .If("NoFoodDecided", () => { return Inventory.Has(ItemType.FOOD); })
+                    .If("NoFoodDecided", () => { return isInTable && !HasBeenAttended && !Inventory.Has(ItemType.ORDER); })
                     .Do("DecideFood", DecideFood)
                     .End()
                 .Sequence("BeAttendedSequence")
                     .If("NeedsToBeAttended", () => { return ( isInTable && HasBeenReceived && !HasBeenAttended); })
                     .Do("LeaveCheck", leaveCheck)
-                    /*.If("ReadyToBeAttended", () => { return isBeingAttended; })
-                    .Do("MakeOrder", MakeOrder)*/
                     .End()
                 .Sequence("BeServedAndEatSequence")
                     .If("NeedsToBeServed", () => { return isInTable && HasBeenAttended && !HasBeenServed && !HasFinishedEating; })

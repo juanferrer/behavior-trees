@@ -24,6 +24,7 @@ namespace Data
         MONEY
     }
 
+    [System.Serializable]
     public struct Food
     {
         public TableScript table;

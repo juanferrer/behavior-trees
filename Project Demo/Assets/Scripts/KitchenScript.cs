@@ -5,7 +5,6 @@ using Data;
 
 public class KitchenScript : MonoBehaviour
 {
-
     private List<Food> foodPrepared;
     private List<Food> orders;
     private List<TableScript> bills;
@@ -42,9 +41,14 @@ public class KitchenScript : MonoBehaviour
         return foodPrepared.Count > 0;
     }
 
-    public void AddOrder(Food food)
+    public void AddOrder(Food order)
     {
-        orders.Add(food);
+        orders.Add(order);
+    }
+
+    public Food GetOrder()
+    {
+        return orders[0];
     }
 
     public bool IsBillReady()

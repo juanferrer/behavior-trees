@@ -4,6 +4,7 @@ using UnityEngine;
 using Data;
 using FluentBehaviorTree;
 
+[System.Serializable]
 public class Inventory
 {
     public Food food;

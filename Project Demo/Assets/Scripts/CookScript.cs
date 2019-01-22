@@ -6,14 +6,14 @@ using UnityEngine.AI;
 
 public class CookScript : MonoBehaviour
 {
-
     GameManagerScript gm;
     NavMeshAgent agent;
-    BlackboardScript blackboard;
     BehaviorTree bt;
-    GameObject kitchen;
-    GameObject table;
-    MonoBehaviour queue;
+    QueueScript queue;
+    KitchenScript kitchen;
+    TableScript table;
+    CustomerScript customer;
+    public Inventory Inventory;
 
     /// <summary>
     /// Use Unity's meshnav to travel to given position
@@ -24,9 +24,7 @@ public class CookScript : MonoBehaviour
     {
         // Set a new destination
         if (agent.isStopped)
-        //if (!Mathf.Approximately(agent.destination.x, pos.x) || !Mathf.Approximately(agent.destination.z, pos.z))
         {
-            //agent.destination = pos;
             agent.SetDestination(pos);
             agent.isStopped = false;
             return Status.RUNNING;
@@ -37,7 +35,7 @@ public class CookScript : MonoBehaviour
 
         if (reachedPos)
         {
-            Debug.Log("Customer reached destination: " + pos.ToString("G2"));
+            Debug.Log("Cook reached destination: " + pos.ToString("G2"));
             agent.isStopped = true;
             return Status.SUCCESS;
         }
@@ -57,38 +55,15 @@ public class CookScript : MonoBehaviour
         return GoTo(pos);
     }
 
-    /// <summary>
-    /// Decide what to do next and set the value of the appropriate boolean
-    /// </summary>
-    /// <returns></returns>
-    private Status AssessPriority()
-    {
-        return Status.ERROR;
-    }
-
-    private Status CleanTable(GameObject table)
-    {
-        return Status.ERROR;
-    }
-
-    private Status FindAnEmptyTable()
-    {
-        return Status.ERROR;
-    }
-
-    private Status SendCustomerToTable(GameObject table)
-    {
-        return Status.ERROR;
-    }
-
     // Use this for initialization
     void Start()
     {
         gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerScript>();
-        blackboard = gm.GetComponent<BlackboardScript>();
-        queue = gm.queue.GetComponent<QueueScript>();
+        kitchen = gm.kitchen;
+        queue = gm.queue;
         agent = GetComponent<NavMeshAgent>();
         agent.isStopped = true;
+        Inventory = new Inventory();
     }
 
     // Update is called once per frame
