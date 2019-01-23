@@ -9,11 +9,12 @@
         ? ReadyToBeReceived
         ! GoToTable
         ! SitInTable
+    & DecideWhatToOrder
+        ? NoFoodDecided
+        !DecideFood
     & BeAttended
         ? NeedsToBeAttended
         # LeaveCheck.btml
-        ? ReadyToBeAttended
-        ! MakeOrder
     & BeServedAndEat
         ? NeedsToBeServed
         # LeaveCheck.btml
