@@ -31,6 +31,7 @@ public class CustomerScript : MonoBehaviour
     public bool HasReceivedFood { get; private set; } = false;
     public bool HasFinishedEating { get; private set; } = false;
     public bool HasReceivedBill { get; private set; } = false;
+    public bool IsWaiting { get; private set; } = true;
 
 
     /// <summary>
@@ -92,7 +93,11 @@ public class CustomerScript : MonoBehaviour
     private Status Wait()
     {
         timeWaited += Time.deltaTime;
-        if (timeWaited > availableTime) return Status.FAILURE;
+        if (timeWaited > availableTime)
+        {
+            IsWaiting = false;
+            return Status.FAILURE;
+        }
         return Status.SUCCESS;
     }
 
