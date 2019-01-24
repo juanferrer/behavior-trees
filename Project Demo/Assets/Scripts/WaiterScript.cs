@@ -5,15 +5,22 @@ using Data;
 
 public class WaiterScript : MonoBehaviour
 {
-    GameManagerScript gm;           // Game manager
-    NavMeshAgent agent;             // Navigation agent
-    BehaviorTree bt;                // Behaviour tree
-    QueueScript queue;              // Queue
-    KitchenScript kitchen;          // Kitchen
-    TableScript table;              // Usually empty. Set when going to a certain table
-    CustomerScript customer;        // Usually empty. Set when interacting with a customer
-    BlackboardScript blackboard;    // Global information
-    public Inventory Inventory;     // Inventory of entity
+    GameManagerScript gm;                   // Game manager
+    NavMeshAgent agent;                     // Navigation agent
+    BehaviorTree bt;                        // Behaviour tree
+    BehaviorTree bringOrderSequence;        // Subtree for getting the order to the kitchen
+    BehaviorTree bringFoodToTableSequence;  // Subtree for giving food to customer
+    BehaviorTree getFoodSequence;           // Subtree for fetching food from kitchen
+    BehaviorTree receiveCustomerSequence;   // Subtree for receiving customer
+    BehaviorTree getBillSequence;           // Subtree for fetching bill from kitchen
+    BehaviorTree bringBillSequence;         // Subtree for giving bill to customer
+    BehaviorTree attendCustomerSequence;    // Subtree for attending waiting customer
+    QueueScript queue;                      // Queue
+    KitchenScript kitchen;                  // Kitchen
+    TableScript table;                      // Usually empty. Set when going to a certain table
+    CustomerScript customer;                // Usually empty. Set when interacting with a customer
+    BlackboardScript blackboard;            // Global information
+    public Inventory Inventory;             // Inventory of entity
 
     bool shouldReceiveCustomer;
     bool shouldAttendCustomer;
@@ -295,70 +302,96 @@ public class WaiterScript : MonoBehaviour
         shouldBringBill = false;
         isPerformingAction = false;
 
+        bringOrderSequence = new BehaviorTreeBuilder("BringOrderSequence")
+            .Sequence("BringOrder")
+                .Sequence("ShouldBringOrder")
+                    .If("HasOrder", () => { return Inventory.Has(ItemType.ORDER); })
+                    .End()
+                .Do("GoToKitchen", () => { return GoTo(kitchen); })
+                .Do("GiveOrderToKitchen", GiveOrderToKitchen)
+                .End()
+            .End();
+
+        bringFoodToTableSequence = new BehaviorTreeBuilder("BringFoodToTableSequence")
+            .Sequence("BringFoodToTable")
+                .Sequence("ShouldServeFood")
+                    .If("HasFood", () => { return Inventory.Has(ItemType.FOOD); })
+                    .End()
+                .Do("GoToTable", () => { return GoTo(table); })
+                .Do("GiveFoodToCustomer", ServeFood)
+                .End()
+            .End();
+
+        getFoodSequence = new BehaviorTreeBuilder("GetFoodSequence")
+           .Sequence("GetFood")
+                .Sequence("ShouldServeFood")
+                    .If("IsFoodPrepared", kitchen.IsFoodPrepared)
+                    .Not("DoesNotHaveFood")
+                        .If("HasFood", () => { return Inventory.Has(ItemType.FOOD); })
+                    .End()
+                .Do("GoToKitchen", () => { return GoTo(kitchen); })
+                .Do("PickupFood", GetFoodFromKitchen)
+                .End()
+            .End();
+
+        receiveCustomerSequence = new BehaviorTreeBuilder("ReceiveCustomerSequence")
+            .Sequence("ReceiveCustomer")
+                .Sequence("ShouldReceiveCustomer")
+                    .If("AreThereEmptyTables", () => { return blackboard.EmptyTablesCount > 0; })
+                    .If("AreThereCustomersInQueue", () => { return blackboard.CustomersInQueueCount > 0; })
+                    .End()
+                .Do("GoToQueue", () => { return GoTo(queue); })
+                .Do("SendCustomerToTable", SendCustomerToTable)
+                .End()
+            .End();
+
+        getBillSequence = new BehaviorTreeBuilder("GetBillSequence")
+            .Sequence("GetBill")
+                .Sequence("ShouldGetBill")
+                    .If("IsBillReady", kitchen.IsBillReady)
+                    .Not("DoesNotHaveBill")
+                        .If("HasBill", () => { return Inventory.Has(ItemType.BILL); })
+                    .End()
+                .Do("GoToKitchen", () => { return GoTo(kitchen); })
+                .Do("PickupBill", GetBillFromKitchen)
+                .End()
+            .End();
+
+        bringBillSequence = new BehaviorTreeBuilder("BringBillSequence")
+            .Sequence("BringBill")
+                .Sequence("ShouldBringBill")
+                    .If("HasBill", () => { return Inventory.Has(ItemType.BILL); })
+                    .End()
+                .Do("GoToTable", () => { return GoTo(table); })
+                .Do("GiveBillToCustomer", GiveBillToCustomer)
+                .Do("GetMoneyFromCustomer", () => { return Inventory.GetFrom(ItemType.MONEY, customer.Inventory); })
+                .Do("CleanTable", () => { return CleanTable(table); })
+                .End()
+            .End();
+
+        attendCustomerSequence = new BehaviorTreeBuilder("AttendCustomerSequence")
+            .Sequence("AttendCustomer")
+                .Sequence("ShouldAttendCustomer")
+                    .If("AreThereCustomerToAttend", () => { return blackboard.CustomersToAttendCount > 0; })
+                    .End()
+                .Do("GetCustomerToAttend", GetCustomerToAttend)
+                .Do("GoToCustomer", () => { return GoTo(customer); })
+                .Do("Attend", AttendCustomer)
+                .End()
+            .End();
+
         // Declare BT
-        bt = new BehaviorTreeBuilder("")
+        bt = new BehaviorTreeBuilder("WaiterBT")
         .RepeatUntilFail("Loop")
             .Selector("Selector")
-                .Sequence("BringOrder")
-                    .Sequence("ShouldBringOrder")
-                        .If("HasOrder", () => { return Inventory.Has(ItemType.ORDER); })
-                        .End()
-                    .Do("GoToKitchen", () => { return GoTo(kitchen); })
-                    .Do("GiveOrderToKitchen", GiveOrderToKitchen)
-                    .End()
-                .Sequence("BringFoodToTable")
-                    .Sequence("ShouldServeFood")
-                        .If("HasFood", () => { return Inventory.Has(ItemType.FOOD); })
-                        .End()
-                    .Do("GoToTable", () => { return GoTo(table); })
-                    .Do("GiveFoodToCustomer", ServeFood)
-                    .End()
-                .Sequence("GetFood")
-                    .Sequence("ShouldServeFood")
-                        .If("IsFoodPrepared", kitchen.IsFoodPrepared)
-                        .Not("DoesNotHaveFood")
-                            .If("HasFood", () => { return Inventory.Has(ItemType.FOOD); })
-                        .End()
-                    .Do("GoToKitchen", () => { return GoTo(kitchen); })
-                    .Do("PickupFood", GetFoodFromKitchen)
-                    .End()
-                .Sequence("ReceiveCustomer")
-                    .Sequence("ShouldReceiveCustomer")
-                        .If("AreThereEmptyTables", () => { return blackboard.EmptyTablesCount > 0; })
-                        .If("AreThereCustomersInQueue", () => { return blackboard.CustomersInQueueCount > 0; })
-                        .End()
-                    .Do("GoToQueue", () => { return GoTo(queue); })
-                    .Do("SendCustomerToTable", SendCustomerToTable)
-                    .End()
-                .Sequence("GetBill")
-                    .Sequence("ShouldGetBill")
-                        .If("IsBillReady", kitchen.IsBillReady)
-                        .Not("DoesNotHaveBill")
-                            .If("HasBill", () => { return Inventory.Has(ItemType.BILL); })
-                        .End()
-                    .Do("GoToKitchen", () => { return GoTo(kitchen); })
-                    .Do("PickupBill", GetBillFromKitchen)
-                    .End()
-                .Sequence("BringBill")
-                    .Sequence("ShouldBringBill")
-                        .If("HasBill", () => { return Inventory.Has(ItemType.BILL); })
-                        .End()
-                    .Do("GoToTable", () => { return GoTo(table); })
-                    .Do("GiveBillToCustomer", GiveBillToCustomer)
-                    .Do("GetMoneyFromCustomer", () => { return Inventory.GetFrom(ItemType.MONEY, customer.Inventory); })
-                    .Do("CleanTable", () => { return CleanTable(table); })
-                    .End()
-                .Sequence("AttendCustomer")
-                    .Sequence("ShouldAttendCustomer")
-                        .If("AreThereCustomerToAttend", () => { return blackboard.CustomersToAttendCount > 0; })
-                        .End()
-                    .Do("GetCustomerToAttend", GetCustomerToAttend)
-                    .Do("GoToCustomer", () => { return GoTo(customer); })
-                    .Do("Attend", AttendCustomer)
-                    .End()
+                .Do("BringOrderSequence", bringOrderSequence)
+                .Do("BringFoodToTableSequence", bringFoodToTableSequence)
+                .Do("GetFoodSequence", getFoodSequence)
+                .Do("ReceiveCustomerSequence", receiveCustomerSequence)
+                .Do("GetBillSequence", getBillSequence)
+                .Do("BringBillSequence", bringBillSequence)
+                .Do("AttendCustomerSequence", attendCustomerSequence)
                 .Do("JustWait", () => { return Status.SUCCESS; })
-
-           
                 .End()
             .End();
 

@@ -7,16 +7,22 @@ using System;
 
 public class CustomerScript : MonoBehaviour
 {
-    GameManagerScript gm;           // Game manager
-    NavMeshAgent agent;             // Navigation agent
-    BehaviorTree bt;                // Behaviour tree
-    BehaviorTree leaveCheck;        // Subtree to check whether available time has passed
-    QueueScript queue;              // Queue
-    KitchenScript kitchen;          // Kitchen
-    TableScript table;              // Usually empty. Set when going to a certain table
-    GameObject exit;                // Exit
-    BlackboardScript blackboard;    // Global information
-    public Inventory Inventory;     // Inventory of entity
+    GameManagerScript gm;                   // Game manager
+    NavMeshAgent agent;                     // Navigation agent
+    BehaviorTree bt;                        // Behaviour tree
+    BehaviorTree leaveCheck;                // Subtree to check whether available time has passed
+    BehaviorTree queueSequence;             // Subtree for starting to queue
+    BehaviorTree tableSequence;             // Subtree for going to table
+    BehaviorTree decideOrderSequence;       // Subtree for deciding on order
+    BehaviorTree beAttendedSequence;        // Subtree for waiting to be attended
+    BehaviorTree beServedAndEatSequence;    // Subtree for waiting to be served and eat
+    BehaviorTree waitBillSequence;          // Subtree for waiting bill and pay
+    QueueScript queue;                      // Queue
+    KitchenScript kitchen;                  // Kitchen
+    TableScript table;                      // Usually empty. Set when going to a certain table
+    GameObject exit;                        // Exit
+    BlackboardScript blackboard;            // Global information
+    public Inventory Inventory;             // Inventory of entity
 
     int availableTime;
     float timeWaited = 0;
@@ -225,77 +231,101 @@ public class CustomerScript : MonoBehaviour
                 .End()
             .End();
 
+        queueSequence = new BehaviorTreeBuilder("QueueSequence")
+            .Sequence("QueueSequence")
+                .Sequence("NeedsToStartQueue")
+                    .Not("IsNotInQueue")
+                        .If("IsInQueue", () => { return isInQueue; })
+                    .Not("IsNotBeingReceived")
+                        .If("IsBeingReceived", () => { return isBeingReceived; })
+                    .Not("HasNotBeenReceived")
+                        .If("HasBeenReceived", () => { return HasBeenReceived; })
+                    .End()
+                .Do("GoToQueue", () => { return GoTo(queue.GetNextPosition()); })
+                .Do("StartQueue", StartQueue)
+                .End()
+            .End();
+
+        tableSequence = new BehaviorTreeBuilder("TableSequence")
+            .Sequence("TableSequence")
+                .Sequence("NeedsToGetATable")
+                    .Not("HasNotBeenReceived")
+                        .If("HasBeenReceived", () => { return HasBeenReceived; })
+                    .End()
+                .Do("LeaveCheck", leaveCheck)
+                .Sequence("ReadyToBeReceived")
+                    .If("IsBeingReceived", () => { return isBeingReceived; })
+                    .End()
+                .Do("GoToTable", () => { return GoTo(table); })
+                .Do("SitInTable", SitInTable)
+                .End()
+            .End();
+
+        decideOrderSequence = new BehaviorTreeBuilder("DecideOrderSequence")
+            .Sequence("DecideWhatToOrder")
+                .Sequence("NoFoodDecided")
+                    .If("IsInTable", () => { return isInTable; })
+                    .Not("HasNotBeenAttended")
+                        .If("HasBeenAttended", () => { return HasBeenAttended; })
+                    .Not("DoesNotHaveOrder")
+                        .If("HasOrder", () => { return Inventory.Has(ItemType.ORDER); })
+                    .End()
+                .Do("DecideFood", DecideFood)
+                .End()
+            .End();
+
+        beAttendedSequence = new BehaviorTreeBuilder("BeAttendedSequence")
+            .Sequence("BeAttendedSequence")
+                .Sequence("NeedsToBeAttended")
+                    .If("IsInTable", () => { return isInTable; })
+                    .If("HasBeenReceived", () => { return HasBeenReceived; })
+                    .Not("HasNotBeenAttended")
+                        .If("HasBeenAttended", () => { return HasBeenAttended; })
+                    .End()
+                .Do("LeaveCheck", leaveCheck)
+                .End()
+            .End();
+
+        beServedAndEatSequence = new BehaviorTreeBuilder("BeServedAndEatSequence")
+            .Sequence("BeServedAndEatSequence")
+                .Sequence("NeedsToBeServed")
+                    .If("IsInTable", () => { return isInTable; })
+                    .If("HasBeenAttended", () => { return HasBeenAttended; })
+                    .Not("HasNotBeenServed")
+                        .If("HasBeenServed", () => { return HasBeenServed; })
+                    .Not("HasNotFinishedEating")
+                        .If("HasFinishedEating", () => { return HasFinishedEating; })
+                    .End()
+                .Do("LeaveCheck", leaveCheck)
+                .If("HasFood", () => { return HasReceivedFood; })
+                .Wait("Eat", timeEating)
+                    .Do("Eat", Eat)
+                .End()
+            .End();
+
+        waitBillSequence = new BehaviorTreeBuilder("WaitBillSequence")
+            .Sequence("WaitForBillSequence")
+                .Sequence("NeedsToBeServed")
+                    .If("IsInTable", () => { return isInTable; })
+                    .If("HasFinishedEating", () => { return HasFinishedEating; })
+                    .End()
+                .Do("LeaveCheck", leaveCheck)
+                .If("HasReceivedBill", () => { return HasReceivedBill; })
+                .Do("PayBill", PayBill)
+                .Do("Leave", Leave)
+                .End()
+            .End();
+
         // Debug DLL in Unity:
         // https://www.robinryf.com/blog/2016/04/10/convert-pdb-to-mdb.html
-        bt = new BehaviorTreeBuilder("")
+        bt = new BehaviorTreeBuilder("CustomerBT")
             .Selector("Selector")
-                .Sequence("QueueSequence")
-                    .Sequence("NeedsToStartQueue")
-                        .Not("IsNotInQueue")
-                            .If("IsInQueue", () => { return isInQueue; })
-                        .Not("IsNotBeingReceived")
-                            .If("IsBeingReceived", () => { return isBeingReceived; })
-                        .Not("HasNotBeenReceived")
-                            .If("HasBeenReceived", () => { return HasBeenReceived; })
-                        .End()
-                    .Do("GoToQueue", () => { return GoTo(queue.GetNextPosition()); })
-                    .Do("StartQueue", StartQueue)
-                    .End()
-                .Sequence("TableSequence")
-                    .Sequence("NeedsToGetATable")
-                        .Not("HasNotBeenReceived")
-                            .If("HasBeenReceived", () => { return HasBeenReceived; })
-                        .End()
-                    .Do("LeaveCheck", leaveCheck)
-                    .Sequence("ReadyToBeReceived")
-                        .If("IsBeingReceived", () => { return isBeingReceived; })
-                        .End()
-                    .Do("GoToTable", () => { return GoTo(table); })
-                    .Do("SitInTable", SitInTable)
-                    .End()
-                .Sequence("DecideWhatToOrder")
-                    .Sequence("NoFoodDecided")
-                        .If("IsInTable", () => { return isInTable; })
-                        .Not("HasNotBeenAttended")
-                            .If("HasBeenAttended", () => { return HasBeenAttended; })
-                        .Not("DoesNotHaveOrder")
-                            .If("HasOrder", () => { return Inventory.Has(ItemType.ORDER); })
-                        .End()
-                    .Do("DecideFood", DecideFood)
-                    .End()
-                .Sequence("BeAttendedSequence")
-                    .Sequence("NeedsToBeAttended")
-                        .If("IsInTable", () => { return isInTable; })
-                        .If("HasBeenReceived", () => { return HasBeenReceived; })
-                        .Not("HasNotBeenAttended")
-                            .If("HasBeenAttended", () => { return HasBeenAttended; })
-                        .End()
-                    .Do("LeaveCheck", leaveCheck)
-                    .End()
-                .Sequence("BeServedAndEatSequence")
-                    .Sequence("NeedsToBeServed")
-                        .If("IsInTable", () => { return isInTable; })
-                        .If("HasBeenAttended", () => { return HasBeenAttended; })
-                        .Not("HasNotBeenServed")
-                            .If("HasBeenServed", () => { return HasBeenServed; })
-                        .Not("HasNotFinishedEating")
-                            .If("HasFinishedEating", () => { return HasFinishedEating; })
-                        .End()
-                    .Do("LeaveCheck", leaveCheck)
-                    .If("HasFood", () => { return HasReceivedFood;  })
-                    .Wait("Eat", timeEating)
-                        .Do("Eat", Eat)
-                    .End()
-                .Sequence("WaitForBillSequence")
-                    .Sequence("NeedsToBeServed")
-                        .If("IsInTable", () => { return isInTable; })
-                        .If("HasFinishedEating", () => { return HasFinishedEating; })
-                        .End()
-                    .Do("LeaveCheck", leaveCheck)
-                    .If("HasReceivedBill", () => { return HasReceivedBill; })
-                    .Do("PayBill", PayBill)
-                    .Do("Leave", Leave)
-                    .End()
+                .Do("QueueSequence", queueSequence)
+                .Do("TableSequence", tableSequence)
+                .Do("DecideOrderSequence", decideOrderSequence)
+                .Do("BeAttendedSequence", beAttendedSequence)
+                .Do("BeServedAndEatSequence", beServedAndEatSequence)
+                .Do("WaitBillSequence", waitBillSequence)
                 .End()
             .End();
 
