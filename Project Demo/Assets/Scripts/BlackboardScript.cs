@@ -11,19 +11,17 @@ public class BlackboardScript : MonoBehaviour
 
     public int CustomersInQueueCount { get; private set; }
     public int CustomersToAttendCount { get; private set; }
-    public bool WaiterInQueue { get; private set; }
     public int EmptyTablesCount { get; private set; }
 
     public BlackboardScript()
     {
         CustomersInQueueCount = 0;
-        WaiterInQueue = false;
     }
 
     public TableScript GetEmptyTable()
     {
         if (EmptyTablesCount == 0) return null;
-        var emptyTables = tables.Where(table => !table.IsOccupied);
+        var emptyTables = tables.Where(table => !table.IsOccupied && !table.IsAssigned);
         return emptyTables.ElementAt(Random.Range(0, emptyTables.Count()));
     }
 
@@ -44,13 +42,12 @@ public class BlackboardScript : MonoBehaviour
     private void LateUpdate()
     {
         CustomersInQueueCount = queue.CustomerCount();
-        WaiterInQueue = queue.IsWaiterInQueue();
         EmptyTablesCount = 0;
         CustomersToAttendCount = 0;
         foreach (var table in tables)
         {
-            if (!table.IsOccupied) ++EmptyTablesCount;
-            else if (!table.Customer.HasBeenAttended) ++CustomersToAttendCount;
+            if (!table.IsOccupied && !table.IsAssigned) ++EmptyTablesCount;
+            else if (!table.Customer?.HasBeenAttended ?? false) ++CustomersToAttendCount;
         }
     }
 }

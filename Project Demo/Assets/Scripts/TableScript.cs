@@ -7,6 +7,7 @@ public class TableScript : MonoBehaviour
 	public bool IsClean { get; private set; }
 
 	public bool IsOccupied { get; private set; }
+    public bool IsAssigned { get; set; }
 
 	public CustomerScript Customer { get; private set; }
 
@@ -22,6 +23,7 @@ public class TableScript : MonoBehaviour
         // TODO: Add a new customer to this table
         IsOccupied = true;
         Customer = customer;
+        IsAssigned = false;
     }
 
     // Use this for initialization
@@ -29,6 +31,7 @@ public class TableScript : MonoBehaviour
 	{
 		IsClean = true;
 		IsOccupied = false;
+        IsAssigned = false;
 		Customer = null;
 	}
 

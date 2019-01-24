@@ -10,7 +10,6 @@ public class QueueScript : MonoBehaviour
 	void Start ()
 	{
 		customerQueue = new List<CustomerScript>();
-        waiterInQueue = false;
     }
 	
 	// Update is called once per frame
@@ -39,11 +38,6 @@ public class QueueScript : MonoBehaviour
     public int CustomerCount()
     {
         return customerQueue.Count;
-    }
-
-    public bool IsWaiterInQueue()
-    {
-        return waiterInQueue;
     }
 
     /// <summary>

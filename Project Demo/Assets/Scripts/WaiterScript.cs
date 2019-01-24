@@ -22,13 +22,6 @@ public class WaiterScript : MonoBehaviour
     BlackboardScript blackboard;            // Global information
     public Inventory Inventory;             // Inventory of entity
 
-    bool shouldReceiveCustomer;
-    bool shouldAttendCustomer;
-    bool shouldBringOrder;
-    bool shouldServeFood;
-    bool shouldBringBill;
-    bool isPerformingAction;
-
     /// <summary>
     /// Use Unity's meshnav to travel to given position
     /// </summary>
@@ -75,7 +68,6 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status GiveOrderToKitchen()
     {
-        isPerformingAction = false;
         if (!Inventory.order.table.Customer.IsWaiting)
         {
             Inventory.order = new Food();
@@ -84,7 +76,6 @@ public class WaiterScript : MonoBehaviour
         Debug.Log("Waiter left order in kitchen");
         kitchen.AddOrder(Inventory.order);
         Inventory.order = new Food();
-        customer = null;
         return Status.SUCCESS;
     }
 
@@ -94,7 +85,6 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status GetFoodFromKitchen()
     {
-        isPerformingAction = false;
         Debug.Log("Waiter got food from kitchen");
         Inventory.food = kitchen.GetFoodPrepared();
         table = Inventory.food.table;
@@ -115,15 +105,13 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status ServeFood()
     {
-        isPerformingAction = false;
         if (!Inventory.food.table.Customer.IsWaiting)
         {
             Inventory.food = new Food();
-            customer = null;
             return Status.FAILURE;
         }
-        Inventory.GiveTo(ItemType.FOOD, customer.Inventory);
-        customer.Serve();
+        Inventory.food.table.Customer.Serve();
+        Inventory.GiveTo(ItemType.FOOD, Inventory.food.table.Customer.Inventory);
         return Status.SUCCESS;
     }
 
@@ -133,7 +121,6 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status GetBillFromKitchen()
     {
-        isPerformingAction = false;
         Debug.Log("Waiter got bill from kitchen");
         Inventory.bill = true;
         table = kitchen.GetBill();
@@ -149,16 +136,15 @@ public class WaiterScript : MonoBehaviour
 
     private Status GiveBillToCustomer()
     {
-        isPerformingAction = false;
-        if (!customer.IsWaiting)
+        if (!table.Customer.IsWaiting)
         {
             // Customer left... Well, destroy the bill
             Inventory.bill = false;
-            customer = null;
+            table = null;
             return Status.FAILURE;
         }
-        Inventory.GiveTo(ItemType.BILL, customer.Inventory);
-        customer.BringBill();
+        table.Customer.BringBill();
+        Inventory.GiveTo(ItemType.BILL, table.Customer.Inventory);
 
         return Status.SUCCESS;
     }
@@ -179,7 +165,6 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status AttendCustomer()
     {
-        isPerformingAction = false;
         if (!customer.IsWaiting)
         {
             customer = null;
@@ -187,6 +172,11 @@ public class WaiterScript : MonoBehaviour
         }
         Inventory.GetFrom(ItemType.ORDER, customer.Inventory);
         customer.Attend();
+
+        // Now that the customer has been attended, so prepare for next customer
+        customer = null;
+        table = null;
+
         return Status.SUCCESS;
     }
 
@@ -196,10 +186,10 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status SendCustomerToTable()
     {
-        isPerformingAction = false;
         table = blackboard.GetEmptyTable();
         customer = queue.GetNextCustomer();
         customer.Receive(table);
+        table.IsAssigned = true;
 
         // Now that the customer has been received, so prepare for next customer
         customer = null;
@@ -215,7 +205,6 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status CleanTable(TableScript table)
     {
-        isPerformingAction = false;
         var tableScript = table.GetComponent<TableScript>();
         tableScript.Clean();
         return tableScript.IsClean ? Status.SUCCESS : Status.FAILURE;
@@ -337,7 +326,6 @@ public class WaiterScript : MonoBehaviour
                 .Do("JustWait", () => { return Status.SUCCESS; })
                 .End()
             .End();
-
     }
 
     // Update is called once per frame

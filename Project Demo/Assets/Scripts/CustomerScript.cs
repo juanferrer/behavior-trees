@@ -116,6 +116,7 @@ public class CustomerScript : MonoBehaviour
         // If it was in Queue, leave queue
         isInQueue = false;
         isInTable = false;
+        IsWaiting = false;
         queue.LeaveQueue(this);
         var status = GoTo(exit.transform.position);
         if (status == Status.SUCCESS)

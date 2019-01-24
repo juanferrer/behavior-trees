@@ -33,7 +33,7 @@ namespace Data
 
     static public class Globals
 	{
-		static public int MinWaitTime = 20;
+		static public int MinWaitTime = 30;
 		static public int MaxWaitTime = 100;
 	}
 }
