@@ -113,14 +113,18 @@ public class CustomerScript : MonoBehaviour
     /// <returns></returns>
     private Status Leave()
     {
-        var status = GoTo(exit.transform.position);
         // If it was in Queue, leave queue
         isInQueue = false;
         isInTable = false;
         queue.LeaveQueue(this);
-        if (status == Status.SUCCESS) gameObject.SetActive(false);
+        var status = GoTo(exit.transform.position);
+        if (status == Status.SUCCESS)
+        {
+            //gameObject.SetActive(false);
+            Destroy(gameObject);
+        }
         // Send this to pool or destroy
-        Destroy(gameObject);
+        
         Debug.Log("Customer left");
         return status;
 	}
@@ -224,7 +228,7 @@ public class CustomerScript : MonoBehaviour
 
         // Declare BTs
 
-        leaveCheck = new BehaviorTreeBuilder("")
+        leaveCheck = new BehaviorTreeBuilder("LeaveCheck")
             .Selector("LeaveSelector")
                 .Do("Wait", Wait)
                 .Do("Leave", () => { return Leave(); })

@@ -84,6 +84,7 @@ public class WaiterScript : MonoBehaviour
         Debug.Log("Waiter left order in kitchen");
         kitchen.AddOrder(Inventory.order);
         Inventory.order = new Food();
+        customer = null;
         return Status.SUCCESS;
     }
 
@@ -190,69 +191,6 @@ public class WaiterScript : MonoBehaviour
     }
 
     /// <summary>
-    /// Decide what to do next and set the value of the appropriate boolean
-    /// </summary>
-    /// <returns></returns>
-    private Status AssessPriority()
-    {
-        // TODO: Add?
-        if (isPerformingAction) return Status.SUCCESS;
-
-        shouldBringOrder = false;
-        shouldReceiveCustomer = false;
-        shouldAttendCustomer = false;
-        shouldServeFood = false;
-        shouldBringBill = false;
-        isPerformingAction = false;
-
-        // Do we have a customer's order? We should be taking that to the kitchen
-        if (Inventory.Has(ItemType.ORDER))
-        {
-            isPerformingAction = shouldBringOrder = true;
-            return Status.SUCCESS;
-        }
-
-        // We need to keep dishes warm, so that's first
-        if (kitchen.IsFoodPrepared() || Inventory.Has(ItemType.FOOD))
-        {
-            isPerformingAction = shouldServeFood = true;
-            return Status.SUCCESS;
-        }
-
-        // We have no food ready to be served
-        // There needs to be free tables before we receive a new customer
-        // Also, make sure someone is in the queue
-        if (blackboard.EmptyTablesCount > 0 && blackboard.CustomersInQueueCount > 0)
-        {
-            isPerformingAction = shouldReceiveCustomer = true;
-            return Status.SUCCESS;
-        }
-
-        // Someone is already receiving customers or there is noone to receive
-        // Bring bill to customers, lest they leave without paying
-        // STOP THE SINPA! (https://en.wiktionary.org/wiki/sinpa)
-        if (kitchen.IsBillReady() || Inventory.Has(ItemType.BILL))
-        {
-            // TODO
-            isPerformingAction = shouldBringBill = true;
-            return Status.SUCCESS;
-        }
-
-        // Since the bills have been taken care of, check if any sitting customer
-        // is still to be attended
-        if (blackboard.CustomersToAttendCount > 0)
-        {
-            isPerformingAction = shouldAttendCustomer = true;
-            return Status.SUCCESS;
-        }
-
-        // Wait, I guess? You're still getting paid, tho
-        isPerformingAction = false;
-
-        return Status.SUCCESS;
-    }
-
-    /// <summary>
     /// Get an empty table and send the first customer from the queue to that table
     /// </summary>
     /// <returns></returns>
@@ -295,13 +233,7 @@ public class WaiterScript : MonoBehaviour
         agent.isStopped = true;
         Inventory = new Inventory();
 
-
-        shouldReceiveCustomer = false;
-        shouldAttendCustomer = false;
-        shouldServeFood = false;
-        shouldBringBill = false;
-        isPerformingAction = false;
-
+        // Do we have a customer's order? We should be taking that to the kitchen
         bringOrderSequence = new BehaviorTreeBuilder("BringOrderSequence")
             .Sequence("BringOrder")
                 .Sequence("ShouldBringOrder")
@@ -312,6 +244,7 @@ public class WaiterScript : MonoBehaviour
                 .End()
             .End();
 
+        // We need to keep dishes warm (and we have one in our hands!), so do that now
         bringFoodToTableSequence = new BehaviorTreeBuilder("BringFoodToTableSequence")
             .Sequence("BringFoodToTable")
                 .Sequence("ShouldServeFood")
@@ -322,6 +255,7 @@ public class WaiterScript : MonoBehaviour
                 .End()
             .End();
 
+        // We need to keep dishes warm, so do that now
         getFoodSequence = new BehaviorTreeBuilder("GetFoodSequence")
            .Sequence("GetFood")
                 .Sequence("ShouldServeFood")
@@ -334,6 +268,9 @@ public class WaiterScript : MonoBehaviour
                 .End()
             .End();
 
+        // We have no food ready to be served
+        // There needs to be free tables before we receive a new customer
+        // Also, make sure someone is in the queue
         receiveCustomerSequence = new BehaviorTreeBuilder("ReceiveCustomerSequence")
             .Sequence("ReceiveCustomer")
                 .Sequence("ShouldReceiveCustomer")
@@ -345,6 +282,9 @@ public class WaiterScript : MonoBehaviour
                 .End()
             .End();
 
+        // Someone is already receiving customers or there is noone to receive
+        // Bring bill to customers, lest they leave without paying
+        // STOP THE SINPA! (https://en.wiktionary.org/wiki/sinpa)
         getBillSequence = new BehaviorTreeBuilder("GetBillSequence")
             .Sequence("GetBill")
                 .Sequence("ShouldGetBill")
@@ -357,6 +297,7 @@ public class WaiterScript : MonoBehaviour
                 .End()
             .End();
 
+        // We have the bill and need to take it to the customer
         bringBillSequence = new BehaviorTreeBuilder("BringBillSequence")
             .Sequence("BringBill")
                 .Sequence("ShouldBringBill")
@@ -369,6 +310,8 @@ public class WaiterScript : MonoBehaviour
                 .End()
             .End();
 
+        // Since the bills have been taken care of, check if any sitting customer
+        // is still to be attended
         attendCustomerSequence = new BehaviorTreeBuilder("AttendCustomerSequence")
             .Sequence("AttendCustomer")
                 .Sequence("ShouldAttendCustomer")

@@ -22,6 +22,11 @@ public class KitchenScript : MonoBehaviour
     {	
 	}
 
+    public bool IsFoodPrepared()
+    {
+        return foodPrepared.Count > 0;
+    }
+
     public Food GetFoodPrepared()
     {
         Food plate = foodPrepared[0];
@@ -36,19 +41,19 @@ public class KitchenScript : MonoBehaviour
         orders.Remove(food);
     }
 
-    public bool IsFoodPrepared()
+    public bool IsOrderPending()
     {
-        return foodPrepared.Count > 0;
-    }
-
-    public void AddOrder(Food order)
-    {
-        orders.Add(order);
+        return orders.Count > 0;
     }
 
     public Food GetOrder()
     {
         return orders[0];
+    }
+
+    public void AddOrder(Food order)
+    {
+        orders.Add(order);
     }
 
     public bool IsBillReady()
