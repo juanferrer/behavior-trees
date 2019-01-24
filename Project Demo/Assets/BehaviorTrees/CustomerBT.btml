@@ -1,27 +1,54 @@
 | Selector
     & Queue
-        ? NeedsToStartQueue
+        & NeedsToStartQueue
+	    ¬ IsNotInQueue
+                ? IsInQueue
+	    ¬ IsNotBeingReceived
+                ? IsBeingReceived
+            ¬ HasNotBeenReceived
+                ? HasBeenReceived
         ! GoToQueue
         ! StartQueue
     & Table
-        ? NeedsToGetATable
+        & NeedsToGetATable
+            ¬ HasNotBeenReceived
+                ? HasBeenReceived
         # LeaveCheck.btml
-        ? ReadyToBeReceived
+        & ReadyToBeReceived
+            ? IsBeingReceived
         ! GoToTable
         ! SitInTable
     & DecideWhatToOrder
-        ? NoFoodDecided
-        !DecideFood
+        & NoFoodDecided
+            ? IsInTable
+	    ¬ HasNotBeenAttended
+                ? HasBeenAttended
+            ¬ DoesNotHaveOrder
+                ? HasOrder
+        ! DecideFood
     & BeAttended
-        ? NeedsToBeAttended
+        & NeedsToBeAttended
+            ? IsInTable
+            ? HasBeenReceived
+            ¬ HasNotBeenAttended
+                ? HasBeenAttended
         # LeaveCheck.btml
     & BeServedAndEat
-        ? NeedsToBeServed
+        & NeedsToBeServed
+            ? IsInTable
+            ? HasBeenAttended
+            ¬ HasNotBeenServed
+                ? HasBeenServed
+            ¬ HasNotFinishedEating
+                ? HasFinishedEating
         # LeaveCheck.btml
         ? HasFood
-        ! Eat
+        " Eat
+            ! FinishEating
     & WaitForBill
-        ? NeedsToReceiveBill
+        & NeedsToReceiveBill
+            ? IsInTable
+            ? HasFinishedEating
         # LeaveCheck.btml
         ? HasReceivedBill
         ! PayBill

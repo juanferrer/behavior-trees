@@ -10,9 +10,9 @@ namespace Data
 	public enum FoodType
 	{
         NONE,
-		DISH1,
-		DISH2,
-		DISH3,
+		SOUP,
+		PIZZA,
+		FISHNCHIPS,
 	}
 
     public enum ItemType

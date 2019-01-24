@@ -224,7 +224,7 @@ public class WaiterScript : MonoBehaviour
         // Someone is already receiving customers or there is noone to receive
         // Bring bill to customers, lest they leave without paying
         // STOP THE SINPA! (https://en.wiktionary.org/wiki/sinpa)
-        if (kitchen.IsBillReady())
+        if (kitchen.IsBillReady() || Inventory.Has(ItemType.BILL))
         {
             // TODO
             isPerformingAction = shouldBringBill = true;

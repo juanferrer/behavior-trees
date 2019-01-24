@@ -9,6 +9,9 @@ public class CookScript : MonoBehaviour
     GameManagerScript gm;
     NavMeshAgent agent;
     BehaviorTree bt;
+    BehaviorTree grabIngredients;
+    BehaviorTree prepareIngredients;
+    BehaviorTree cookIngredients;
     QueueScript queue;
     KitchenScript kitchen;
     TableScript table;
@@ -64,6 +67,22 @@ public class CookScript : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         agent.isStopped = true;
         Inventory = new Inventory();
+
+
+
+        bt =  new BehaviorTreeBuilder("")
+            .RepeatUntilFail("Loop")
+                .Selector("Selector")
+                    .Sequence("Cook")
+                        .Do("GrabIngredients", grabIngredients)
+                        .Do("PrepareIngredients", prepareIngredients)
+                        .Do("CookIngredients", cookIngredients)
+                        .Do("FinishDish", () => { return Status.ERROR; })
+                        .End()
+                    .Do("JustWait", () => { return Status.ERROR; })
+                .End()
+            .End();
+
     }
 
     // Update is called once per frame

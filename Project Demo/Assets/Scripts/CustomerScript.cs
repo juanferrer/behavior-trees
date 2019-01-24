@@ -20,7 +20,7 @@ public class CustomerScript : MonoBehaviour
 
     int availableTime;
     float timeWaited = 0;
-    float timeEating = 3;
+    ulong timeEating = 3;
 
     bool isInQueue = false;
     bool isInTable = false;
@@ -114,6 +114,7 @@ public class CustomerScript : MonoBehaviour
         queue.LeaveQueue(this);
         if (status == Status.SUCCESS) gameObject.SetActive(false);
         // Send this to pool or destroy
+        Destroy(gameObject);
         Debug.Log("Customer left");
         return status;
 	}
@@ -156,15 +157,9 @@ public class CustomerScript : MonoBehaviour
     {
         // Destroy food from table
         if (!HasBeenServed) HasBeenServed = true;
-        timeEating -= Time.deltaTime;
-
-        if (timeEating <= 0)
-        {
-            HasFinishedEating = true;
-            Debug.Log("Customer finished eating");
-            return Status.SUCCESS;
-        }
-        return Status.RUNNING;
+        HasFinishedEating = true;
+        Debug.Log("Customer finished eating");
+        return Status.SUCCESS;
     }
 
     /// <summary>
@@ -219,6 +214,7 @@ public class CustomerScript : MonoBehaviour
         agent.isStopped = true;
         Inventory = new Inventory();
         Inventory.money = true;
+        timeEating = (ulong)UnityEngine.Random.Range(3000, 5000);
 
         // Declare BTs
 
@@ -234,33 +230,67 @@ public class CustomerScript : MonoBehaviour
         bt = new BehaviorTreeBuilder("")
             .Selector("Selector")
                 .Sequence("QueueSequence")
-                    .If("NeedsToStartQueue", () => { return !isInQueue && !isBeingReceived && !HasBeenReceived; })
+                    .Sequence("NeedsToStartQueue")
+                        .Not("IsNotInQueue")
+                            .If("IsInQueue", () => { return isInQueue; })
+                        .Not("IsNotBeingReceived")
+                            .If("IsBeingReceived", () => { return isBeingReceived; })
+                        .Not("HasNotBeenReceived")
+                            .If("HasBeenReceived", () => { return HasBeenReceived; })
+                        .End()
                     .Do("GoToQueue", () => { return GoTo(queue.GetNextPosition()); })
                     .Do("StartQueue", StartQueue)
                     .End()
                 .Sequence("TableSequence")
-                    .If("NeedsToGetATable", () => { return !HasBeenReceived; })
+                    .Sequence("NeedsToGetATable")
+                        .Not("HasNotBeenReceived")
+                            .If("HasBeenReceived", () => { return HasBeenReceived; })
+                        .End()
                     .Do("LeaveCheck", leaveCheck)
-                    .If("ReadyToBeReceived", () => { return isBeingReceived; })
+                    .Sequence("ReadyToBeReceived")
+                        .If("IsBeingReceived", () => { return isBeingReceived; })
+                        .End()
                     .Do("GoToTable", () => { return GoTo(table); })
                     .Do("SitInTable", SitInTable)
                     .End()
                 .Sequence("DecideWhatToOrder")
-                    .If("NoFoodDecided", () => { return isInTable && !HasBeenAttended && !Inventory.Has(ItemType.ORDER); })
+                    .Sequence("NoFoodDecided")
+                        .If("IsInTable", () => { return isInTable; })
+                        .Not("HasNotBeenAttended")
+                            .If("HasBeenAttended", () => { return HasBeenAttended; })
+                        .Not("DoesNotHaveOrder")
+                            .If("HasOrder", () => { return Inventory.Has(ItemType.ORDER); })
+                        .End()
                     .Do("DecideFood", DecideFood)
                     .End()
                 .Sequence("BeAttendedSequence")
-                    .If("NeedsToBeAttended", () => { return ( isInTable && HasBeenReceived && !HasBeenAttended); })
+                    .Sequence("NeedsToBeAttended")
+                        .If("IsInTable", () => { return isInTable; })
+                        .If("HasBeenReceived", () => { return HasBeenReceived; })
+                        .Not("HasNotBeenAttended")
+                            .If("HasBeenAttended", () => { return HasBeenAttended; })
+                        .End()
                     .Do("LeaveCheck", leaveCheck)
                     .End()
                 .Sequence("BeServedAndEatSequence")
-                    .If("NeedsToBeServed", () => { return isInTable && HasBeenAttended && !HasBeenServed && !HasFinishedEating; })
+                    .Sequence("NeedsToBeServed")
+                        .If("IsInTable", () => { return isInTable; })
+                        .If("HasBeenAttended", () => { return HasBeenAttended; })
+                        .Not("HasNotBeenServed")
+                            .If("HasBeenServed", () => { return HasBeenServed; })
+                        .Not("HasNotFinishedEating")
+                            .If("HasFinishedEating", () => { return HasFinishedEating; })
+                        .End()
                     .Do("LeaveCheck", leaveCheck)
                     .If("HasFood", () => { return HasReceivedFood;  })
-                    .Do("Eat", Eat)
+                    .Wait("Eat", timeEating)
+                        .Do("Eat", Eat)
                     .End()
                 .Sequence("WaitForBillSequence")
-                    .If("NeedsToReceiveBill", () => { return isInTable && HasFinishedEating; })
+                    .Sequence("NeedsToBeServed")
+                        .If("IsInTable", () => { return isInTable; })
+                        .If("HasFinishedEating", () => { return HasFinishedEating; })
+                        .End()
                     .Do("LeaveCheck", leaveCheck)
                     .If("HasReceivedBill", () => { return HasReceivedBill; })
                     .Do("PayBill", PayBill)

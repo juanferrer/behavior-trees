@@ -1,0 +1,5 @@
+& Sequence
+    ! CheckRecipe
+    ! GoToStorage
+    ! GrabRequiredIngredient
+    ! GoTo

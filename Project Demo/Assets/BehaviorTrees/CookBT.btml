@@ -1,0 +1,8 @@
+* Loop
+    | Selector
+        & Cook
+            # GrabIngredients.btml
+            # PrepareIngredients.btml
+            # CookIngredients.btml
+            ! FinishDish
+        ! JustWait
