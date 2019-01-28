@@ -3,11 +3,15 @@
         & BringOrder
             & ShouldBringOrder
                 ? HasOrder
+			¬ IsNotRecalculating
+					? IsRecalculating
             ! GoToKitchen
             ! GiveOrderToKitchen
         & BringFoodToTable
             & ShouldServeFood
                 ? HasFood
+			¬ IsNotRecalculating
+					? IsRecalculating
             ! GoToTable
             ! GiveFoodToCustomer
         & GetFood
@@ -15,12 +19,17 @@
                 ? IsFoodPrepared
                 ¬ DoesNotHaveFood
                     ? HasFood
+				¬ IsNotRecalculating
+					? IsRecalculating
             ! GoToKitchen
             ! PickupFood
         & ReceiveCustomer
             & ShouldReceiveCustomer
+				? NoOreOrMeIsTakingCareOfQueue
                 ? AreThereEmptyTables
                 ? AreThereCustomersInTheQueue
+				¬ IsNotRecalculating
+					? IsRecalculating
             ! GoToQueue
             ! SendCustomerToTable
         & GetBill
@@ -28,11 +37,17 @@
                 ? IsBillReady
                 ¬ DoesNotHaveBill
                     ? HasBill
+				¬ DoesNotHaveFood
+					? HasFood
+				¬ IsNotRecalculating
+					? IsRecalculating
             ! GoToKitchen
             ! PickupBill
         & BringBill
             & ShouldBringBill
                 ? HasBill
+				¬ IsNotRecalculating
+					? IsRecalculating
             ! GoToTable
             ! GiveBillToCustomer
             ! GetMoneyFromCustomer
@@ -40,6 +55,8 @@
         & AttendCustomer
             & ShouldAttendCustomer
                 ? AreThereCustomersToAttend
+				¬ IsNotRecalculating
+					? IsRecalculating
             ! GetCustomerToAttend
             ! GoToCustomer
             ! Attend

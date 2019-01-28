@@ -7,23 +7,39 @@ using Data;
 
 public class CookScript : MonoBehaviour
 {
-    GameManagerScript gm;                  // Game manager
-    NavMeshAgent agent;                    // Navigation agent
-    BehaviorTree bt;                       // Behaviour tree
-    BehaviorTree getOrderSequence;         // Subtree to get order to prepare
-    BehaviorTree grabIngredients;          // Subtree for getting required ingredients
-    BehaviorTree prepareIngredients;       // Subtree for preparing required ingredients
-    BehaviorTree cookIngredients;          // Subtree for cooking prepared ingredients
-    KitchenScript kitchen;                 // Kitchen
-    public Inventory Inventory;            // Inventory of entity
+    GameManagerScript gm;                   // Game manager
+    NavMeshAgent agent;                     // Navigation agent
+    BehaviorTree bt;                        // Behaviour tree
+    BehaviorTree getOrderSequence;          // Subtree to get order to prepare
+    BehaviorTree grabIngredients;           // Subtree for getting required ingredients
+    BehaviorTree prepareIngredients;        // Subtree for preparing required ingredients
+    BehaviorTree cookIngredients;           // Subtree for cooking prepared ingredients
+    BehaviorTree finishDish;                // Subtree for finishing dish
+    KitchenScript kitchen;                  // Kitchen
+    GameObject storage;                     // Storage
+    BlackboardScript blackboard;            // Global information
+    public Inventory Inventory;             // Inventory of entity
+
+    private bool alreadyGoingSomewhereThisFrame = false;
 
     /// <summary>
     /// Use Unity's meshnav to travel to given position
-    /// </summary>                         
+    /// </summary>
     /// <param name="pos"></param>
     /// <returns></returns>
     private Status GoTo(Vector3 pos)
     {
+        if (alreadyGoingSomewhereThisFrame)
+        {
+            return Status.FAILURE;
+        }
+        alreadyGoingSomewhereThisFrame = true;
+        if (agent.destination != transform.position && (agent.destination - pos).sqrMagnitude > agent.stoppingDistance * 2)
+        {
+            agent.ResetPath();
+            return Status.FAILURE;
+        }
+
         // Set a new destination
         if (agent.isStopped)
         {
@@ -32,12 +48,12 @@ public class CookScript : MonoBehaviour
             return Status.RUNNING;
         }
 
-        bool reachedPos = /*!agent.pathPending && */(agent.remainingDistance <= agent.stoppingDistance) && (!agent.hasPath || Mathf.Approximately(agent.velocity.sqrMagnitude, 0.0f));
+        bool reachedPos = !agent.pathPending && (agent.remainingDistance <= agent.stoppingDistance) && (!agent.hasPath || Mathf.Approximately(agent.velocity.sqrMagnitude, 0.0f));
         bool onTheWay = agent.remainingDistance != Mathf.Infinity && (agent.remainingDistance > agent.stoppingDistance);
 
         if (reachedPos)
         {
-            Debug.Log("Cook reached destination: " + pos.ToString("G2"));
+            Debug.Log("Waiter reached destination: " + pos.ToString("G2"));
             agent.isStopped = true;
             return Status.SUCCESS;
         }
@@ -72,12 +88,48 @@ public class CookScript : MonoBehaviour
         agent.isStopped = true;
         Inventory = new Inventory();
 
-        getOrderSequence = new BehaviorTreeBuilder("")
-            .Not("DoesNotHaveOrder")
-                .If("DoesNotHaveOrder", () => { return Inventory.Has(ItemType.ORDER); })
-            .If("ThereAreOrdersPending", kitchen.IsOrderPending)
-            .Do("GoToKitchen", () => { return GoTo(kitchen); })
-            .Do("GetOrderFromKitchen", GetOrderFromKitchen)
+        grabIngredients = new BehaviorTreeBuilder("GrabIngredientsSequence")
+            .Sequence("GrabIngredientsSequence")
+                .Sequence("NeedsToGetIngredients")
+                    .Not("DoesNotHaveIngredientsForRecipe")
+                        .If("HasIngredientsForRecipe", () => { return false; })
+                    .End()
+                .Do("GoToStorage", () => { return GoTo(storage.transform.position); })
+                .Do("GrabRequiredIngredient", () => { return Status.ERROR; })
+                .End()
+            .End();
+
+        prepareIngredients = new BehaviorTreeBuilder("PrepareIngredientsSequence")
+            .Sequence("PrepareIngredientsSequence")
+                .Sequence("NeedsToPrepareIngredients")
+                    .If("HasIngredientsForRecipe", () => { return false; })
+                    .Not("IngredientsAreNotPrepared")
+                        .If("AreIngredientsPrepared", () => { return false; })
+                    .End()
+                .Do("GoToWorktop", () => { return GoTo(blackboard.GetEmptyWorktop()); })
+                .Do("PrepareIngredients", () => { return Status.ERROR; })
+                .End()
+            .End();
+
+        cookIngredients = new BehaviorTreeBuilder("")
+            .Sequence("GrabIngredientsSequence")
+                .Sequence("NeedsToCookIngredients")
+                    .If("HasIngredientsForRecipe", () => { return false; })
+                    .If("AreIngredientsPrepared", () => { return false; })
+                    .Not("IngredientsAreNotCooked")
+                        .If("AreIngredientsCooked", () => { return false; })
+                    .End()
+                .Do("GoToOven", () => { return GoTo(blackboard.GetEmptyOven()); })
+                .Do("CookIngredients", () => { return Status.ERROR; })
+                .End()
+            .End();
+
+        finishDish = new BehaviorTreeBuilder("")
+            .Sequence("FinishDishSequence")
+                .Sequence("HasFinishedDish")
+                    .If("HasDish", () => { return Inventory.Has(ItemType.FOOD); })
+                    .End()
+                .End()
             .End();
 
         bt =  new BehaviorTreeBuilder("CookBT")
@@ -88,7 +140,7 @@ public class CookScript : MonoBehaviour
                         .Do("GrabIngredients", grabIngredients)
                         .Do("PrepareIngredients", prepareIngredients)
                         .Do("CookIngredients", cookIngredients)
-                        .Do("FinishDish", () => { return Status.ERROR; })
+                        .Do("FinishDish", finishDish)
                         .End()
                     .Do("JustWait", () => { return Status.ERROR; })
                 .End()

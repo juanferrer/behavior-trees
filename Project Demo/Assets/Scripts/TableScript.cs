@@ -34,10 +34,4 @@ public class TableScript : MonoBehaviour
         IsAssigned = false;
 		Customer = null;
 	}
-
-	// Update is called once per frame
-	void Update()
-	{
-
-	}
 }

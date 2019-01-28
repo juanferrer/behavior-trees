@@ -1,5 +1,6 @@
-& Sequence
-    ! CheckRecipe
+& GrabIngredientsSequence
+    & NeedsToGetIngredients
+		¬ DoesNotHaveIngredientsForRecipe
+			? HasIngredientsForRecipe
     ! GoToStorage
     ! GrabRequiredIngredient
-    ! GoTo

@@ -1,0 +1,7 @@
+& PrepareIngredientsSequence
+    & NeedsToPrepareIngredients
+		? HasIngredientsForRecipe
+		¬ IngredientsAreNotPrepared
+			? AreIngredientsPrepared
+    ! GoToWorktop
+    ! PrepareIngredients

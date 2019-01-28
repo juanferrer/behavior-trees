@@ -1,0 +1,8 @@
+& GrabIngredientsSequence
+    & NeedsToCookIngredients
+		? HasIngredientsForRecipe
+		? AreIngredientsPrepared
+		¬ IngredientsAreNotCooked
+			? AreIngredientsCooked
+    ! GoToOven
+    ! CookIngredients
