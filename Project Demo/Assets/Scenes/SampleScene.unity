@@ -499,6 +499,7 @@ Transform:
   - {fileID: 575454670}
   - {fileID: 309864074}
   - {fileID: 1385769896}
+  - {fileID: 2108521540}
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -688,7 +689,7 @@ GameObject:
   m_Layer: 0
   m_Name: Exit
   m_TagString: Exit
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -1412012063857583412, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -1536,7 +1537,7 @@ GameObject:
   m_Layer: 0
   m_Name: Kitchen
   m_TagString: Kitchen
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 2974397684917235467, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -1547,7 +1548,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1446263588}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 10, y: 0, z: 5}
+  m_LocalPosition: {x: 6, y: 0, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 485924681}
@@ -1647,7 +1648,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1123330659405642, guid: d5bf4eaf935a32d4eae99389124c632b, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d5bf4eaf935a32d4eae99389124c632b, type: 2}
@@ -2291,7 +2292,7 @@ GameObject:
   m_Layer: 0
   m_Name: GameManager
   m_TagString: GameController
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
@@ -2311,6 +2312,7 @@ MonoBehaviour:
   exit: {fileID: 624156520}
   customerPrefab: {fileID: 1117080702200402, guid: 667819d3fd8540d40942197cd1b9dd89,
     type: 2}
+  storage: {fileID: 2108521539}
   LeftMostCamPos: 16
   RightMostCamPos: -15
   CamSpeed: 10
@@ -2340,6 +2342,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tables: []
+  worktops: []
+  ovens: []
 --- !u!1001 &2080271179
 Prefab:
   m_ObjectHideFlags: 0
@@ -2391,3 +2395,31 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4063230391406824, guid: 9740097d65b5a374b890992c9d23be06,
     type: 2}
   m_PrefabInternal: {fileID: 2080271179}
+--- !u!1 &2108521539
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2108521540}
+  m_Layer: 0
+  m_Name: Storage
+  m_TagString: Untagged
+  m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2108521540
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2108521539}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 485924681}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
