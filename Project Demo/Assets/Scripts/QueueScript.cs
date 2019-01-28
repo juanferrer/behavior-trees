@@ -5,7 +5,6 @@ using UnityEngine;
 public class QueueScript : MonoBehaviour
 {
     private List<CustomerScript> customerQueue;
-    private bool waiterInQueue;
 	// Use this for initialization
 	void Start ()
 	{

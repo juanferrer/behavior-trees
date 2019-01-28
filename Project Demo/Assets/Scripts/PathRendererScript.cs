@@ -13,7 +13,8 @@ public class PathRendererScript : MonoBehaviour {
     void Start()
     {
         line = GetComponent<LineRenderer>();
-        agent = GetComponent<NavMeshAgent>(); 
+        agent = GetComponent<NavMeshAgent>();
+        agent.SetDestination(transform.position);
     }
 
     private void Update()

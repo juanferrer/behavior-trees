@@ -61,6 +61,7 @@ public class CustomerScript : MonoBehaviour
         if (reachedPos)
         {
             Debug.Log("Customer reached destination: " + pos.ToString("G2"));
+            agent.ResetPath();
             agent.isStopped = true;
             return Status.SUCCESS;
         }
@@ -121,12 +122,12 @@ public class CustomerScript : MonoBehaviour
         var status = GoTo(exit.transform.position);
         if (status == Status.SUCCESS)
         {
+            Debug.Log("Customer left");
             //gameObject.SetActive(false);
             Destroy(gameObject);
         }
         // Send this to pool or destroy
         
-        Debug.Log("Customer left");
         return status;
 	}
 

@@ -22,6 +22,9 @@ public class WaiterScript : MonoBehaviour
     BlackboardScript blackboard;            // Global information
     public Inventory Inventory;             // Inventory of entity
 
+    private bool isRecalculatingTree = false;
+    private bool alreadyGoingSomewhereThisFrame = false;
+
     /// <summary>
     /// Use Unity's meshnav to travel to given position
     /// </summary>
@@ -29,6 +32,17 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status GoTo(Vector3 pos)
     {
+        if (alreadyGoingSomewhereThisFrame)
+        {
+            return Status.FAILURE;
+        }
+        alreadyGoingSomewhereThisFrame = true;
+        if (agent.destination != transform.position && (agent.destination - pos).sqrMagnitude > agent.stoppingDistance * 2)
+        {
+            agent.ResetPath();
+            return Status.FAILURE;
+        }
+
         // Set a new destination
         if (agent.isStopped)
         {
@@ -37,7 +51,7 @@ public class WaiterScript : MonoBehaviour
             return Status.RUNNING;
         }
 
-        bool reachedPos = /*!agent.pathPending && */(agent.remainingDistance <= agent.stoppingDistance) && (!agent.hasPath || Mathf.Approximately(agent.velocity.sqrMagnitude, 0.0f));
+        bool reachedPos = !agent.pathPending && (agent.remainingDistance <= agent.stoppingDistance) && (!agent.hasPath || Mathf.Approximately(agent.velocity.sqrMagnitude, 0.0f));
         bool onTheWay = agent.remainingDistance != Mathf.Infinity && (agent.remainingDistance > agent.stoppingDistance);
 
         if (reachedPos)
@@ -63,19 +77,34 @@ public class WaiterScript : MonoBehaviour
     }
 
     /// <summary>
+    /// Check if waiter is close enough to object
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    private bool CloseEnough(MonoBehaviour obj)
+    {
+        return (transform.position - obj.transform.position).sqrMagnitude <= (agent.stoppingDistance * 2);
+    }
+
+    /// <summary>
     /// Transfer order from entity's inventory to kitchen
     /// </summary>
     /// <returns></returns>
     private Status GiveOrderToKitchen()
     {
+        if (!CloseEnough(kitchen))
+        {
+            isRecalculatingTree = true;
+            return Status.FAILURE;
+        }
         if (!Inventory.order.table.Customer.IsWaiting)
         {
             Inventory.order = new Food();
             return Status.FAILURE;
         }
-        Debug.Log("Waiter left order in kitchen");
         kitchen.AddOrder(Inventory.order);
         Inventory.order = new Food();
+        Debug.Log("Waiter left order in kitchen");
         return Status.SUCCESS;
     }
 
@@ -85,7 +114,11 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status GetFoodFromKitchen()
     {
-        Debug.Log("Waiter got food from kitchen");
+        if (!CloseEnough(kitchen))
+        {
+            isRecalculatingTree = true;
+            return Status.FAILURE;
+        }
         Inventory.food = kitchen.GetFoodPrepared();
         table = Inventory.food.table;
         if (!table.Customer.IsWaiting)
@@ -96,6 +129,7 @@ public class WaiterScript : MonoBehaviour
             table = null;
             return Status.FAILURE;
         }
+        Debug.Log("Waiter got food from kitchen");
         return Status.SUCCESS;
     }
 
@@ -105,6 +139,11 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status ServeFood()
     {
+        if (!CloseEnough(Inventory.food.table.Customer))
+        {
+            isRecalculatingTree = true;
+            return Status.FAILURE;
+        }
         if (!Inventory.food.table.Customer.IsWaiting)
         {
             Inventory.food = new Food();
@@ -112,6 +151,7 @@ public class WaiterScript : MonoBehaviour
         }
         Inventory.food.table.Customer.Serve();
         Inventory.GiveTo(ItemType.FOOD, Inventory.food.table.Customer.Inventory);
+        Debug.Log("Waiter served food");
         return Status.SUCCESS;
     }
 
@@ -121,7 +161,11 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status GetBillFromKitchen()
     {
-        Debug.Log("Waiter got bill from kitchen");
+        if (!CloseEnough(kitchen))
+        {
+            isRecalculatingTree = true;
+            return Status.FAILURE;
+        }
         Inventory.bill = true;
         table = kitchen.GetBill();
         if (!table.Customer.IsWaiting)
@@ -131,11 +175,17 @@ public class WaiterScript : MonoBehaviour
             table = null;
             return Status.FAILURE;
         }
+        Debug.Log("Waiter got bill from kitchen");
         return Status.SUCCESS;
     }
 
     private Status GiveBillToCustomer()
     {
+        if (!CloseEnough(table.Customer))
+        {
+            isRecalculatingTree = true;
+            return Status.FAILURE;
+        }
         if (!table.Customer.IsWaiting)
         {
             // Customer left... Well, destroy the bill
@@ -145,7 +195,7 @@ public class WaiterScript : MonoBehaviour
         }
         table.Customer.BringBill();
         Inventory.GiveTo(ItemType.BILL, table.Customer.Inventory);
-
+        Debug.Log("Waiter gave bill to customer");
         return Status.SUCCESS;
     }
 
@@ -165,6 +215,11 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status AttendCustomer()
     {
+        if (!CloseEnough(customer))
+        {
+            isRecalculatingTree = true;
+            return Status.FAILURE;
+        }
         if (!customer.IsWaiting)
         {
             customer = null;
@@ -177,6 +232,7 @@ public class WaiterScript : MonoBehaviour
         customer = null;
         table = null;
 
+        Debug.Log("Waiter attended customer");
         return Status.SUCCESS;
     }
 
@@ -186,6 +242,12 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status SendCustomerToTable()
     {
+        if (!CloseEnough(queue))
+        {
+            isRecalculatingTree = true;
+            return Status.FAILURE;
+        }
+        Debug.Log("Waiter sent customer to table");
         table = blackboard.GetEmptyTable();
         customer = queue.GetNextCustomer();
         customer.Receive(table);
@@ -195,6 +257,15 @@ public class WaiterScript : MonoBehaviour
         customer = null;
         table = null;
 
+        // And tell everyone you're not in the queue anymore
+        if (blackboard.WaiterTakingCareOfQueue == this) blackboard.SetTakingCareOfQueue(null);
+
+        return Status.SUCCESS;
+    }
+
+    private Status SetGoingToQueue()
+    {
+        blackboard.SetTakingCareOfQueue(this);
         return Status.SUCCESS;
     }
 
@@ -205,6 +276,7 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status CleanTable(TableScript table)
     {
+        Debug.Log("Waiter cleaned table");
         var tableScript = table.GetComponent<TableScript>();
         tableScript.Clean();
         return tableScript.IsClean ? Status.SUCCESS : Status.FAILURE;
@@ -227,6 +299,8 @@ public class WaiterScript : MonoBehaviour
             .Sequence("BringOrder")
                 .Sequence("ShouldBringOrder")
                     .If("HasOrder", () => { return Inventory.Has(ItemType.ORDER); })
+                    .Not("IsNotRecalculating")
+                        .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
                 .Do("GoToKitchen", () => { return GoTo(kitchen); })
                 .Do("GiveOrderToKitchen", GiveOrderToKitchen)
@@ -238,8 +312,10 @@ public class WaiterScript : MonoBehaviour
             .Sequence("BringFoodToTable")
                 .Sequence("ShouldServeFood")
                     .If("HasFood", () => { return Inventory.Has(ItemType.FOOD); })
+                    .Not("IsNotRecalculating")
+                        .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
-                .Do("GoToTable", () => { return GoTo(table); })
+                .Do("GoToTable", () => { return GoTo(table.Customer); })
                 .Do("GiveFoodToCustomer", ServeFood)
                 .End()
             .End();
@@ -251,6 +327,8 @@ public class WaiterScript : MonoBehaviour
                     .If("IsFoodPrepared", kitchen.IsFoodPrepared)
                     .Not("DoesNotHaveFood")
                         .If("HasFood", () => { return Inventory.Has(ItemType.FOOD); })
+                    .Not("IsNotRecalculating")
+                        .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
                 .Do("GoToKitchen", () => { return GoTo(kitchen); })
                 .Do("PickupFood", GetFoodFromKitchen)
@@ -263,9 +341,13 @@ public class WaiterScript : MonoBehaviour
         receiveCustomerSequence = new BehaviorTreeBuilder("ReceiveCustomerSequence")
             .Sequence("ReceiveCustomer")
                 .Sequence("ShouldReceiveCustomer")
+                    .If("NoOneOrMeIsTakingCareOfQueue", () => { return blackboard.WaiterTakingCareOfQueue == null || blackboard.WaiterTakingCareOfQueue == this; })
                     .If("AreThereEmptyTables", () => { return blackboard.EmptyTablesCount > 0; })
                     .If("AreThereCustomersInQueue", () => { return blackboard.CustomersInQueueCount > 0; })
+                    .Not("IsNotRecalculating")
+                        .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
+                .Do("SetGoingToQueue", SetGoingToQueue)
                 .Do("GoToQueue", () => { return GoTo(queue); })
                 .Do("SendCustomerToTable", SendCustomerToTable)
                 .End()
@@ -280,6 +362,10 @@ public class WaiterScript : MonoBehaviour
                     .If("IsBillReady", kitchen.IsBillReady)
                     .Not("DoesNotHaveBill")
                         .If("HasBill", () => { return Inventory.Has(ItemType.BILL); })
+                    .Not("DoesNotHaveFood")
+                        .If("HasFood", () => { return Inventory.Has(ItemType.FOOD); })
+                    .Not("IsNotRecalculating")
+                        .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
                 .Do("GoToKitchen", () => { return GoTo(kitchen); })
                 .Do("PickupBill", GetBillFromKitchen)
@@ -291,8 +377,10 @@ public class WaiterScript : MonoBehaviour
             .Sequence("BringBill")
                 .Sequence("ShouldBringBill")
                     .If("HasBill", () => { return Inventory.Has(ItemType.BILL); })
+                    .Not("IsNotRecalculating")
+                        .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
-                .Do("GoToTable", () => { return GoTo(table); })
+                .Do("GoToTable", () => { return GoTo(table.Customer); })
                 .Do("GiveBillToCustomer", GiveBillToCustomer)
                 .Do("GetMoneyFromCustomer", () => { return Inventory.GetFrom(ItemType.MONEY, customer.Inventory); })
                 .Do("CleanTable", () => { return CleanTable(table); })
@@ -305,6 +393,8 @@ public class WaiterScript : MonoBehaviour
             .Sequence("AttendCustomer")
                 .Sequence("ShouldAttendCustomer")
                     .If("AreThereCustomerToAttend", () => { return blackboard.CustomersToAttendCount > 0; })
+                    .Not("IsNotRecalculating")
+                        .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
                 .Do("GetCustomerToAttend", GetCustomerToAttend)
                 .Do("GoToCustomer", () => { return GoTo(customer); })
@@ -323,7 +413,10 @@ public class WaiterScript : MonoBehaviour
                 .Do("GetBillSequence", getBillSequence)
                 .Do("BringBillSequence", bringBillSequence)
                 .Do("AttendCustomerSequence", attendCustomerSequence)
-                .Do("JustWait", () => { return Status.SUCCESS; })
+                .Do("JustWait", () => {
+                    isRecalculatingTree = false;
+                    return Status.SUCCESS;
+                })
                 .End()
             .End();
     }
@@ -332,5 +425,6 @@ public class WaiterScript : MonoBehaviour
     void Update()
     {
         bt.Tick();
+        alreadyGoingSomewhereThisFrame = false;
     }
 }

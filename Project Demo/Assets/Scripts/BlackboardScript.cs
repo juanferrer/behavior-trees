@@ -12,6 +12,7 @@ public class BlackboardScript : MonoBehaviour
     public int CustomersInQueueCount { get; private set; }
     public int CustomersToAttendCount { get; private set; }
     public int EmptyTablesCount { get; private set; }
+    public WaiterScript WaiterTakingCareOfQueue { get; private set; }
 
     public BlackboardScript()
     {
@@ -30,6 +31,11 @@ public class BlackboardScript : MonoBehaviour
         if (CustomersToAttendCount == 0) return null;
         var occupiedTablesWaitingToBeAttended = tables.Where(table => table.IsOccupied && !table.Customer.HasBeenAttended);
         return occupiedTablesWaitingToBeAttended.ElementAt(Random.Range(0, occupiedTablesWaitingToBeAttended.Count()));
+    }
+
+    public void SetTakingCareOfQueue(WaiterScript waiter)
+    {
+        WaiterTakingCareOfQueue = waiter;
     }
 
     private void Start()
