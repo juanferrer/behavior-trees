@@ -297,8 +297,9 @@ public class CookScript : MonoBehaviour
                     .Do("CookIngredients", cookIngredients)
                     .Do("FinishDish", finishDish)
                     .Do("LeaveDishToServe", leaveDishToServe)
-                    .Do("GetAwayFromTheTable", getAwayFromTheTable)
-                    .Do("JustWait", () => {
+                    //.Do("GetAwayFromTheTable", getAwayFromTheTable)
+                    .Do("JustWait", () =>
+                    {
                         isRecalculatingTree = false;
                         return Status.SUCCESS;
                     })

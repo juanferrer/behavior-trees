@@ -154,10 +154,13 @@ public class CustomerScript : MonoBehaviour
     /// <returns></returns>
     private Status DecideFood()
     {
-        Debug.Log("Customer decided what to order");
-        var values = Enum.GetValues(typeof(FoodType));
-        Inventory.order.food = (FoodType)values.GetValue(UnityEngine.Random.Range(0, values.Length));
-        Inventory.order.table = table;
+        if (!Inventory.Has(ItemType.ORDER))
+        {
+            var values = Enum.GetValues(typeof(FoodType));
+            Inventory.order.food = (FoodType)values.GetValue(UnityEngine.Random.Range(0, values.Length));
+            Inventory.order.table = table;
+            Debug.Log("Customer decided what to order");
+        }
         return Status.SUCCESS;
     }
 

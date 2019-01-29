@@ -11,7 +11,6 @@ public class BlackboardScript : MonoBehaviour
     public List<WorktopScript> worktops;
     public List<OvenScript> ovens;
 
-    public int CustomersInQueueCount { get; private set; }
     public int CustomersToAttendCount { get; private set; }
     public int EmptyTablesCount { get; private set; }
     public int EmptyWorktopsCount { get; private set; }
@@ -20,7 +19,6 @@ public class BlackboardScript : MonoBehaviour
 
     public BlackboardScript()
     {
-        CustomersInQueueCount = 0;
     }
 
     public TableScript GetEmptyTable()
@@ -51,7 +49,9 @@ public TableScript GetTableToAttend()
         if (CustomersToAttendCount == 0) return null;
         var occupiedTablesWaitingToBeAttended = tables.Where(table => table.IsOccupied && !table.Customer.HasBeenAttended && !table.HasWaiterEnRoute);
         var tableToAttend = occupiedTablesWaitingToBeAttended.ElementAt(Random.Range(0, occupiedTablesWaitingToBeAttended.Count()));
+        // One customer is being attended, so set the values for that
         tableToAttend.HasWaiterEnRoute = true;
+        CustomersToAttendCount--;
         return tableToAttend;
     }
 
@@ -71,7 +71,6 @@ public TableScript GetTableToAttend()
 
     private void LateUpdate()
     {
-        CustomersInQueueCount = queue.CustomerCount();
         EmptyTablesCount = 0;
         EmptyWorktopsCount = 0;
         EmptyOvensCount = 0;
@@ -79,7 +78,7 @@ public TableScript GetTableToAttend()
         foreach (var table in tables)
         {
             if (!table.IsOccupied && !table.IsAssigned) ++EmptyTablesCount;
-            else if (!table.HasWaiterEnRoute && (!table.Customer?.HasBeenAttended ?? false)) ++CustomersToAttendCount;
+            else if (table.IsOccupied && !table.HasWaiterEnRoute && !table.Customer.HasBeenAttended) ++CustomersToAttendCount;
         }
         foreach (var worktop in worktops)
         {

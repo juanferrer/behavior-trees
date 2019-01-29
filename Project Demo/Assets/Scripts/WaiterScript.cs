@@ -205,8 +205,11 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status GetCustomerToAttend()
     {
-        table = blackboard.GetTableToAttend();
-        customer = table.Customer;
+        if (table == null && customer == null)
+        {
+            table = blackboard.GetTableToAttend();
+            customer = table.Customer;
+        }
         return Status.SUCCESS;
     }
 
@@ -230,7 +233,7 @@ public class WaiterScript : MonoBehaviour
         customer.Attend();
         table.HasWaiterEnRoute = false;
 
-        // Now that the customer has been attended, so prepare for next customer
+        // Now that the customer has been attended, prepare for next customer
         customer = null;
         table = null;
 
@@ -259,8 +262,8 @@ public class WaiterScript : MonoBehaviour
         customer = null;
         table = null;
 
-        // And, if there's no customers left, tell everyone you're not in the queue anymore
-        if (blackboard.WaiterTakingCareOfQueue == this && blackboard.CustomersInQueueCount == 0) blackboard.SetTakingCareOfQueue(null);
+        // And, if there's no customers left (only the one that's being received right now), tell everyone you're not in the queue anymore
+        if (blackboard.WaiterTakingCareOfQueue == this && queue.CustomerCount() == 1) blackboard.SetTakingCareOfQueue(null);
 
         return Status.SUCCESS;
     }
@@ -345,7 +348,7 @@ public class WaiterScript : MonoBehaviour
                 .Sequence("ShouldReceiveCustomer")
                     .If("NoOneOrMeIsTakingCareOfQueue", () => { return blackboard.WaiterTakingCareOfQueue == null || blackboard.WaiterTakingCareOfQueue == this; })
                     .If("AreThereEmptyTables", () => { return blackboard.EmptyTablesCount > 0; })
-                    .If("AreThereCustomersInQueue", () => { return blackboard.CustomersInQueueCount > 0; })
+                    .If("AreThereCustomersInQueue", () => { return queue.CustomerCount() > 0; })
                     .Not("IsNotRecalculating")
                         .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
@@ -394,7 +397,11 @@ public class WaiterScript : MonoBehaviour
         attendCustomerSequence = new BehaviorTreeBuilder("AttendCustomerSequence")
             .Sequence("AttendCustomer")
                 .Sequence("ShouldAttendCustomer")
-                    .If("AreThereCustomerToAttend", () => { return blackboard.CustomersToAttendCount > 0; })
+                    .If("AreThereCustomerToAttendOrAlreadyhaveOne", () =>
+                    {
+                        return blackboard.CustomersToAttendCount > 0 ||
+                        (table!= null && table.HasWaiterEnRoute && !customer.HasBeenAttended);
+                    })
                     .Not("IsNotRecalculating")
                         .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
@@ -415,7 +422,8 @@ public class WaiterScript : MonoBehaviour
                 .Do("GetBillSequence", getBillSequence)
                 .Do("BringBillSequence", bringBillSequence)
                 .Do("AttendCustomerSequence", attendCustomerSequence)
-                .Do("JustWait", () => {
+                .Do("JustWait", () =>
+                {
                     isRecalculatingTree = false;
                     return Status.SUCCESS;
                 })
