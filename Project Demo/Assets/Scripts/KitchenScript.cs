@@ -48,7 +48,9 @@ public class KitchenScript : MonoBehaviour
 
     public Food GetOrder()
     {
-        return orders[0];
+        Food order = orders[0];
+        orders.RemoveAt(0);
+        return order;
     }
 
     public void AddOrder(Food order)

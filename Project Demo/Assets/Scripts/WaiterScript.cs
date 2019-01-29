@@ -205,7 +205,8 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status GetCustomerToAttend()
     {
-        customer = blackboard.GetTableToAttend().Customer;
+        table = blackboard.GetTableToAttend();
+        customer = table.Customer;
         return Status.SUCCESS;
     }
 
@@ -227,6 +228,7 @@ public class WaiterScript : MonoBehaviour
         }
         Inventory.GetFrom(ItemType.ORDER, customer.Inventory);
         customer.Attend();
+        table.HasWaiterEnRoute = false;
 
         // Now that the customer has been attended, so prepare for next customer
         customer = null;
@@ -257,8 +259,8 @@ public class WaiterScript : MonoBehaviour
         customer = null;
         table = null;
 
-        // And tell everyone you're not in the queue anymore
-        if (blackboard.WaiterTakingCareOfQueue == this) blackboard.SetTakingCareOfQueue(null);
+        // And, if there's no customers left, tell everyone you're not in the queue anymore
+        if (blackboard.WaiterTakingCareOfQueue == this && blackboard.CustomersInQueueCount == 0) blackboard.SetTakingCareOfQueue(null);
 
         return Status.SUCCESS;
     }
@@ -418,7 +420,7 @@ public class WaiterScript : MonoBehaviour
                     return Status.SUCCESS;
                 })
                 .End()
-            .End();
+        .End();
     }
 
     // Update is called once per frame

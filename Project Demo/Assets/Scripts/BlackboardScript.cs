@@ -33,22 +33,26 @@ public class BlackboardScript : MonoBehaviour
     public WorktopScript GetEmptyWorktop()
     {
         if (EmptyWorktopsCount == 0) return null;
-        var emptyWorktops = worktops.Where(worktop => !worktop.IsOccupied);
-        return emptyWorktops.ElementAt(Random.Range(0, emptyWorktops.Count()));
+        var emptyWorktops = worktops.Where(worktop => !worktop.IsOccupied && !worktop.IsAssigned);
+        var emptyWorktop = emptyWorktops.ElementAt(Random.Range(0, emptyWorktops.Count()));
+        emptyWorktop.IsAssigned = true;
+        return emptyWorktop;
     }
 
     public OvenScript GetEmptyOven()
     {
         if (EmptyOvensCount == 0) return null;
-        var emptyOvens = ovens.Where(oven => !oven.IsOccupied);
+        var emptyOvens = ovens.Where(oven => !oven.IsOccupied && !oven.IsAssigned);
         return emptyOvens.ElementAt(Random.Range(0, emptyOvens.Count()));
     }
 
 public TableScript GetTableToAttend()
     {
         if (CustomersToAttendCount == 0) return null;
-        var occupiedTablesWaitingToBeAttended = tables.Where(table => table.IsOccupied && !table.Customer.HasBeenAttended);
-        return occupiedTablesWaitingToBeAttended.ElementAt(Random.Range(0, occupiedTablesWaitingToBeAttended.Count()));
+        var occupiedTablesWaitingToBeAttended = tables.Where(table => table.IsOccupied && !table.Customer.HasBeenAttended && !table.HasWaiterEnRoute);
+        var tableToAttend = occupiedTablesWaitingToBeAttended.ElementAt(Random.Range(0, occupiedTablesWaitingToBeAttended.Count()));
+        tableToAttend.HasWaiterEnRoute = true;
+        return tableToAttend;
     }
 
     public void SetTakingCareOfQueue(WaiterScript waiter)
@@ -62,6 +66,7 @@ public TableScript GetTableToAttend()
         queue = gm.queue;
         tables.AddRange(GameObject.FindGameObjectsWithTag("Table").Select(table => table.GetComponent<TableScript>()));
         worktops.AddRange(GameObject.FindGameObjectsWithTag("Worktop").Select(worktop => worktop.GetComponent<WorktopScript>()));
+        ovens.AddRange(GameObject.FindGameObjectsWithTag("Oven").Select(oven => oven.GetComponent<OvenScript>()));
     }
 
     private void LateUpdate()
@@ -69,19 +74,20 @@ public TableScript GetTableToAttend()
         CustomersInQueueCount = queue.CustomerCount();
         EmptyTablesCount = 0;
         EmptyWorktopsCount = 0;
+        EmptyOvensCount = 0;
         CustomersToAttendCount = 0;
         foreach (var table in tables)
         {
             if (!table.IsOccupied && !table.IsAssigned) ++EmptyTablesCount;
-            else if (!table.Customer?.HasBeenAttended ?? false) ++CustomersToAttendCount;
+            else if (!table.HasWaiterEnRoute && (!table.Customer?.HasBeenAttended ?? false)) ++CustomersToAttendCount;
         }
         foreach (var worktop in worktops)
         {
-            if (!worktop.IsOccupied) ++EmptyWorktopsCount;
+            if (!worktop.IsOccupied && !worktop.IsAssigned) ++EmptyWorktopsCount;
         }
         foreach (var oven in ovens)
         {
-            if (!oven.IsOccupied) ++EmptyOvensCount;
+            if (!oven.IsOccupied && !oven.IsAssigned) ++EmptyOvensCount;
         }
     }
 }

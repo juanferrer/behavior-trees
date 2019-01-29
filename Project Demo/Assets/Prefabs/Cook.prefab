@@ -146,7 +146,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1123330659405642}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 28.44, y: 0, z: 2.04}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4862737926531838}
@@ -354,6 +354,10 @@ MonoBehaviour:
     order:
       table: {fileID: 0}
       food: 0
+    ingredients:
+      table: {fileID: 0}
+      food: 0
+      state: 0
 --- !u!120 &120899208714634732
 LineRenderer:
   m_ObjectHideFlags: 1

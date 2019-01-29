@@ -11,6 +11,7 @@ public class Inventory
     public bool bill;
     public bool money;
     public Food order;
+    public Ingredients ingredients;
 
     public Inventory()
     {
@@ -18,6 +19,7 @@ public class Inventory
         bill = false;
         money = false;
         order = new Food();
+        ingredients = new Ingredients();
     }
 
     public bool Has(ItemType type)
@@ -28,6 +30,7 @@ public class Inventory
             case ItemType.BILL: return this.bill;
             case ItemType.MONEY: return this.money;
             case ItemType.ORDER: return this.order.food != FoodType.NONE;
+            case ItemType.INGREDIENTS: return this.ingredients.food != FoodType.NONE;
             default: return false;
         }
     }

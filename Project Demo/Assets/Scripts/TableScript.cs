@@ -8,6 +8,7 @@ public class TableScript : MonoBehaviour
 
 	public bool IsOccupied { get; private set; }
     public bool IsAssigned { get; set; }
+    public bool HasWaiterEnRoute { get; set; }
 
 	public CustomerScript Customer { get; private set; }
 
@@ -32,6 +33,7 @@ public class TableScript : MonoBehaviour
 		IsClean = true;
 		IsOccupied = false;
         IsAssigned = false;
+        HasWaiterEnRoute = false;
 		Customer = null;
 	}
 }

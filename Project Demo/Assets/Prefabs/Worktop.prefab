@@ -71,6 +71,7 @@ GameObject:
   - component: {fileID: 33886203661478976}
   - component: {fileID: 23942180130969226}
   - component: {fileID: 65888177369705530}
+  - component: {fileID: 114724011853068970}
   m_Layer: 0
   m_Name: Worktop
   m_TagString: Worktop
@@ -271,3 +272,14 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114724011853068970
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1889390911450464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b58459b50f4778439501e1f0cc62485, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

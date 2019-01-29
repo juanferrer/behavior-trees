@@ -1,29 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Data;
 
 public class OvenScript : MonoBehaviour {
 
     public bool IsOccupied { get; private set; }
+    public bool IsAssigned { get; set; }
 
-    public OvenScript Cook { get; private set; }
-
-    public void StartUsing(OvenScript cook)
+    public void CookIngredients(Ingredients ingredients, Inventory entity)
     {
-        IsOccupied = true;
-        Cook = cook;
-    }
-
-    public void StopUsing()
-    {
-        IsOccupied = false;
-        Cook = null;
+        var newIngredients = ingredients;
+        newIngredients.state = IngredientsState.COOKED;
+        entity.ingredients = newIngredients;
     }
 
     // Use this for initialization
     void Start()
     {
         IsOccupied = false;
-        Cook = null;
+        IsAssigned = false;
     }
 }

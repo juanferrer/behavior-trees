@@ -21,7 +21,15 @@ namespace Data
         ORDER,
         FOOD,
         BILL,
-        MONEY
+        MONEY,
+        INGREDIENTS
+    }
+
+    public enum IngredientsState
+    {
+        RAW,
+        PREPARED,
+        COOKED
     }
 
     [System.Serializable]
@@ -31,9 +39,17 @@ namespace Data
         public FoodType food;
     }
 
+    [System.Serializable]
+    public struct Ingredients
+    {
+        public TableScript table;
+        public FoodType food;
+        public IngredientsState state;
+    }
+
     static public class Globals
 	{
-		static public int MinWaitTime = 30;
-		static public int MaxWaitTime = 100;
+		static public int MinWaitTime = 60;
+		static public int MaxWaitTime = 200;
 	}
 }

@@ -42,7 +42,7 @@ GameObject:
   - component: {fileID: 114963144041535432}
   - component: {fileID: 195799350625337874}
   m_Layer: 0
-  m_Name: Waiter 1
+  m_Name: Waiter
   m_TagString: Customer
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -149,6 +149,10 @@ MonoBehaviour:
     order:
       table: {fileID: 0}
       food: 0
+    ingredients:
+      table: {fileID: 0}
+      food: 0
+      state: 0
 --- !u!114 &114963144041535432
 MonoBehaviour:
   m_ObjectHideFlags: 1

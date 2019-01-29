@@ -9,7 +9,6 @@ public class GameManagerScript : MonoBehaviour
     public QueueScript queue;
 	public GameObject exit;
     public GameObject customerPrefab;
-    public GameObject storage;
     private new GameObject camera;
 
     private CustomerScript customer;
