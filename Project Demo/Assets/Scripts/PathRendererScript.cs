@@ -15,6 +15,7 @@ public class PathRendererScript : MonoBehaviour {
         line = GetComponent<LineRenderer>();
         agent = GetComponent<NavMeshAgent>();
         agent.SetDestination(transform.position);
+        line.SetPositions(new Vector3[]{ transform.position, transform.position});
     }
 
     private void Update()
