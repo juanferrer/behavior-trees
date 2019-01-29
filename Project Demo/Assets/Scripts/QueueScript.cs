@@ -24,7 +24,7 @@ public class QueueScript : MonoBehaviour
 	public Vector3 GetNextPosition()
 	{
         var nextPosition = gameObject.transform.position;
-        nextPosition.x -= (customerQueue.Count * 3.0f);
+        nextPosition.x -= (customerQueue.Count * 2.0f);
         return nextPosition;
 	}
 

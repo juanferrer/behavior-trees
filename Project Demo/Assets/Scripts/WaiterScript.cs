@@ -39,7 +39,7 @@ public class WaiterScript : MonoBehaviour
         alreadyGoingSomewhereThisFrame = true;
         if (agent.destination != transform.position && (agent.destination - pos).sqrMagnitude > agent.stoppingDistance * 2)
         {
-            agent.ResetPath();
+             agent.ResetPath();
             return Status.FAILURE;
         }
 
@@ -83,7 +83,7 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private bool CloseEnough(MonoBehaviour obj)
     {
-        return (transform.position - obj.transform.position).sqrMagnitude <= (agent.stoppingDistance * 2);
+        return (transform.position - obj.transform.position).sqrMagnitude <= (agent.stoppingDistance * 3);
     }
 
     /// <summary>
@@ -114,6 +114,12 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status GetFoodFromKitchen()
     {
+        // Since the players is doing something else, let's reset everything we can reset here
+        if (table != null) table.HasWaiterEnRoute = false;
+        customer = null;
+        table = null;
+        if (blackboard.WaiterTakingCareOfQueue == this) blackboard.SetTakingCareOfQueue(this);
+
         if (!CloseEnough(kitchen))
         {
             isRecalculatingTree = true;
@@ -161,6 +167,12 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status GetBillFromKitchen()
     {
+        // Reset everything that can be reset, since we might have stopped doing something else
+        if (table != null) table.HasWaiterEnRoute = false;
+        customer = null;
+        table = null;
+        if (blackboard.WaiterTakingCareOfQueue == this) blackboard.SetTakingCareOfQueue(this);
+
         if (!CloseEnough(kitchen))
         {
             isRecalculatingTree = true;
@@ -205,6 +217,8 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status GetCustomerToAttend()
     {
+        if (blackboard.WaiterTakingCareOfQueue == this) blackboard.SetTakingCareOfQueue(this);
+
         if (table == null && customer == null)
         {
             table = blackboard.GetTableToAttend();
@@ -263,13 +277,18 @@ public class WaiterScript : MonoBehaviour
         table = null;
 
         // And, if there's no customers left (only the one that's being received right now), tell everyone you're not in the queue anymore
-        if (blackboard.WaiterTakingCareOfQueue == this && queue.CustomerCount() == 1) blackboard.SetTakingCareOfQueue(null);
+        if (blackboard.WaiterTakingCareOfQueue == this && queue.CustomerCount() == 0) blackboard.SetTakingCareOfQueue(null);
 
         return Status.SUCCESS;
     }
 
     private Status SetGoingToQueue()
     {
+        // Reset everything that can be reset, since we might have stopped doing something else
+        if (table != null) table.HasWaiterEnRoute = false;
+        customer = null;
+        table = null;
+
         blackboard.SetTakingCareOfQueue(this);
         return Status.SUCCESS;
     }
@@ -417,10 +436,10 @@ public class WaiterScript : MonoBehaviour
             .Selector("Selector")
                 .Do("BringOrderSequence", bringOrderSequence)
                 .Do("BringFoodToTableSequence", bringFoodToTableSequence)
+                .Do("BringBillSequence", bringBillSequence)
                 .Do("GetFoodSequence", getFoodSequence)
                 .Do("ReceiveCustomerSequence", receiveCustomerSequence)
                 .Do("GetBillSequence", getBillSequence)
-                .Do("BringBillSequence", bringBillSequence)
                 .Do("AttendCustomerSequence", attendCustomerSequence)
                 .Do("JustWait", () =>
                 {

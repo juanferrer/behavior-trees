@@ -85,7 +85,7 @@ public class CookScript : MonoBehaviour
     /// <returns></returns>
     private bool CloseEnough(MonoBehaviour obj)
     {
-        return (transform.position - obj.transform.position).sqrMagnitude <= (agent.stoppingDistance * 2);
+        return (transform.position - obj.transform.position).sqrMagnitude <= (agent.stoppingDistance * 3);
     }
 
     private Status GetOrderFromKitchen()
