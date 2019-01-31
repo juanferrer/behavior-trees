@@ -39,7 +39,7 @@ public class CookScript : MonoBehaviour
             return Status.FAILURE;
         }
         alreadyGoingSomewhereThisFrame = true;
-        if (agent.destination != transform.position && (agent.destination - pos).sqrMagnitude > agent.stoppingDistance * 2)
+        if (agent.destination != transform.position && !CloseEnough(pos, agent.destination))
         {
             agent.ResetPath();
             return Status.FAILURE;
@@ -83,14 +83,14 @@ public class CookScript : MonoBehaviour
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    private bool CloseEnough(MonoBehaviour obj)
+    private bool CloseEnough(Vector3 obj1, Vector3 obj2)
     {
-        return (transform.position - obj.transform.position).sqrMagnitude <= (agent.stoppingDistance * 3);
+        return (obj1 - obj2).sqrMagnitude <= (agent.stoppingDistance * agent.stoppingDistance) + 1.0f;
     }
 
     private Status GetOrderFromKitchen()
     {
-        if (!CloseEnough(kitchen))
+        if (!CloseEnough(transform.position, kitchen.transform.position))
         {
             isRecalculatingTree = true;
             return Status.FAILURE;
@@ -102,7 +102,7 @@ public class CookScript : MonoBehaviour
 
     private Status GetIngredientsFromStorage()
     {
-        if (!CloseEnough(storage))
+        if (!CloseEnough(transform.position, storage.transform.position))
         {
             isRecalculatingTree = true;
             return Status.FAILURE;
@@ -125,7 +125,7 @@ public class CookScript : MonoBehaviour
 
     private Status PrepareIngredientsInWorktop()
     {
-        if (!CloseEnough(worktop))
+        if (!CloseEnough(transform.position, worktop.transform.position))
         {
             isRecalculatingTree = true;
             return Status.FAILURE;
@@ -150,7 +150,7 @@ public class CookScript : MonoBehaviour
 
     private Status CookIngredients()
     {
-        if (!CloseEnough(oven))
+        if (!CloseEnough(transform.position, oven.transform.position))
         {
             isRecalculatingTree = true;
             return Status.FAILURE;
@@ -164,7 +164,7 @@ public class CookScript : MonoBehaviour
 
     private Status PrepareDish()
     {
-        if (!CloseEnough(worktop))
+        if (!CloseEnough(transform.position, worktop.transform.position))
         {
             isRecalculatingTree = true;
             return Status.FAILURE;
@@ -179,7 +179,7 @@ public class CookScript : MonoBehaviour
 
     private Status LeaveDishInKitchen()
     {
-        if (!CloseEnough(kitchen))
+        if (!CloseEnough(transform.position, kitchen.transform.position))
         {
             isRecalculatingTree = true;
             return Status.FAILURE;

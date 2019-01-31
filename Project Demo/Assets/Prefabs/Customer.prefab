@@ -151,6 +151,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2d799c620f4e8547a6ce2e2c0bf1ca1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Inventory:
+    food:
+      table: {fileID: 0}
+      food: 0
+    bill: 0
+    money: 0
+    order:
+      table: {fileID: 0}
+      food: 0
+    ingredients:
+      table: {fileID: 0}
+      food: 0
+      state: 0
 --- !u!120 &120379240205735132
 LineRenderer:
   m_ObjectHideFlags: 1
@@ -263,4 +276,4 @@ NavMeshAgent:
   m_Height: 2
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
+  m_ObstacleAvoidanceType: 0
