@@ -9,7 +9,7 @@ public class GameManagerScript : MonoBehaviour
     public QueueScript queue;
 	public GameObject exit;
     public GameObject customerPrefab;
-    private new GameObject camera;
+    public new GameObject cam;
 
     private CustomerScript customer;
 
@@ -22,10 +22,9 @@ public class GameManagerScript : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-        camera = GameObject.FindGameObjectWithTag("MainCamera");
         queue = GameObject.FindGameObjectWithTag("Queue").GetComponent<QueueScript>();
         kitchen = GameObject.FindGameObjectWithTag("Kitchen").GetComponent<KitchenScript>();
-        camera = GameObject.FindGameObjectWithTag("MainCamera");
+        cam = GameObject.FindGameObjectWithTag("MainCamera");
         blackboard = GetComponent<BlackboardScript>();
         SpawnCustomer();
     }
@@ -44,16 +43,16 @@ public class GameManagerScript : MonoBehaviour
 
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         {
-            if (camera.transform.position.x < LeftMostCamPos)
+            if (cam.transform.position.x < LeftMostCamPos)
             {
-                camera.transform.Translate(-CamSpeed * Time.deltaTime, 0.0f, 0.0f);
+                cam.transform.Translate(-CamSpeed * Time.deltaTime, 0.0f, 0.0f);
             }
         }
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         {
-            if (camera.transform.position.x > RightMostCamPos)
+            if (cam.transform.position.x > RightMostCamPos)
             {
-                camera.transform.Translate(CamSpeed * Time.deltaTime, 0.0f, 0.0f);
+                cam.transform.Translate(CamSpeed * Time.deltaTime, 0.0f, 0.0f);
             }
         }
 
