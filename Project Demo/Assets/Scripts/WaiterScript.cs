@@ -86,8 +86,16 @@ public class WaiterScript : MonoBehaviour
                 table = null;
             }
         }
-
         return GoTo(pos);
+    }
+
+    private Status ShowThought(ThoughtType thoughtType)
+    {
+        if (!thought.IsShowing)
+        {
+            thought.Show(thoughtType);
+        }
+        return Status.SUCCESS;
     }
 
     /// <summary>
@@ -341,6 +349,7 @@ public class WaiterScript : MonoBehaviour
                     .Not("IsNotRecalculating")
                         .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
+                .Do("ShowThought", () => { return ShowThought(ThoughtType.ORDER); })
                 .Do("GoToKitchen", () => { return GoTo(kitchen); })
                 .Do("GiveOrderToKitchen", GiveOrderToKitchen)
                 .End()
@@ -354,6 +363,7 @@ public class WaiterScript : MonoBehaviour
                     .Not("IsNotRecalculating")
                         .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
+                .Do("ShowThought", () => { return ShowThought(ThoughtType.FOOD); })
                 .Do("GoToTable", () => { return GoTo(Inventory.food.table.Customer); })
                 .Do("GiveFoodToCustomer", ServeFood)
                 .End()
@@ -369,6 +379,7 @@ public class WaiterScript : MonoBehaviour
                     .Not("IsNotRecalculating")
                         .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
+                .Do("ShowThought", () => { return ShowThought(ThoughtType.FOOD); })
                 .Do("GoToKitchen", () => { return GoTo(kitchen); })
                 .Do("PickupFood", GetFoodFromKitchen)
                 .End()
@@ -386,6 +397,7 @@ public class WaiterScript : MonoBehaviour
                     .Not("IsNotRecalculating")
                         .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
+                .Do("ShowThought", () => { return ShowThought(ThoughtType.QUEUE); })
                 .Do("SetGoingToQueue", SetGoingToQueue)
                 .Do("GoToQueue", () => { return GoTo(queue); })
                 .Do("SendCustomerToTable", SendCustomerToTable)
@@ -406,6 +418,7 @@ public class WaiterScript : MonoBehaviour
                     .Not("IsNotRecalculating")
                         .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
+                .Do("ShowThought", () => { return ShowThought(ThoughtType.BILL); })
                 .Do("GoToKitchen", () => { return GoTo(kitchen); })
                 .Do("PickupBill", GetBillFromKitchen)
                 .End()
@@ -419,6 +432,7 @@ public class WaiterScript : MonoBehaviour
                     .Not("IsNotRecalculating")
                         .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
+                .Do("ShowThought", () => { return ShowThought(ThoughtType.BILL); })
                 .Do("GoToTable", () => { return GoTo(Inventory.bill.table.Customer); })
                 .Do("GiveBillToCustomer", GiveBillToCustomer)
                 .Do("GetMoneyFromCustomer", () => { return Inventory.GetFrom(ItemType.MONEY, customer.Inventory); })
@@ -439,6 +453,7 @@ public class WaiterScript : MonoBehaviour
                     .Not("IsNotRecalculating")
                         .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
+                .Do("ShowThought", () => { return ShowThought(ThoughtType.CUSTOMER); })
                 .Do("GetCustomerToAttend", GetCustomerToAttend)
                 .Do("GoToCustomer", () => { return GoTo(customer); })
                 .Do("Attend", AttendCustomer)

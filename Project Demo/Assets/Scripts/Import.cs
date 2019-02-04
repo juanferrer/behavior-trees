@@ -38,6 +38,8 @@ namespace Data
         SATISFIED,
         UNSATISFIED,
         // Waiter
+        QUEUE,
+        CUSTOMER,
         ORDER,
         FOOD,
         BILL,

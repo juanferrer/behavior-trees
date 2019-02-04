@@ -9,6 +9,7 @@ public class ThoughtScript : MonoBehaviour {
     GameObject cam;
     SpriteRenderer renderer;
     float showTimer;
+    public bool IsShowing { get; private set;}
 
 	// Use this for initialization
 	void Start ()
@@ -17,6 +18,7 @@ public class ThoughtScript : MonoBehaviour {
         cam = gm.cam;
         renderer = GetComponent<SpriteRenderer>();
         showTimer = 0;
+        IsShowing = false;
     }
 	
 	// Update is called once per frame
@@ -29,13 +31,15 @@ public class ThoughtScript : MonoBehaviour {
             if (showTimer < 0)
             {
                 renderer.enabled = false;
+                IsShowing = false;
             }
         }
     }
 
     public void Show(ThoughtType thought)
     {
-        showTimer = 5;
+        showTimer = 2;
         renderer.enabled = true;
+        IsShowing = true;
     }
 }

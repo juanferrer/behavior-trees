@@ -1985,11 +1985,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 11
       objectReference: {fileID: 0}
-    - target: {fileID: 212896383077920808, guid: d5bf4eaf935a32d4eae99389124c632b,
-        type: 2}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d5bf4eaf935a32d4eae99389124c632b, type: 2}
   m_IsPrefabAsset: 0
@@ -2099,6 +2094,11 @@ Prefab:
     - target: {fileID: 1123330659405642, guid: d5bf4eaf935a32d4eae99389124c632b, type: 2}
       propertyPath: m_Name
       value: Cook (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 120899208714634732, guid: d5bf4eaf935a32d4eae99389124c632b,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d5bf4eaf935a32d4eae99389124c632b, type: 2}
