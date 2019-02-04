@@ -37,6 +37,7 @@ namespace Data
         // Customer
         SATISFIED,
         UNSATISFIED,
+        MENU,
         // Waiter
         QUEUE,
         CUSTOMER,

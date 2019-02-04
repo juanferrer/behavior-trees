@@ -10,6 +10,7 @@ public class GameManagerScript : MonoBehaviour
 	public GameObject exit;
     public GameObject customerPrefab;
     public new GameObject cam;
+    public List<Sprite> ThoughtSprites;
 
     private CustomerScript customer;
 
