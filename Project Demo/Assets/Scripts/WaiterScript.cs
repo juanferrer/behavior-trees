@@ -20,6 +20,7 @@ public class WaiterScript : MonoBehaviour
     TableScript table;                      // Usually empty. Set when going to a certain table
     CustomerScript customer;                // Usually empty. Set when interacting with a customer
     BlackboardScript blackboard;            // Global information
+    ThoughtScript thought;                  // Thought
     public Inventory Inventory;             // Inventory of entity
 
     private bool isRecalculatingTree = false;
@@ -327,6 +328,7 @@ public class WaiterScript : MonoBehaviour
         kitchen = gm.kitchen;
         queue = gm.queue;
         blackboard = gm.blackboard;
+        thought = GetComponentInChildren<ThoughtScript>();
         agent = GetComponent<NavMeshAgent>();
         agent.isStopped = true;
         Inventory = new Inventory();

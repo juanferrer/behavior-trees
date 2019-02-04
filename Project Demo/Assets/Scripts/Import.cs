@@ -34,11 +34,14 @@ namespace Data
 
     public enum ThoughtType
     {
+        // Customer
         SATISFIED,
         UNSATISFIED,
+        // Waiter
         ORDER,
         FOOD,
         BILL,
+        // Cook
         INGREDIENTS,
         PREPARE,
         COOK,

@@ -76,7 +76,7 @@ Material:
     - _MKEditorShowSketchBehavior: 0
     - _MKEditorShowSpecularBehavior: 1
     - _MKEditorShowTranslucentBehavior: 0
-    - _Metallic: 0.452
+    - _Metallic: 0.706
     - _Mode: 0
     - _OcclusionStrength: 1
     - _OutlineSize: 0
