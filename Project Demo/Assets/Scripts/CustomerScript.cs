@@ -82,6 +82,16 @@ public class CustomerScript : MonoBehaviour
 	}
 
     /// <summary>
+    /// Check if customer is close enough to object
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    private bool CloseEnough(Vector3 obj1, Vector3 obj2)
+    {
+        return (obj1 - obj2).sqrMagnitude <= (agent.stoppingDistance * agent.stoppingDistance) + 2.0f;
+    }
+
+    /// <summary>
     /// Go to queue and start queueing
     /// </summary>
     /// <returns></returns>
@@ -120,7 +130,7 @@ public class CustomerScript : MonoBehaviour
         IsWaiting = false;
         queue.LeaveQueue(this);
         var status = GoTo(exit.transform.position);
-        if (status == Status.SUCCESS)
+        if (status == Status.SUCCESS || CloseEnough(transform.position, exit.transform.position))
         {
             Debug.Log("Customer left");
             //gameObject.SetActive(false);

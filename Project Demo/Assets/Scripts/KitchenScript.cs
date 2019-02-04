@@ -7,14 +7,14 @@ public class KitchenScript : MonoBehaviour
 {
     private List<Food> foodPrepared;
     private List<Food> orders;
-    private List<TableScript> bills;
+    private List<Food> bills;
 
 	// Use this for initialization
 	void Start ()
     {
         foodPrepared = new List<Food>();
         orders = new List<Food>();
-        bills = new List<TableScript>();
+        bills = new List<Food>();
 	}
 	
 	// Update is called once per frame
@@ -31,7 +31,7 @@ public class KitchenScript : MonoBehaviour
     {
         Food plate = foodPrepared[0];
         foodPrepared.RemoveAt(0);
-        bills.Add(plate.table);
+        bills.Add(plate);
         return plate;
     }
 
@@ -63,9 +63,9 @@ public class KitchenScript : MonoBehaviour
         return bills.Count > 0;
     }
 
-    public TableScript GetBill()
+    public Food GetBill()
     {
-        TableScript bill = bills[0];
+        Food bill = bills[0];
         bills.RemoveAt(0);
         return bill;
     }

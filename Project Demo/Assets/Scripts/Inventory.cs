@@ -8,7 +8,7 @@ using FluentBehaviorTree;
 public class Inventory
 {
     public Food food;
-    public bool bill;
+    public Food bill;
     public bool money;
     public Food order;
     public Ingredients ingredients;
@@ -16,7 +16,7 @@ public class Inventory
     public Inventory()
     {
         food = new Food();
-        bill = false;
+        bill = new Food();
         money = false;
         order = new Food();
         ingredients = new Ingredients();
@@ -27,7 +27,7 @@ public class Inventory
         switch (type)
         {
             case ItemType.FOOD: return this.food.food != FoodType.NONE;
-            case ItemType.BILL: return this.bill;
+            case ItemType.BILL: return this.bill.table != null;
             case ItemType.MONEY: return this.money;
             case ItemType.ORDER: return this.order.food != FoodType.NONE;
             case ItemType.INGREDIENTS: return this.ingredients.food != FoodType.NONE;
@@ -51,7 +51,7 @@ public class Inventory
                 break;
             case ItemType.BILL:
                 entity.bill = this.bill;
-                this.bill = false;
+                this.bill = new Food();
                 break;
             case ItemType.MONEY:
                 entity.money = this.money;

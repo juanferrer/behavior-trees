@@ -98,7 +98,7 @@ NavMeshSettings:
   m_BuildSettings:
     serializedVersion: 2
     agentTypeID: 0
-    agentRadius: 0.75
+    agentRadius: 0.3
     agentHeight: 2
     agentSlope: 45
     agentClimb: 0.75
@@ -106,7 +106,7 @@ NavMeshSettings:
     maxJumpAcrossDistance: 0
     minRegionArea: 2
     manualCellSize: 0
-    cellSize: 0.25
+    cellSize: 0.1
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
@@ -181,7 +181,7 @@ GameObject:
   m_TagString: Kitchen
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &101567358
 Transform:
@@ -1381,6 +1381,10 @@ Prefab:
       propertyPath: m_Name
       value: Cook (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 1123330659405642, guid: d5bf4eaf935a32d4eae99389124c632b, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d5bf4eaf935a32d4eae99389124c632b, type: 2}
   m_IsPrefabAsset: 0
@@ -1527,7 +1531,7 @@ GameObject:
   m_TagString: Storage
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &1262583949
 Transform:
@@ -2099,6 +2103,10 @@ Prefab:
     - target: {fileID: 1123330659405642, guid: d5bf4eaf935a32d4eae99389124c632b, type: 2}
       propertyPath: m_Name
       value: Cook (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1123330659405642, guid: d5bf4eaf935a32d4eae99389124c632b, type: 2}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d5bf4eaf935a32d4eae99389124c632b, type: 2}

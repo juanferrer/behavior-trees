@@ -39,7 +39,7 @@ public class CookScript : MonoBehaviour
             return Status.FAILURE;
         }
         alreadyGoingSomewhereThisFrame = true;
-        if (agent.destination != transform.position && !CloseEnough(pos, agent.destination))
+        if (agent.destination != transform.position && !CloseEnough(pos, agent.destination) && !CloseEnough(transform.position, agent.destination))
         {
             agent.ResetPath();
             return Status.FAILURE;
@@ -79,13 +79,13 @@ public class CookScript : MonoBehaviour
     }
 
     /// <summary>
-    /// Check if waiter is close enough to object
+    /// Check if cook is close enough to object
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
     private bool CloseEnough(Vector3 obj1, Vector3 obj2)
     {
-        return (obj1 - obj2).sqrMagnitude <= (agent.stoppingDistance * agent.stoppingDistance) + 1.0f;
+        return (obj1 - obj2).sqrMagnitude <= (agent.stoppingDistance * agent.stoppingDistance) + 2.0f;
     }
 
     private Status GetOrderFromKitchen()
@@ -291,12 +291,12 @@ public class CookScript : MonoBehaviour
         bt = new BehaviorTreeBuilder("CookBT")
             .RepeatUntilFail("Loop")
                 .Selector("Selector")
-                    .Do("GetOrder", getOrderSequence)
-                    .Do("GrabIngredients", grabIngredients)
-                    .Do("PrepareIngredients", prepareIngredients)
-                    .Do("CookIngredients", cookIngredients)
-                    .Do("FinishDish", finishDish)
                     .Do("LeaveDishToServe", leaveDishToServe)
+                    .Do("FinishDish", finishDish)
+                    .Do("GetOrder", getOrderSequence)
+                    .Do("CookIngredients", cookIngredients)
+                    .Do("PrepareIngredients", prepareIngredients)
+                    .Do("GrabIngredients", grabIngredients)
                     //.Do("GetAwayFromTheTable", getAwayFromTheTable)
                     .Do("JustWait", () =>
                     {
