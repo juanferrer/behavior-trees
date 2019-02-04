@@ -155,7 +155,9 @@ MonoBehaviour:
     food:
       table: {fileID: 0}
       food: 0
-    bill: 0
+    bill:
+      table: {fileID: 0}
+      food: 0
     money: 0
     order:
       table: {fileID: 0}
@@ -179,7 +181,7 @@ LineRenderer:
   m_ReflectionProbeUsage: 0
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: fc0c97c24948dbb46af185d005777f46, type: 2}
+  - {fileID: 2100000, guid: 5edde68fe46f69e48b566516ea718fe8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
