@@ -32,6 +32,18 @@ namespace Data
         COOKED
     }
 
+    public enum ThoughtType
+    {
+        SATISFIED,
+        UNSATISFIED,
+        ORDER,
+        FOOD,
+        BILL,
+        INGREDIENTS,
+        PREPARE,
+        COOK,
+    }
+
     [System.Serializable]
     public struct Food
     {
