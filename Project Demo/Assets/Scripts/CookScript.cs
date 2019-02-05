@@ -21,6 +21,7 @@ public class CookScript : MonoBehaviour
     StorageScript storage;                  // Storage
     WorktopScript worktop;                  // Worktop
     OvenScript oven;                        // Oven
+    ThoughtScript thought;                  // Thought
     BlackboardScript blackboard;            // Global information
     public Inventory Inventory;             // Inventory of entity
 
@@ -76,6 +77,15 @@ public class CookScript : MonoBehaviour
         Vector3 pos = obj.transform.position;
 
         return GoTo(pos);
+    }
+
+    private Status ShowThought(ThoughtType thoughtType)
+    {
+        if (!thought.IsShowing)
+        {
+            thought.Show(thoughtType);
+        }
+        return Status.SUCCESS;
     }
 
     /// <summary>
@@ -198,6 +208,7 @@ public class CookScript : MonoBehaviour
         kitchen = gm.kitchen;
         agent = GetComponent<NavMeshAgent>();
         agent.isStopped = true;
+        thought = GetComponentInChildren<ThoughtScript>();
         Inventory = new Inventory();
         blackboard = gm.blackboard;
         storage = GameObject.FindGameObjectWithTag("Storage").GetComponent<StorageScript>();
@@ -211,6 +222,7 @@ public class CookScript : MonoBehaviour
                             .If("HasIngredients", () => { return Inventory.Has(ItemType.INGREDIENTS); })
                         .If("ThereAreOrdersPending", () => { return kitchen.IsOrderPending(); })
                         .End()
+                    .Do("ShowThought", () => { return ShowThought(ThoughtType.ORDER); })
                     .Do("GoToKitchen", () => { return GoTo(kitchen); })
                     .Do("GetOrderFromKitchen", GetOrderFromKitchen)
                 .End()
@@ -225,6 +237,7 @@ public class CookScript : MonoBehaviour
                         .Not("IsNotRecalculating")
                             .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
+                .Do("ShowThought", () => { return ShowThought(ThoughtType.INGREDIENTS); })
                 .Do("GoToStorage", () => { return GoTo(storage); })
                 .Do("GrabRequiredIngredient", GetIngredientsFromStorage)
                 .End()
@@ -238,6 +251,7 @@ public class CookScript : MonoBehaviour
                     .Not("IsNotRecalculating")
                         .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
+                .Do("ShowThought", () => { return ShowThought(ThoughtType.PREPARE); })
                 .Do("GetEmptyWorktop", GetEmptyWorktop)
                 .Do("GoToWorktop", () => { return GoTo(worktop); })
                 .Do("PrepareIngredients", PrepareIngredientsInWorktop)
@@ -252,6 +266,7 @@ public class CookScript : MonoBehaviour
                     .Not("IsNotRecalculating")
                             .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
+                .Do("ShowThought", () => { return ShowThought(ThoughtType.COOK); })
                 .Do("GetEmptyOven", GetEmptyOven)
                 .Do("GoToOven", () => { return GoTo(oven); })
                 .Do("CookIngredients", CookIngredients)
@@ -266,6 +281,7 @@ public class CookScript : MonoBehaviour
                     .Not("IsNotRecalculating")
                             .If("Recalculating", () => { return isRecalculatingTree; })
                     .End()
+                .Do("ShowThought", () => { return ShowThought(ThoughtType.FOOD); })
                 .Do("GetEmptyWorktop", GetEmptyWorktop)
                 .Do("GoToWorktop", () => { return GoTo(worktop); })
                 .Do("PrepareDish", PrepareDish)
@@ -277,6 +293,7 @@ public class CookScript : MonoBehaviour
                 .Sequence("HasFinishedDish")
                     .If("HasFood", () => { return Inventory.Has(ItemType.FOOD); })
                     .End()
+                .Do("ShowThought", () => { return ShowThought(ThoughtType.FOOD); })
                 .Do("GoToKitchen", () => { return GoTo(kitchen); })
                 .Do("LeaveDishInKitchen", LeaveDishInKitchen)
                 .End()

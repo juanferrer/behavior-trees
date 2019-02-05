@@ -21,6 +21,7 @@ public class CustomerScript : MonoBehaviour
     KitchenScript kitchen;                  // Kitchen
     TableScript table;                      // Usually empty. Set when going to a certain table
     GameObject exit;                        // Exit
+    ThoughtScript thought;                  // Thought
     BlackboardScript blackboard;            // Global information
     public Inventory Inventory;             // Inventory of entity
 
@@ -80,6 +81,15 @@ public class CustomerScript : MonoBehaviour
 
 		return GoTo(pos);
 	}
+
+    private Status ShowThought(ThoughtType thoughtType)
+    {
+        if (!thought.IsShowing)
+        {
+            thought.Show(thoughtType);
+        }
+        return Status.SUCCESS;
+    }
 
     /// <summary>
     /// Check if customer is close enough to object
@@ -237,6 +247,7 @@ public class CustomerScript : MonoBehaviour
         exit = gm.exit;
         agent = GetComponent<NavMeshAgent>();
         agent.isStopped = true;
+        thought = GetComponentInChildren<ThoughtScript>();
         Inventory = new Inventory();
         Inventory.money = true;
         timeEating = (ulong)UnityEngine.Random.Range(3000, 5000);
@@ -260,6 +271,7 @@ public class CustomerScript : MonoBehaviour
                     .Not("HasNotBeenReceived")
                         .If("HasBeenReceived", () => { return HasBeenReceived; })
                     .End()
+                .Do("ShowThought", () => { return ShowThought(ThoughtType.QUEUE); })
                 .Do("GoToQueue", () => { return GoTo(queue.GetNextPosition()); })
                 .Do("StartQueue", StartQueue)
                 .End()
@@ -275,6 +287,7 @@ public class CustomerScript : MonoBehaviour
                 .Sequence("ReadyToBeReceived")
                     .If("IsBeingReceived", () => { return isBeingReceived; })
                     .End()
+                .Do("ShowThought", () => { return ShowThought(ThoughtType.QUEUE); })
                 .Do("GoToTable", () => { return GoTo(table); })
                 .Do("SitInTable", SitInTable)
                 .End()
@@ -289,6 +302,7 @@ public class CustomerScript : MonoBehaviour
                     .Not("DoesNotHaveOrder")
                         .If("HasOrder", () => { return Inventory.Has(ItemType.ORDER); })
                     .End()
+                .Do("ShowThought", () => { return ShowThought(ThoughtType.MENU); })
                 .Do("DecideFood", DecideFood)
                 .End()
             .End();
@@ -316,6 +330,7 @@ public class CustomerScript : MonoBehaviour
                         .If("HasFinishedEating", () => { return HasFinishedEating; })
                     .End()
                 .Do("LeaveCheck", leaveCheck)
+                .Do("ShowThought", () => { return ShowThought(ThoughtType.FOOD); })
                 .If("HasFood", () => { return HasReceivedFood; })
                 .Wait("Eat", timeEating)
                     .Do("Eat", Eat)
@@ -329,6 +344,7 @@ public class CustomerScript : MonoBehaviour
                     .If("HasFinishedEating", () => { return HasFinishedEating; })
                     .End()
                 .Do("LeaveCheck", leaveCheck)
+                .Do("ShowThought", () => { return ShowThought(ThoughtType.BILL); })
                 .If("HasReceivedBill", () => { return HasReceivedBill; })
                 .Do("PayBill", PayBill)
                 .Do("Leave", Leave)
