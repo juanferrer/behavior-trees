@@ -19,6 +19,7 @@ public class GameManagerScript : MonoBehaviour
     public float CamSpeed;
     public BlackboardScript blackboard;
     public float CustomerSpawnCounter;
+    public GameObject CreditsText;
 
 	// Use this for initialization
 	void Start ()
@@ -40,6 +41,11 @@ public class GameManagerScript : MonoBehaviour
     public void ExitApplication()
     {
         Application.Quit();
+    }
+
+    public void ToggleCredits()
+    {
+        CreditsText.SetActive(!CreditsText.activeSelf);
     }
 	
 	// Update is called once per frame
