@@ -30,11 +30,16 @@ public class GameManagerScript : MonoBehaviour
         SpawnCustomer();
     }
 
-    void SpawnCustomer()
+    public void SpawnCustomer()
     {
         var newPos = new Vector3(Random.Range(0.0f, -30.0f), 0.0f, Random.Range(-10.0f, 10.0f));
         GameObject.Instantiate(customerPrefab, newPos, Quaternion.identity);
         CustomerSpawnCounter = Random.Range(2f, 20f);
+    }
+
+    public void ExitApplication()
+    {
+        Application.Quit();
     }
 	
 	// Update is called once per frame
@@ -57,16 +62,14 @@ public class GameManagerScript : MonoBehaviour
             }
         }
 
-        // DEBUG
         if (Input.GetKeyDown(KeyCode.Space) || CustomerSpawnCounter <= 0)
         {
             SpawnCustomer();
         }
 
-        if (Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
-            Debug.Log("Preparing food");
-            kitchen.AddFoodPrepared(kitchen.GetOrder()); 
+            ExitApplication();
         }
     }
 }
