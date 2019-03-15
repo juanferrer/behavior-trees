@@ -27,6 +27,15 @@ public class TableScript : MonoBehaviour
         IsAssigned = false;
     }
 
+    public void LeaveTable(CustomerScript customer)
+    {
+        if (Customer == customer)
+        {
+            IsOccupied = false;
+            IsAssigned = false;
+        }
+    }
+
     // Use this for initialization
     void Start()
 	{

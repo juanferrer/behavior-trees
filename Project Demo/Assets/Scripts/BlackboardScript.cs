@@ -60,6 +60,14 @@ public TableScript GetTableToAttend()
         WaiterTakingCareOfQueue = waiter;
     }
 
+    public void StopTakingCareOfQueue(WaiterScript waiter)
+    {
+        if (WaiterTakingCareOfQueue == waiter)
+        {
+            WaiterTakingCareOfQueue = null;
+        }
+    }
+
     private void Start()
     {
         gm = GetComponent<GameManagerScript>();

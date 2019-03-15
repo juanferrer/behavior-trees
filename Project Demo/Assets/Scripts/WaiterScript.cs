@@ -73,7 +73,7 @@ public class WaiterScript : MonoBehaviour
     private Status GoTo(MonoBehaviour obj)
     {
         Vector3 pos = obj.transform.position;
-        if (obj.tag != "Queue" && blackboard.WaiterTakingCareOfQueue == this) blackboard.SetTakingCareOfQueue(null);
+        if (obj.tag != "Queue" && blackboard.WaiterTakingCareOfQueue == this) blackboard.StopTakingCareOfQueue(this);
         if (obj.tag != "Customer" && obj.tag != "Table")
         {
             if (customer != null)
@@ -84,6 +84,18 @@ public class WaiterScript : MonoBehaviour
             {
                 table.HasWaiterEnRoute = false;
                 table = null;
+            }
+        }
+
+        if (obj.tag == "Customer")
+        {
+            var c = obj.GetComponent<CustomerScript>();
+            if (!c.IsWaiting || c.IsLeaving)
+            {
+                customer = null;
+                table = null;
+                table.HasWaiterEnRoute = false;
+                return Status.FAILURE;
             }
         }
         return GoTo(pos);
@@ -140,7 +152,7 @@ public class WaiterScript : MonoBehaviour
         if (table != null) table.HasWaiterEnRoute = false;
         customer = null;
         table = null;
-        if (blackboard.WaiterTakingCareOfQueue == this) blackboard.SetTakingCareOfQueue(null);
+        if (blackboard.WaiterTakingCareOfQueue == this) blackboard.StopTakingCareOfQueue(this);
 
         if (!CloseEnough(transform.position, kitchen.transform.position))
         {
@@ -193,7 +205,7 @@ public class WaiterScript : MonoBehaviour
         if (table != null) table.HasWaiterEnRoute = false;
         customer = null;
         table = null;
-        if (blackboard.WaiterTakingCareOfQueue == this) blackboard.SetTakingCareOfQueue(null);
+        if (blackboard.WaiterTakingCareOfQueue == this) blackboard.StopTakingCareOfQueue(this);
 
         if (!CloseEnough(transform.position, kitchen.transform.position))
         {
@@ -239,7 +251,7 @@ public class WaiterScript : MonoBehaviour
     /// <returns></returns>
     private Status GetCustomerToAttend()
     {
-        if (blackboard.WaiterTakingCareOfQueue == this) blackboard.SetTakingCareOfQueue(null);
+        if (blackboard.WaiterTakingCareOfQueue == this) blackboard.StopTakingCareOfQueue(this);
 
         if (table == null && customer == null)
         {
@@ -299,7 +311,7 @@ public class WaiterScript : MonoBehaviour
         table = null;
 
         // And, if there's no customers left (only the one that's being received right now), tell everyone you're not in the queue anymore
-        if (blackboard.WaiterTakingCareOfQueue == this && queue.CustomerCount() == 0) blackboard.SetTakingCareOfQueue(null);
+        if (blackboard.WaiterTakingCareOfQueue == this && queue.CustomerCount() == 0) blackboard.StopTakingCareOfQueue(this);
 
         return Status.SUCCESS;
     }

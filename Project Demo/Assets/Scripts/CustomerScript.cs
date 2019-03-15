@@ -39,6 +39,7 @@ public class CustomerScript : MonoBehaviour
     public bool HasFinishedEating { get; private set; } = false;
     public bool HasReceivedBill { get; private set; } = false;
     public bool IsWaiting { get; private set; } = true;
+    public bool IsLeaving { get; private set; } = false;
 
 
     /// <summary>
@@ -48,6 +49,7 @@ public class CustomerScript : MonoBehaviour
     /// <returns></returns>
     private Status GoTo(Vector3 pos)
 	{
+        if (!agent.isActiveAndEnabled) return Status.FAILURE;
         // Set a new destination
         if (agent.isStopped)
 		{
@@ -138,7 +140,9 @@ public class CustomerScript : MonoBehaviour
         isInQueue = false;
         isInTable = false;
         IsWaiting = false;
+        IsLeaving = true;
         queue.LeaveQueue(this);
+        table.LeaveTable(this);
         var status = GoTo(exit.transform.position);
         if (status == Status.SUCCESS || CloseEnough(transform.position, exit.transform.position))
         {
@@ -257,7 +261,7 @@ public class CustomerScript : MonoBehaviour
         leaveCheck = new BehaviorTreeBuilder("LeaveCheck")
             .Selector("LeaveSelector")
                 .Do("Wait", Wait)
-                .Do("Leave", () => { return Leave(); })
+                .Do("Leave", Leave)
                 .End()
             .End();
 
@@ -361,6 +365,10 @@ public class CustomerScript : MonoBehaviour
                 .Do("BeAttendedSequence", beAttendedSequence)
                 .Do("BeServedAndEatSequence", beServedAndEatSequence)
                 .Do("WaitBillSequence", waitBillSequence)
+                .Sequence("Leaving")
+                    .If("IsLeaving", () => { return IsLeaving; })
+                    .Do("Leave", Leave)
+                    .End()
                 .End()
             .End();
 
