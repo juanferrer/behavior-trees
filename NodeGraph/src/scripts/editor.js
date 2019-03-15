@@ -55,7 +55,7 @@ class Editor {
 	 * @param {Number} amount
 	 * @param {Boolean} isDeleting
 	 */
-	moveCursor(direction, amount =  1, isDeleting = false) {
+	moveCursor(direction, amount = 1, isDeleting = false) {
 		// Remove cursor
 		$("." + Editor.data.cursorClass).remove();
 
@@ -319,7 +319,7 @@ class Editor {
 			this.addNewNumberLine();
 			this.redraw(newLine, false);
 		});
-		this.removeNumberLine();
+		//this.removeNumberLine();
 	}
 
 	/**
@@ -544,7 +544,7 @@ Editor.eventHandlers = {
 					editor.moveCursor("none", 1, true);
 				}
 				break;
-	
+
 			case "Tab":
 				if (event.shiftKey) {
 					// Shift + Tab
@@ -557,14 +557,14 @@ Editor.eventHandlers = {
 						}
 						editor.moveCursor("left", spacesToCompleteTab, true);
 					}
-					} else {
-						// Normal Tab
-						editor.insertCharacterInPosition("    ", editor.cursor.colPos, element);
-					}
-					editor.removeInputElements();
-					editor.addInputToElement(element);
-					// Make sure you don't deselect the editor
-					event.preventDefault();
+				} else {
+					// Normal Tab
+					editor.insertCharacterInPosition("    ", editor.cursor.colPos, element);
+				}
+				editor.removeInputElements();
+				editor.addInputToElement(element);
+				// Make sure you don't deselect the editor
+				event.preventDefault();
 				break;
 
 			case "Shift":
