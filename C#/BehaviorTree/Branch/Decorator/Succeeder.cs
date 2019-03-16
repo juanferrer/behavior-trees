@@ -28,7 +28,7 @@ namespace FluentBehaviorTree
         {
             this.Result = child.Tick();
 
-            if (this.Result != Status.ERROR)
+            if (this.Result == Status.FAILURE)
             {
                 this.Result = Status.SUCCESS;
             }

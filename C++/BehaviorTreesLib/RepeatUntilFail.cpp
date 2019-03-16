@@ -27,7 +27,8 @@ namespace fluentBehaviorTree
 	{
 		this->setResult(mChild->tick());
 
-		if (this->getResult() == EStatus::FAILURE) this->setResult(EStatus::SUCCESS);
+		if (this->getResult() == EStatus::SUCCESS) this->setResult(EStatus::RUNNING);
+		else if (this->getResult() == EStatus::FAILURE) this->setResult(EStatus::SUCCESS);
 
 		return this->getResult();
 	}
