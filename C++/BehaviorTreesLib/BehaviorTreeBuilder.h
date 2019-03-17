@@ -4,6 +4,7 @@
 #include "General.h"
 #include <stack>
 #include "Branch.h"
+#include <functional>
 
 
 namespace fluentBehaviorTree
@@ -33,11 +34,13 @@ namespace fluentBehaviorTree
 		/******* LEAF ********/
 		/*********************/
 
-		BehaviorTreeBuilder Do(std::string name, EStatus(*f)());
+		//BehaviorTreeBuilder Do(std::string name, EStatus(*f)());
+		BehaviorTreeBuilder Do(std::string name, std::function<EStatus()> f);
 
 		BehaviorTreeBuilder Do(std::string name, Node *tree);
 
-		BehaviorTreeBuilder If(std::string name, bool(*f)());
+		//BehaviorTreeBuilder If(std::string name, bool(*f)());
+		BehaviorTreeBuilder If(std::string name, std::function<bool()> f);
 
 
 		/*********************/

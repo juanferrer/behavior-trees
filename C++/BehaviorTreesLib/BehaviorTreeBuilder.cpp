@@ -26,7 +26,8 @@ namespace fluentBehaviorTree
 	/*********************/
 
 	// Add an action to the tree
-	BehaviorTreeBuilder BehaviorTreeBuilder::Do(std::string name, EStatus(*f)())
+	/*BehaviorTreeBuilder BehaviorTreeBuilder::Do(std::string name, EStatus(*f)())*/
+	BehaviorTreeBuilder BehaviorTreeBuilder::Do(std::string name, std::function<EStatus()> f)
 	{
 		//Action currentNode(name, f);
 		auto currentNode = new Action(name, f);
@@ -62,7 +63,8 @@ namespace fluentBehaviorTree
 	}
 
 	// Add condition
-	BehaviorTreeBuilder BehaviorTreeBuilder::If(std::string name, bool(*f)())
+	/*BehaviorTreeBuilder BehaviorTreeBuilder::If(std::string name, bool(*f)())*/
+	BehaviorTreeBuilder BehaviorTreeBuilder::If(std::string name, std::function<bool()> f)
 	{
 		//Condition currentNode(name, f);
 		Condition* currentNode = new Condition(name, f);

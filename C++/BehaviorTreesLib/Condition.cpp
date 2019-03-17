@@ -1,5 +1,6 @@
 #include "Condition.h"
 #include <string>
+#include <functional>
 
 namespace fluentBehaviorTree
 {
@@ -8,7 +9,8 @@ namespace fluentBehaviorTree
 		Condition* newNode = new Condition(this->getName(), this->mCondition);
 		return newNode;
 	}
-	Condition::Condition(std::string name, bool(*f)())
+	//Condition::Condition(std::string name, bool(*f)())
+	Condition::Condition(std::string name, std::function<bool()> f)
 	{
 		this->setName(name);
 		mCondition = f;

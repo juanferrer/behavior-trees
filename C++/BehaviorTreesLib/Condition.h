@@ -2,6 +2,7 @@
 #define BT_CONDITION_H
 
 #include "Leaf.h"
+#include <functional>
 
 namespace fluentBehaviorTree
 {
@@ -10,10 +11,12 @@ namespace fluentBehaviorTree
 	private:
 		Node* copy() override;
 		// Function to check
-		bool(*mCondition)();
+		//bool(*mCondition)();
+		std::function<bool()> mCondition;
 
 	public:
-		Condition(std::string name, bool(*f)());
+		//Condition(std::string name, bool(*f)());
+		Condition(std::string name, std::function<bool()> f);
 
 	protected:
 		EStatus tickNode() override;

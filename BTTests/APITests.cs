@@ -30,7 +30,7 @@ namespace BTTests
             Assert.AreEqual(Status.SUCCESS, Subtree(() => { return Status.SUCCESS; }));
             Assert.AreEqual(Status.FAILURE, Subtree(() => { return Status.FAILURE; }));
             Assert.AreEqual(Status.RUNNING, Subtree(() => { return Status.RUNNING; }));
-            Assert.AreEqual(Status.ERROR, Subtree(() => { return Status.ERROR; }));
+            Assert.AreEqual(Status.ERROR,   Subtree(() => { return Status.ERROR; }));
         }
 
         // Composites
@@ -70,7 +70,7 @@ namespace BTTests
             Assert.AreEqual(Status.FAILURE, Negator(() => { return Status.SUCCESS; }));
             Assert.AreEqual(Status.SUCCESS, Negator(() => { return Status.FAILURE; }));
             Assert.AreEqual(Status.RUNNING, Negator(() => { return Status.RUNNING; }));
-            Assert.AreEqual(Status.ERROR, Negator(() => { return Status.ERROR; }));
+            Assert.AreEqual(Status.ERROR,   Negator(() => { return Status.ERROR; }));
         }
 
         [TestMethod]
@@ -80,7 +80,7 @@ namespace BTTests
             Assert.AreEqual(Status.SUCCESS, Repeater(2, 5));
             Assert.AreEqual(Status.SUCCESS, Repeater(0, 5));
             Assert.AreEqual(Status.RUNNING, Repeater(5, 1));
-            Assert.AreEqual(Status.ERROR, Repeater(0, 0));
+            Assert.AreEqual(Status.ERROR,   Repeater(0, 0));
         }
 
         [TestMethod]
@@ -90,7 +90,7 @@ namespace BTTests
             Assert.AreEqual(Status.SUCCESS, RepeatUntilFail(2, 5));
             Assert.AreEqual(Status.SUCCESS, RepeatUntilFail(0, 5));
             Assert.AreEqual(Status.RUNNING, RepeatUntilFail(5, 1));
-            Assert.AreEqual(Status.ERROR, RepeatUntilFail(0, 0));
+            Assert.AreEqual(Status.ERROR,   RepeatUntilFail(0, 0));
         }
 
         [TestMethod]
@@ -100,7 +100,7 @@ namespace BTTests
             Assert.AreEqual(Status.SUCCESS, Succeeder(() => { return Status.SUCCESS; }));
             Assert.AreEqual(Status.SUCCESS, Succeeder(() => { return Status.FAILURE; }));
             Assert.AreEqual(Status.RUNNING, Succeeder(() => { return Status.RUNNING; }));
-            Assert.AreEqual(Status.ERROR, Succeeder(() => { return Status.ERROR; }));
+            Assert.AreEqual(Status.ERROR,   Succeeder(() => { return Status.ERROR; }));
         }
 
         [TestMethod]
@@ -163,13 +163,13 @@ namespace BTTests
             return result;
         }
 
-        Status Selector(bool n1, bool n2, bool n3)
+        Status Selector(bool b1, bool b2, bool b3)
         {
             BehaviorTree bt = new BehaviorTreeBuilder("SelectorTest")
                 .Selector("Selector")
-                    .If("Condition", () => { return n1; })
-                    .If("Condition", () => { return n2; })
-                    .If("Condition", () => { return n3; })
+                    .If("Condition", () => { return b1; })
+                    .If("Condition", () => { return b2; })
+                    .If("Condition", () => { return b3; })
                     .End()
                 .End();
 
@@ -256,16 +256,6 @@ namespace BTTests
             result = bt.Tick();
 
             return result;
-        }
-    }
-
-    [TestClass]
-    public class BTMLTests
-    {
-        [TestMethod]
-        public void Success()
-        {
-            return;
         }
     }
 }

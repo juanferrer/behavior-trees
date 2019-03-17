@@ -7,7 +7,8 @@ namespace fluentBehaviorTree
 		Action* newNode = new Action(this->getName(), this->mAction);
 		return newNode;
 	}
-	Action::Action(std::string name, EStatus(*f)())
+	//Action::Action(std::string name, EStatus(*f)())
+	Action::Action(std::string name, std::function<EStatus()> f)
 	{
 		this->setName(name);
 		mAction = f;
