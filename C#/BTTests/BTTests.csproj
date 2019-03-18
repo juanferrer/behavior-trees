@@ -52,6 +52,7 @@
     <Compile Include="APITests.cs" />
     <Compile Include="BTMLTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="FluentAPITests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
