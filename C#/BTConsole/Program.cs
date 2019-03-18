@@ -189,14 +189,14 @@ namespace BTConsole
                                 .Do("Open door", openDoor)
                                 .Do("Unlock door", UnlockDoor)
                                 .Do("Break door down", BreakDoor)
+                                .Sequence("Check if anyone comes")
+                                    .Wait("Wait for people to come", 5000)
+                                        .If("Someone came", SomeoneCame)
+                                    .Do("Ask them to open door", AskToOpenDoor)
+                                    .End()
                                 .End()
                             .Ignore("Try to close door")
                                 .Do("Close door", CloseDoor)
-                            .End()
-                        .Sequence("Check if anyone comes")
-                            .Wait("Wait for people to come", 5000)
-                                .If("Someone came", SomeoneCame)
-                            .Do("Ask them to open door", AskToOpenDoor)
                             .End()
                         .Sequence("Try window")
                             .Do("Go to window", GoToWindow)
@@ -206,8 +206,12 @@ namespace BTConsole
                         .End()
                     .End();
 
-            tree.Tick();
-            //testTree.Tick();
+            Status result;
+
+            do
+            {
+                result = tree.Tick();
+            } while (result != Status.SUCCESS && result != Status.FAILURE);
 
             Console.ReadKey();
         }

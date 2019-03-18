@@ -29,5 +29,8 @@
     <ClCompile Include="apiTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="btmlTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
