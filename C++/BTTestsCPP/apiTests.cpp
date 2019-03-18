@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
-#include "../C++/BehaviorTreesLib/BehaviorTree.h"
-#include "../C++/BehaviorTreesLib/BehaviorTreeBuilder.h"
+#include "../BehaviorTreesLib/BehaviorTree.h"
+#include "../BehaviorTreesLib/BehaviorTreeBuilder.h"
 #include <thread>
 #include <chrono>
 
