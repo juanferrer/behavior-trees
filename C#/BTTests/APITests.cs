@@ -11,10 +11,10 @@ namespace BTTests
         [TestMethod]
         public void ActionTest()
         {
-            Assert.AreEqual(Status.SUCCESS, Action(() => { return Status.SUCCESS; }));
-            Assert.AreEqual(Status.FAILURE, Action(() => { return Status.FAILURE; }));
-            Assert.AreEqual(Status.RUNNING, Action(() => { return Status.RUNNING; }));
-            Assert.AreEqual(Status.ERROR, Action(() => { return Status.ERROR; }));
+            Assert.AreEqual(Status.SUCCESS, Action(ReturnSUCCESS));
+            Assert.AreEqual(Status.FAILURE, Action(ReturnFAILURE));
+            Assert.AreEqual(Status.RUNNING, Action(ReturnRUNNING));
+            Assert.AreEqual(Status.ERROR,   Action(ReturnERROR));
         }
 
         [TestMethod]
@@ -27,10 +27,10 @@ namespace BTTests
         [TestMethod]
         public void SubtreeTest()
         {
-            Assert.AreEqual(Status.SUCCESS, Subtree(() => { return Status.SUCCESS; }));
-            Assert.AreEqual(Status.FAILURE, Subtree(() => { return Status.FAILURE; }));
-            Assert.AreEqual(Status.RUNNING, Subtree(() => { return Status.RUNNING; }));
-            Assert.AreEqual(Status.ERROR,   Subtree(() => { return Status.ERROR; }));
+            Assert.AreEqual(Status.SUCCESS, Subtree(ReturnSUCCESS));
+            Assert.AreEqual(Status.FAILURE, Subtree(ReturnFAILURE));
+            Assert.AreEqual(Status.RUNNING, Subtree(ReturnRUNNING));
+            Assert.AreEqual(Status.ERROR,   Subtree(ReturnERROR));
         }
 
         // Composites
@@ -38,13 +38,13 @@ namespace BTTests
         public void SequenceTest()
         {
             // Only succeeds when all are true
-            Assert.AreEqual(Status.SUCCESS, Sequence(true, true, true));
-            Assert.AreEqual(Status.FAILURE, Sequence(true, true, false));
-            Assert.AreEqual(Status.FAILURE, Sequence(true, false, false));
+            Assert.AreEqual(Status.SUCCESS, Sequence(true,  true,  true));
+            Assert.AreEqual(Status.FAILURE, Sequence(true,  true,  false));
+            Assert.AreEqual(Status.FAILURE, Sequence(true,  false, false));
             Assert.AreEqual(Status.FAILURE, Sequence(false, false, false));
-            Assert.AreEqual(Status.FAILURE, Sequence(false, true, true));
-            Assert.AreEqual(Status.FAILURE, Sequence(false, true, false));
-            Assert.AreEqual(Status.FAILURE, Sequence(true, false, true));
+            Assert.AreEqual(Status.FAILURE, Sequence(false, true,  true));
+            Assert.AreEqual(Status.FAILURE, Sequence(false, true,  false));
+            Assert.AreEqual(Status.FAILURE, Sequence(true,  false, true));
             Assert.AreEqual(Status.FAILURE, Sequence(false, false, true));
         }
 
@@ -52,13 +52,13 @@ namespace BTTests
         public void SelectorTest()
         {
             // Only fails when all are false
-            Assert.AreEqual(Status.SUCCESS, Selector(true, true, true));
-            Assert.AreEqual(Status.SUCCESS, Selector(true, true, false));
-            Assert.AreEqual(Status.SUCCESS, Selector(true, false, false));
+            Assert.AreEqual(Status.SUCCESS, Selector(true,  true,  true));
+            Assert.AreEqual(Status.SUCCESS, Selector(true,  true,  false));
+            Assert.AreEqual(Status.SUCCESS, Selector(true,  false, false));
             Assert.AreEqual(Status.FAILURE, Selector(false, false, false));
-            Assert.AreEqual(Status.SUCCESS, Selector(false, true, true));
-            Assert.AreEqual(Status.SUCCESS, Selector(false, true, false));
-            Assert.AreEqual(Status.SUCCESS, Selector(true, false, true));
+            Assert.AreEqual(Status.SUCCESS, Selector(false, true,  true));
+            Assert.AreEqual(Status.SUCCESS, Selector(false, true,  false));
+            Assert.AreEqual(Status.SUCCESS, Selector(true,  false, true));
             Assert.AreEqual(Status.SUCCESS, Selector(false, false, true));
         }
 
@@ -67,10 +67,10 @@ namespace BTTests
         public void NegatorTest()
         {
             // Only fails when all are false
-            Assert.AreEqual(Status.FAILURE, Negator(() => { return Status.SUCCESS; }));
-            Assert.AreEqual(Status.SUCCESS, Negator(() => { return Status.FAILURE; }));
-            Assert.AreEqual(Status.RUNNING, Negator(() => { return Status.RUNNING; }));
-            Assert.AreEqual(Status.ERROR,   Negator(() => { return Status.ERROR; }));
+            Assert.AreEqual(Status.FAILURE, Negator(ReturnSUCCESS));
+            Assert.AreEqual(Status.SUCCESS, Negator(ReturnFAILURE));
+            Assert.AreEqual(Status.RUNNING, Negator(ReturnRUNNING));
+            Assert.AreEqual(Status.ERROR,   Negator(ReturnERROR));
         }
 
         [TestMethod]
@@ -97,10 +97,10 @@ namespace BTTests
         public void SucceederTest()
         {
             // Only fails when all are false
-            Assert.AreEqual(Status.SUCCESS, Succeeder(() => { return Status.SUCCESS; }));
-            Assert.AreEqual(Status.SUCCESS, Succeeder(() => { return Status.FAILURE; }));
-            Assert.AreEqual(Status.RUNNING, Succeeder(() => { return Status.RUNNING; }));
-            Assert.AreEqual(Status.ERROR,   Succeeder(() => { return Status.ERROR; }));
+            Assert.AreEqual(Status.SUCCESS, Succeeder(ReturnSUCCESS));
+            Assert.AreEqual(Status.SUCCESS, Succeeder(ReturnFAILURE));
+            Assert.AreEqual(Status.RUNNING, Succeeder(ReturnRUNNING));
+            Assert.AreEqual(Status.ERROR,   Succeeder(ReturnERROR));
         }
 
         [TestMethod]
@@ -109,6 +109,36 @@ namespace BTTests
             Assert.AreEqual(Status.SUCCESS, Timer(100, 100));
             Assert.AreEqual(Status.RUNNING, Timer(300, 100));
             Assert.AreEqual(Status.SUCCESS, Timer(100, 300));
+        }
+
+                Status ReturnSUCCESS()
+        {
+            return Status.SUCCESS;
+        }
+
+        Status ReturnFAILURE()
+        {
+            return Status.FAILURE;
+        }
+
+        Status ReturnRUNNING()
+        {
+            return Status.RUNNING;
+        }
+
+        Status ReturnERROR()
+        {
+            return Status.ERROR;
+        }
+
+        bool ReturnTrue()
+        {
+            return true;
+        }
+
+        bool ReturnFalse()
+        {
+            return false;
         }
 
         Status Action(Func<Status> function)
@@ -248,7 +278,7 @@ namespace BTTests
         {
             BehaviorTree bt = new BehaviorTreeBuilder("TimerTest")
                 .Wait("Timer", timeUntilSuccess)
-                    .Do("Action", () => { return Status.SUCCESS; })
+                    .Do("Action", ReturnSUCCESS)
                 .End();
             Status result = bt.Tick();
             // Sleep for 50 ms longer, just to make sure the task finishes

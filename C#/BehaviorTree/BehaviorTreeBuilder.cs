@@ -49,7 +49,7 @@ namespace FluentBehaviorTree
 
         public BehaviorTreeBuilder Do(string name, BehaviorTree tree)
         {
-            // TODO: Needs deep copy
+            // Needs deep copy
             var currentNode = (tree.Clone() as BehaviorTree).GetRoot();
 
             if (parentNodes.Count > 0)
