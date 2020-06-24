@@ -62,6 +62,34 @@ namespace BTTests
             Assert.AreEqual(Selector(false, false, true),  SelectorAPI(false, false, true));
         }
 
+        [TestMethod]
+        public void RandomSequenceTest()
+        {
+            // Only fails when all are false
+            Assert.AreEqual(RandomSequence(true, true, true),    RandomSequenceAPI(true, true, true));
+            Assert.AreEqual(RandomSequence(true, true, false),   RandomSequenceAPI(true, true, false));
+            Assert.AreEqual(RandomSequence(true, false, false),  RandomSequenceAPI(true, false, false));
+            Assert.AreEqual(RandomSequence(false, false, false), RandomSequenceAPI(false, false, false));
+            Assert.AreEqual(RandomSequence(false, true, true),   RandomSequenceAPI(false, true, true));
+            Assert.AreEqual(RandomSequence(false, true, false),  RandomSequenceAPI(false, true, false));
+            Assert.AreEqual(RandomSequence(true, false, true),   RandomSequenceAPI(true, false, true));
+            Assert.AreEqual(RandomSequence(false, false, true),  RandomSequenceAPI(false, false, true));
+        }
+
+        [TestMethod]
+        public void RandomSelectorTest()
+        {
+            // Only fails when all are false
+            Assert.AreEqual(RandomSelector(true, true, true),    RandomSelectorAPI(true, true, true));
+            Assert.AreEqual(RandomSelector(true, true, false),   RandomSelectorAPI(true, true, false));
+            Assert.AreEqual(RandomSelector(true, false, false),  RandomSelectorAPI(true, false, false));
+            Assert.AreEqual(RandomSelector(false, false, false), RandomSelectorAPI(false, false, false));
+            Assert.AreEqual(RandomSelector(false, true, true),   RandomSelectorAPI(false, true, true));
+            Assert.AreEqual(RandomSelector(false, true, false),  RandomSelectorAPI(false, true, false));
+            Assert.AreEqual(RandomSelector(true, false, true),   RandomSelectorAPI(true, false, true));
+            Assert.AreEqual(RandomSelector(false, false, true),  RandomSelectorAPI(false, false, true));
+        }
+
         // Decorators
         [TestMethod]
         public void NegatorTest()
@@ -220,9 +248,9 @@ namespace BTTests
         {
             BehaviorTree bt = new BehaviorTreeBuilder("SequenceTest")
                 .Sequence("Sequence")
-                    .If("Condition", () => { return b1; })
-                    .If("Condition", () => { return b2; })
-                    .If("Condition", () => { return b3; })
+                    .If("Condition 1", () => { return b1; })
+                    .If("Condition 2", () => { return b2; })
+                    .If("Condition 3", () => { return b3; })
                     .End()
                 .End();
 
@@ -235,9 +263,9 @@ namespace BTTests
         {
             var root = new Root();
             var seq = new Sequence("Sequence");
-            seq.AddChild(new Condition("Condition", () => { return b1; }));
-            seq.AddChild(new Condition("Condition", () => { return b2; }));
-            seq.AddChild(new Condition("Condition", () => { return b3; }));
+            seq.AddChild(new Condition("Condition 1", () => { return b1; }));
+            seq.AddChild(new Condition("Condition 2", () => { return b2; }));
+            seq.AddChild(new Condition("Condition 3", () => { return b3; }));
             root.AddChild(seq);
             BehaviorTree bt = new BehaviorTree("SequenceTest", root);
 
@@ -250,9 +278,9 @@ namespace BTTests
         {
             BehaviorTree bt = new BehaviorTreeBuilder("SelectorTest")
                 .Selector("Selector")
-                    .If("Condition", () => { return b1; })
-                    .If("Condition", () => { return b2; })
-                    .If("Condition", () => { return b3; })
+                    .If("Condition 1", () => { return b1; })
+                    .If("Condition 2", () => { return b2; })
+                    .If("Condition 3", () => { return b3; })
                     .End()
                 .End();
 
@@ -265,11 +293,71 @@ namespace BTTests
         {
             var root = new Root();
             var seq = new Selector("Selector");
-            seq.AddChild(new Condition("Condition", () => { return b1; }));
-            seq.AddChild(new Condition("Condition", () => { return b2; }));
-            seq.AddChild(new Condition("Condition", () => { return b3; }));
+            seq.AddChild(new Condition("Condition 1", () => { return b1; }));
+            seq.AddChild(new Condition("Condition 2", () => { return b2; }));
+            seq.AddChild(new Condition("Condition 3", () => { return b3; }));
             root.AddChild(seq);
             BehaviorTree bt = new BehaviorTree("SelectorTest", root);
+
+            Status result = bt.Tick();
+
+            return result;
+        }
+
+        Status RandomSequenceAPI(bool b1, bool b2, bool b3)
+        {
+            BehaviorTree bt = new BehaviorTreeBuilder("RandomSequenceTest")
+                .Sequence("Random sequence")
+                    .If("Condition 1", () => { return b1; })
+                    .If("Condition 2", () => { return b2; })
+                    .If("Condition 3", () => { return b3; })
+                    .End()
+                .End();
+
+            Status result = bt.Tick();
+
+            return result;
+        }
+
+        Status RandomSequence(bool b1, bool b2, bool b3)
+        {
+            var root = new Root();
+            var seq = new RandomSequence("Random sequence");
+            seq.AddChild(new Condition("Condition 1", () => { return b1; }));
+            seq.AddChild(new Condition("Condition 2", () => { return b2; }));
+            seq.AddChild(new Condition("Condition 3", () => { return b3; }));
+            root.AddChild(seq);
+            BehaviorTree bt = new BehaviorTree("RandomSequenceTest", root);
+
+            Status result = bt.Tick();
+
+            return result;
+        }
+
+        Status RandomSelectorAPI(bool b1, bool b2, bool b3)
+        {
+            BehaviorTree bt = new BehaviorTreeBuilder("RandomSelectorTest")
+                .Selector("Random selector")
+                    .If("Condition 1", () => { return b1; })
+                    .If("Condition 2", () => { return b2; })
+                    .If("Condition 3", () => { return b3; })
+                    .End()
+                .End();
+
+            Status result = bt.Tick();
+
+            return result;
+        }
+
+        Status RandomSelector(bool b1, bool b2, bool b3)
+        {
+            var root = new Root();
+            var seq = new RandomSelector("Random selector");
+            seq.AddChild(new Condition("Condition 1", () => { return b1; }));
+            seq.AddChild(new Condition("Condition 2", () => { return b2; }));
+            seq.AddChild(new Condition("Condition 3", () => { return b3; }));
+            root.AddChild(seq);
+            BehaviorTree bt = new BehaviorTree("RandomSelectorTest", root);
 
             Status result = bt.Tick();
 

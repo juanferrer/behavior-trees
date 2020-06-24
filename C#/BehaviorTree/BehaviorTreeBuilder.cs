@@ -8,7 +8,7 @@ namespace FluentBehaviorTree
 {
     public class BehaviorTreeBuilder
     {
-        private string name;
+        readonly private string name;
         private Stack<Node> parentNodes;
 
         public BehaviorTreeBuilder(string newName)
@@ -217,6 +217,44 @@ namespace FluentBehaviorTree
         public BehaviorTreeBuilder Selector(string name)
         {
             var currentNode = new Selector(name);
+
+            if (parentNodes.Count > 0)
+            {
+                (parentNodes.Peek() as Branch).AddChild(currentNode);
+            }
+
+            parentNodes.Push(currentNode);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Add a random sequence
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public BehaviorTreeBuilder RandomSequence(string name)
+        {
+            var currentNode = new RandomSequence(name);
+
+            if (parentNodes.Count > 0)
+            {
+                (parentNodes.Peek() as Branch).AddChild(currentNode);
+            }
+
+            parentNodes.Push(currentNode);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Add a random selector
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public BehaviorTreeBuilder RandomSelector(string name)
+        {
+            var currentNode = new RandomSelector(name);
 
             if (parentNodes.Count > 0)
             {

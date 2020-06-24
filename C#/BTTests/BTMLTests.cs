@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FluentBehaviorTree;
+using FluentBehaviorTree.Utilities;
 
 
 namespace BTTests
@@ -67,6 +68,14 @@ namespace BTTests
                     .Do("Open window", OpenWindow)
                     .Do("Close window", CloseWindow)
                     .End()
+                .End()
+            .End();
+
+        static BehaviorTree randomTree = new BehaviorTreeBuilder("Random tree")
+            .RandomSequence("Do three actions")
+                .Do("Action 1", DoAction1)
+                .Do("Action 2", DoAction2)
+                .Do("Action 3", DoAction3)
                 .End()
             .End();
 
@@ -208,6 +217,44 @@ namespace BTTests
             Assert.AreEqual(Status.FAILURE, RunTree(nestedTree));
         }
 
+        [TestMethod]
+        public void RandomTreeTest()
+        {
+            RandomSystem.Seed(rngSeed);
+            // For the next five shuffles, list order should be:
+            // 2, 1, 3
+            // 3, 2, 1
+            // 2, 3, 1
+            // 1, 2, 3
+            // 3, 2, 1
+
+            condition1 = true;
+            condition2 = true;
+            condition3 = true;
+            resultString = "";
+            Assert.AreEqual(Status.SUCCESS, RunTree(randomTree)); // true, true, true
+            Assert.AreEqual("213", resultString);
+
+            condition2 = false;
+            resultString = "";
+            Assert.AreEqual(Status.FAILURE, RunTree(randomTree)); // true, false, true
+            Assert.AreEqual("32", resultString);
+
+            resultString = "";
+            Assert.AreEqual(Status.FAILURE, RunTree(randomTree)); // true, false, true
+            Assert.AreEqual("2", resultString);
+
+            resultString = "";
+            Assert.AreEqual(Status.FAILURE, RunTree(randomTree)); // true, false, true
+            Assert.AreEqual("12", resultString);
+
+            condition1 = false;
+            condition2 = true;
+            resultString = "";
+            Assert.AreEqual(Status.FAILURE, RunTree(randomTree)); // false, true, true
+            Assert.AreEqual("321", resultString);
+        }
+
         public Status RunTree(BehaviorTree tree)
         {
             Status result = Status.ERROR;
@@ -228,6 +275,11 @@ namespace BTTests
         static bool someoneCame;
         static bool isWindowLocked;
         static int ticked;
+        static bool condition1;
+        static bool condition2;
+        static bool condition3;
+        static string resultString;
+        static int rngSeed = 42;
 
         static public bool IsWayBlocked()
         {
@@ -364,6 +416,31 @@ namespace BTTests
         {
             Console.WriteLine("Closing window");
             return Status.SUCCESS;
+        }
+
+        static public Status DoAction1()
+        {
+            Console.WriteLine("Performing Action1");
+            resultString += "1";
+            if (condition1) return Status.SUCCESS;
+            else return Status.FAILURE;
+        }
+
+        static public Status DoAction2()
+        {
+            Console.WriteLine("Performing Action2");
+            resultString += "2";
+            if (condition2) return Status.SUCCESS;
+            else return Status.FAILURE;
+        }
+
+
+        static public Status DoAction3()
+        {
+            Console.WriteLine("Performing Action3");
+            resultString += "3";
+            if (condition3) return Status.SUCCESS;
+            else return Status.FAILURE;
         }
     }
 }

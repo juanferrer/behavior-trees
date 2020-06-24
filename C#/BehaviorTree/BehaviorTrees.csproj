@@ -42,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Branch\Branch.cs" />
+    <Compile Include="Branch\Composite\RandomSelector.cs" />
+    <Compile Include="Branch\Composite\RandomSequence.cs" />
     <Compile Include="Branch\Decorator\RepeatUntilFail.cs" />
     <Compile Include="Branch\Decorator\Repeater.cs" />
     <Compile Include="Branch\Decorator\Timer.cs" />

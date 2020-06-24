@@ -65,7 +65,7 @@ namespace FluentBehaviorTree
         /// <summary>
         /// Close node to ensure we don't go through it again
         /// </summary>
-        private void Close()
+        protected virtual void Close()
         {
             IsOpen = false;
         }

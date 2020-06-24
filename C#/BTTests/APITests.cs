@@ -1,12 +1,16 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FluentBehaviorTree;
+using FluentBehaviorTree.Utilities;
 
 namespace BTTests
 {
     [TestClass]
     public class APITests
     {
+        private int randomLeafExecuted;
+        private int rngSeed = 42;
+
         // Leaf nodes
         [TestMethod]
         public void ActionTest()
@@ -60,6 +64,71 @@ namespace BTTests
             Assert.AreEqual(Status.SUCCESS, Selector(false, true,  false));
             Assert.AreEqual(Status.SUCCESS, Selector(true,  false, true));
             Assert.AreEqual(Status.SUCCESS, Selector(false, false, true));
+        }
+
+        [TestMethod]
+        public void RandomSequenceTest()
+        {
+            // Only succeeds when all are true
+            Assert.AreEqual(Status.SUCCESS, RandomSequence(true, true, true));
+            Assert.AreEqual(Status.FAILURE, RandomSequence(true, true, false));
+            Assert.AreEqual(Status.FAILURE, RandomSequence(true, false, false));
+            Assert.AreEqual(Status.FAILURE, RandomSequence(false, false, false));
+            Assert.AreEqual(Status.FAILURE, RandomSequence(false, true, true));
+            Assert.AreEqual(Status.FAILURE, RandomSequence(false, true, false));
+            Assert.AreEqual(Status.FAILURE, RandomSequence(true, false, true));
+            Assert.AreEqual(Status.FAILURE, RandomSequence(false, false, true));
+
+            // Also check it's being executed at random
+            RandomSystem.Seed(rngSeed);
+            // For the next five shuffles, list order should be:
+            // 2, 1, 3
+            // 3, 2, 1
+            // 2, 3, 1
+            // 1, 2, 3
+            // 3, 2, 1
+            RandomSequence(false, true, false);
+            Assert.AreEqual(1, randomLeafExecuted);
+            RandomSequence(false, true, false);
+            Assert.AreEqual(3, randomLeafExecuted);
+            RandomSequence(false, true, true);
+            Assert.AreEqual(1, randomLeafExecuted);
+            RandomSequence(false, false, false);
+            Assert.AreEqual(1, randomLeafExecuted);
+            RandomSequence(false, false, true);
+            Assert.AreEqual(2, randomLeafExecuted);
+        }
+
+        [TestMethod]
+        public void RandomSelectorTest()
+        {
+            Assert.AreEqual(Status.SUCCESS, RandomSelector(true, true, true));
+            Assert.AreEqual(Status.SUCCESS, RandomSelector(true, true, false));
+            Assert.AreEqual(Status.SUCCESS, RandomSelector(true, false, false));
+            Assert.AreEqual(Status.FAILURE, RandomSelector(false, false, false));
+            Assert.AreEqual(Status.SUCCESS, RandomSelector(false, true, true));
+            Assert.AreEqual(Status.SUCCESS, RandomSelector(false, true, false));
+            Assert.AreEqual(Status.SUCCESS, RandomSelector(true, false, true));
+            Assert.AreEqual(Status.SUCCESS, RandomSelector(false, false, true));
+
+            // Also check it's being executed at random
+            RandomSystem.Seed(rngSeed);
+            // For the next five shuffles, list order should be:
+            // 2, 1, 3
+            // 3, 2, 1
+            // 2, 3, 1
+            // 1, 2, 3
+            // 3, 2, 1
+            RandomSelector(false, true, false);
+            Assert.AreEqual(2, randomLeafExecuted);
+            RandomSelector(false, true, false);
+            Assert.AreEqual(2, randomLeafExecuted);
+            RandomSelector(false, true, true);
+            Assert.AreEqual(2, randomLeafExecuted);
+            RandomSelector(false, false, true);
+            Assert.AreEqual(3, randomLeafExecuted);
+            RandomSelector(false, false, true);
+            Assert.AreEqual(3, randomLeafExecuted);
         }
 
         // Decorators
@@ -182,9 +251,9 @@ namespace BTTests
         {
             BehaviorTree bt = new BehaviorTreeBuilder("SequenceTest")
                 .Sequence("Sequence")
-                    .If("Condition", () => { return b1; })
-                    .If("Condition", () => { return b2; })
-                    .If("Condition", () => { return b3; })
+                    .If("Condition 1", () => { return b1; })
+                    .If("Condition 2", () => { return b2; })
+                    .If("Condition 3", () => { return b3; })
                     .End()
                 .End();
 
@@ -197,9 +266,63 @@ namespace BTTests
         {
             BehaviorTree bt = new BehaviorTreeBuilder("SelectorTest")
                 .Selector("Selector")
-                    .If("Condition", () => { return b1; })
-                    .If("Condition", () => { return b2; })
-                    .If("Condition", () => { return b3; })
+                    .If("Condition 1", () => { return b1; })
+                    .If("Condition 2", () => { return b2; })
+                    .If("Condition 3", () => { return b3; })
+                    .End()
+                .End();
+
+            Status result = bt.Tick();
+
+            return result;
+        }
+
+        Status RandomSequence(bool b1, bool b2, bool b3)
+        {
+            BehaviorTree bt = new BehaviorTreeBuilder("RandomSequenceTest")
+                .RandomSequence("RandomSequence")
+                    .If("Condition 1", () => 
+                    {
+                        randomLeafExecuted = 1;
+                        return b1;
+                    })
+                    .If("Condition 2", () =>
+                    {
+                        randomLeafExecuted = 2;
+                        return b2;
+                    })
+                    .If("Condition 3", () =>
+                    {
+                        randomLeafExecuted = 3;
+                        return b3;
+                    })
+                    .End()
+                .End();
+
+            Status result = bt.Tick();
+
+            return result;
+        }
+
+        Status RandomSelector(bool b1, bool b2, bool b3)
+        {
+            BehaviorTree bt = new BehaviorTreeBuilder("RandomSelectorTest")
+                .RandomSelector("Random selector")
+                    .If("Condition 1", () =>
+                    {
+                        randomLeafExecuted = 1;
+                        return b1;
+                    })
+                    .If("Condition 2", () =>
+                    {
+                        randomLeafExecuted = 2;
+                        return b2;
+                    })
+                    .If("Condition 3", () =>
+                    {
+                        randomLeafExecuted = 3;
+                        return b3;
+                    })
                     .End()
                 .End();
 
