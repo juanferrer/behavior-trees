@@ -8,7 +8,7 @@ namespace FluentBehaviorTree
 {
     public abstract class Composite : Branch
     {
-        public List<Node> children;
+        protected List<Node> children;
 
         public override void AddChild(Node n)
         {

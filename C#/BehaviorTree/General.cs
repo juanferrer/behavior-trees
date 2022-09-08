@@ -12,10 +12,10 @@ namespace FluentBehaviorTree
         ERROR = 3
     }
 
-    // https://stackoverflow.com/questions/129389/how-do-you-do-a-deep-copy-of-an-object-in-net-c-specifically/11308879#11308879
 
     public static class Extensions
     {
+        // https://stackoverflow.com/questions/129389/how-do-you-do-a-deep-copy-of-an-object-in-net-c-specifically/11308879#11308879
         public static IList<T> Clone<T>(this IList<T> list) where T : ICloneable
         {
             return list.Select(item => (T)item.Clone()).ToList();
