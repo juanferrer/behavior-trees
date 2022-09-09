@@ -223,10 +223,13 @@ namespace BTTests
             RandomSystem.Seed(rngSeed);
             // For the next five shuffles, list order should be:
             // 2, 1, 3
-            // 3, 2, 1
-            // 2, 3, 1
+            // 3, 1, 2
+            // 1, 2, 3
             // 1, 2, 3
             // 3, 2, 1
+
+            // This takes into account that the same shuffled children are re-shuffled after
+            // every tick (that's why it's different than the other shuffles with the same see
 
             condition1 = true;
             condition2 = true;
@@ -238,18 +241,20 @@ namespace BTTests
             condition2 = false;
             resultString = "";
             Assert.AreEqual(Status.FAILURE, RunTree(randomTree)); // true, false, true
-            Assert.AreEqual("32", resultString);
-
-            resultString = "";
-            Assert.AreEqual(Status.FAILURE, RunTree(randomTree)); // true, false, true
-            Assert.AreEqual("2", resultString);
+            Assert.AreEqual("312", resultString);
 
             resultString = "";
             Assert.AreEqual(Status.FAILURE, RunTree(randomTree)); // true, false, true
             Assert.AreEqual("12", resultString);
 
-            condition1 = false;
             condition2 = true;
+            condition3 = false;
+            resultString = "";
+            Assert.AreEqual(Status.FAILURE, RunTree(randomTree)); // true, true, false
+            Assert.AreEqual("123", resultString);
+
+            condition1 = false;
+            condition3 = true;
             resultString = "";
             Assert.AreEqual(Status.FAILURE, RunTree(randomTree)); // false, true, true
             Assert.AreEqual("321", resultString);
@@ -261,7 +266,7 @@ namespace BTTests
             do
             {
                 result = tree.Tick();
-            } while (result != Status.SUCCESS && result != Status.FAILURE);
+            } while (result == Status.RUNNING);
             return result;
         }
 
