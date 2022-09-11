@@ -1,8 +1,10 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
+using System.Collections.Generic;
+
 using FluentBehaviorTree;
 using FluentBehaviorTree.Utilities;
-using System.Runtime.CompilerServices;
 
 namespace BTTests
 {
@@ -23,6 +25,21 @@ namespace BTTests
             successN = 0;
             failureN = 0;
             errorN = 0;
+        }
+
+        /// <summary>
+        /// n <= 20
+        /// </summary>
+        /// <returns></returns>
+        private ulong Factorial(int n)
+        {
+            if (n > 20) throw new InvalidOperationException("N is greater than 20");
+            ulong result = 1;
+            for (int i = n; i > 0; i--)
+            {
+                result *= (ulong)i;
+            }
+            return result;
         }
 
         // Leaf nodes
@@ -49,6 +66,74 @@ namespace BTTests
             Assert.AreEqual(Status.FAILURE, Subtree(ReturnFAILURE));
             Assert.AreEqual(Status.RUNNING, Subtree(ReturnRUNNING));
             Assert.AreEqual(Status.ERROR,   Subtree(ReturnERROR));
+        }
+
+        [TestMethod]
+        public void RandomSubtreeTest()
+        {
+            var resultString = string.Empty;
+            BehaviorTree subtree1 = new BehaviorTreeBuilder("Subtree1")
+                .RandomSelector("RandomSelector1")
+                    .Do("Action 1", () =>
+                    {
+                        resultString = "1-1";
+                        return Status.SUCCESS;
+                    })
+                    .Do("Action 2", () =>
+                    {
+                        resultString = "1-2";
+                        return Status.SUCCESS;
+                    })
+                .End()
+            .End();
+
+            BehaviorTree subtree2 = new BehaviorTreeBuilder("Subtree2")
+                .RandomSelector("RandomSelector2")
+                    .Do("Action 1", () =>
+                    {
+                        resultString = "2-1";
+                        return Status.SUCCESS;
+                    })
+                    .Do("Action 2", () =>
+                    {
+                        resultString = "2-2";
+                        return Status.SUCCESS;
+                    })
+                .End()
+            .End();
+
+            BehaviorTree bt = new BehaviorTreeBuilder("RandomSubtreeTest")
+                .RandomSelector("RandomSelector")
+                    .Do("Subtree 1", subtree1)
+                    .Do("Subtree 2", subtree2)
+                .End()
+            .End();
+
+            const int repetitions = 10000;
+            var prevResultStrings = new System.Collections.Generic.Dictionary<string, int>();
+
+            for (int i = 0; i < repetitions; i++)
+            {
+                resultString = string.Empty;
+                bt.Tick();
+                if (prevResultStrings.ContainsKey(resultString))
+                {
+                    prevResultStrings[resultString]++;
+                }
+                else
+                {
+                    prevResultStrings.Add(resultString, 1);
+                }
+            }
+            // There should be 4 permutations: 1-1, 1-2, 2-1, 2-2
+            int permutations = 4;
+            int deviation = 100;
+            Assert.AreEqual(permutations, prevResultStrings.Count);
+            var average = repetitions / prevResultStrings.Count;
+            Assert.IsTrue(prevResultStrings.All(e =>
+            {
+                return Math.Abs(e.Value - average) <= deviation;
+            }));
         }
 
         // Composites
@@ -493,7 +578,102 @@ namespace BTTests
             ResetN();
             Assert.AreEqual(Status.RUNNING, RandomSequence(ReturnSUCCESS, ReturnSUCCESS, ReturnSUCCESSOnN, N - 1));
             Assert.AreEqual(3, leafExecuted);
-        }              
+        }
+
+        [TestMethod]
+        public void RandomSequenceShuffleTest()
+        {
+            const int repetitions = 10000;
+            var resultString = "1";
+            var prevResultStrings = new System.Collections.Generic.Dictionary<string, int>();
+
+            BehaviorTree bt1 = new BehaviorTreeBuilder("RandomSequenceTest")
+                .RandomSequence("Random sequence")
+                    .Do("Action 1", () =>
+                    {
+                        resultString += 1;
+                        return Status.FAILURE;
+                    })
+                    .Do("Action 2", () =>
+                    {
+                        resultString += 2;
+                        return Status.FAILURE;
+                    })
+                    .Do("Action 3", () =>
+                    {
+                        resultString += 3;
+                        return Status.FAILURE;
+                    })
+                    .End()
+                .End();
+
+            // This is to make sure the results are at least somewhat uniform
+            for (int i = 0; i < repetitions; i++)
+            {
+                resultString = string.Empty;
+                bt1.Tick();
+                if (prevResultStrings.ContainsKey(resultString))
+                {
+                    prevResultStrings[resultString]++;
+                }
+                else
+                {
+                    prevResultStrings.Add(resultString, 1);
+                }
+            }
+            // There should be 3 permutations: 1, 2, 3 
+            int permutations = 3;
+            int deviation = 100;
+            Assert.AreEqual(permutations, prevResultStrings.Count);
+            var average = repetitions / prevResultStrings.Count;
+            Assert.IsTrue(prevResultStrings.All(e =>
+            {
+                return Math.Abs(e.Value - average) <= deviation;
+            }));
+
+            BehaviorTree bt2 = new BehaviorTreeBuilder("RandomSequenceTest")
+            .RandomSequence("Random sequence")
+                .Do("Action 1", () =>
+                {
+                    resultString += 1;
+                    return Status.FAILURE;
+                })
+                .Do("Action 2", () =>
+                {
+                    resultString += 2;
+                    return Status.FAILURE;
+                })
+                .End()
+            .End();
+
+            resultString = "1";
+            prevResultStrings.Clear();
+
+            // This is to make sure the results are at least somewhat uniform
+            for (int i = 0; i < repetitions; i++)
+            {
+                resultString = string.Empty;
+                bt2.Tick();
+                if (prevResultStrings.ContainsKey(resultString))
+                {
+                    prevResultStrings[resultString]++;
+                }
+                else
+                {
+                    prevResultStrings.Add(resultString, 1);
+                }
+            }
+
+            // There should be 2 permutations: 1, 2
+            permutations = 2;
+            deviation = 100;
+            Assert.AreEqual(permutations, prevResultStrings.Count);
+            average = repetitions / prevResultStrings.Count;
+            Assert.IsTrue(prevResultStrings.All(e =>
+            {
+                return Math.Abs(e.Value - average) <= deviation;
+            }));
+        }
 
         [TestMethod]
         public void RandomSelectorBoolTest()
@@ -620,6 +800,101 @@ namespace BTTests
             ResetN();
             Assert.AreEqual(Status.RUNNING, RandomSelector(ReturnFAILUREOnN, ReturnFAILURE, ReturnFAILUREOnN, N - 1));
             Assert.AreEqual(3, leafExecuted);
+        }
+
+        [TestMethod]
+        public void RandomSelectorShuffleTest()
+        {
+            const int repetitions = 10000;
+            var resultString = "1";
+            var prevResultStrings = new System.Collections.Generic.Dictionary<string, int>();
+
+            BehaviorTree bt1 = new BehaviorTreeBuilder("RandomSelectorTest")
+                .RandomSelector("Random selector")
+                    .Do("Action 1", () =>
+                    {
+                        resultString += 1;
+                        return Status.SUCCESS;
+                    })
+                    .Do("Action 2", () =>
+                    {
+                        resultString += 2;
+                        return Status.SUCCESS;
+                    })
+                    .Do("Action 3", () =>
+                    {
+                        resultString += 3;
+                        return Status.SUCCESS;
+                    })
+                    .End()
+                .End();
+
+            // This is to make sure the results are at least somewhat uniform
+            for (int i = 0; i < repetitions; i++)
+            {
+                resultString = string.Empty;
+                bt1.Tick();
+                if (prevResultStrings.ContainsKey(resultString))
+                {
+                    prevResultStrings[resultString]++;
+                }
+                else
+                {
+                    prevResultStrings.Add(resultString, 1);
+                }
+            }
+            // There should be 3 permutations: 1, 2, 3 
+            int permutations = 3;
+            int deviation = 100;
+            Assert.AreEqual(permutations, prevResultStrings.Count);
+            var average = repetitions / prevResultStrings.Count;
+            Assert.IsTrue(prevResultStrings.All(e =>
+            {
+                return Math.Abs(e.Value - average) <= deviation;
+            }));
+
+            BehaviorTree bt2 = new BehaviorTreeBuilder("RandomSelectorTest")
+            .RandomSelector("Random selector")
+                .Do("Action 1", () =>
+                {
+                    resultString += 1;
+                    return Status.SUCCESS;
+                })
+                .Do("Action 2", () =>
+                {
+                    resultString += 2;
+                    return Status.SUCCESS;
+                })
+                .End()
+            .End();
+
+            resultString = "1";
+            prevResultStrings.Clear();
+
+            // This is to make sure the results are at least somewhat uniform
+            for (int i = 0; i < repetitions; i++)
+            {
+                resultString = string.Empty;
+                bt2.Tick();
+                if (prevResultStrings.ContainsKey(resultString))
+                {
+                    prevResultStrings[resultString]++;
+                }
+                else
+                {
+                    prevResultStrings.Add(resultString, 1);
+                }
+            }
+
+            // There should be 2 permutations: 1, 2
+            permutations = 2;
+            deviation = 100;
+            Assert.AreEqual(permutations, prevResultStrings.Count);
+            average = repetitions / prevResultStrings.Count;
+            Assert.IsTrue(prevResultStrings.All(e =>
+            {
+                return Math.Abs(e.Value - average) <= deviation;
+            }));
         }
 
         // Decorators
@@ -760,11 +1035,11 @@ namespace BTTests
         {
             BehaviorTree subtree = new BehaviorTreeBuilder("Subtree")
                 .Do("Action", function)
-                .End();
+            .End();
 
             BehaviorTree bt = new BehaviorTreeBuilder("SubtreeTest")
                 .Do("Action", subtree)
-                .End();
+            .End();
 
             Status result = bt.Tick();
 

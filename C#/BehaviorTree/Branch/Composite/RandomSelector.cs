@@ -17,5 +17,15 @@ namespace FluentBehaviorTree
 
             children.Shuffle();
         }
+
+        public override object Clone()
+        {
+            Selector newNode = new RandomSelector(this.Name);
+            for (int i = 0, size = children.Count; i < size; ++i)
+            {
+                newNode.AddChild(children[i].Clone() as Node);
+            }
+            return newNode;
+        }
     }
 }
